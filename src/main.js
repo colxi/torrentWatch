@@ -1,10 +1,7 @@
 (function(){
 	'use strict';
 
-
 	var observers = {};
-
-
 
 	window.app = {
 		feeds : [
@@ -31,11 +28,17 @@
 				items 		: {}
 			}
 		],
-		init : document.addEventListener('DOMContentLoaded', function() {
-  			app.init = true;
+		_init : document.addEventListener('DOMContentLoaded', function() {
   			console.log("Starting Torrent Observer");
+  			delete app._init;
+
+  			// set html file for toolbar icon popup
+  			chrome.browserAction.setPopup( {popup:'views/popup/popup.html'} );
+			app.popup = chrome.extension.getViews()[1].document;
+
 			app.updateAllFeeds().then(function(){ console.log('Init done'); });
 		}),
+		popup : null,
 		updateAllFeeds : function(){
 			return new Promise(function(resolve, reject){
 				console.log('app.updateAllFeeds(): Updating all Feeds...');
@@ -85,10 +88,6 @@
 		}
 	};
 
-
-	chrome.browserAction.onClicked.addListener(function() {
-
-	})
 
 })();
 

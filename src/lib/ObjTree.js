@@ -1,13 +1,13 @@
-/* 
- *	Based on ObjTree.js from 
- *	Yusuke Kawasaki http://www.kawa.net/ 
+/*
+ *	Based on ObjTree.js from
+ *	Yusuke Kawasaki http://www.kawa.net/
  *
 */
 
-// If running in Node.js, need package library 'xmldom'. 
+// If running in Node.js, need package library 'xmldom'.
 // Provides the DOMParser object. Everything else stays the same!
 if (typeof window === 'undefined') {
-	var DOMParser = require('xmldom').DOMParser;	
+	var DOMParser = require('xmldom').DOMParser;
 
 	var window = {};
 	window.DOMParser = true;
@@ -15,7 +15,7 @@ if (typeof window === 'undefined') {
 
 (function(global) {
 	var XML;
-	
+
 	// ========================================================================
 	//  XML.ObjTree -- XML source code from/to JavaScript object like E4X
 	// ========================================================================
@@ -307,7 +307,7 @@ if (typeof window === 'undefined') {
 	XML.ObjTree.prototype.xml_escape = function ( text ) {
 	    return String(text).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 	};
-	
+
 	if (typeof exports !== 'undefined') {
 		if (typeof module !== 'undefined' && module.exports) {
 	      exports = module.exports = XML;
@@ -319,8 +319,8 @@ if (typeof window === 'undefined') {
 		}
 		global.UTIL.XML = XML;
 	}
-	
-}(this));
+
+}(window));
 
 
 /*
