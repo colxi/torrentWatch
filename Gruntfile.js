@@ -2,61 +2,31 @@ module.exports = function(grunt) {
 	grunt.initConfig({
 		pkg: grunt.file.readJSON('package.json'),
 		clean: {
-			task: {
-				src: ['source'],
-				dest: 'destination'
-			},
-			options: {
-				'force': false,
-				'no-write': false
-			}
+			options: { 'force': false, 'no-write': false },
+			//
+			build_dir: { src: ['build/**'] },
+			build_scripts:{ src: ['build/js/**/*.js'] }
 		},
-		autoprefixer: {
-			task: {
-				src: ['source'],
-				dest: 'destination'
-			},
-			options: {
-				'browsers': ['> 1%', 'last 2 versions', 'Firefox ESR', 'Opera 12.1'],
-				'cascade': true,
-				'diff': false,
-				'map': false,
-				'silent': false
-			}
+		copy: {
+		  	all_to_build: {
+		    	files: [ {expand: true, cwd: 'src/', src: ['**'], dest: 'build/'} ]
+		  	},
 		},
-		sass: {
-			task: {
-				src: ['source'],
-				dest: 'destination'
-			},
-			options: {
-				'sourcemap': 'auto',
-				'trace': false,
-				'unixNewlines': false,
-				'check': false,
-				'style': 'nested',
-				'precision': 3,
-				'quiet': false,
-				'compass': false,
-				'debugInfo': false,
-				'lineNumbers': false,
-				'loadPath': [],
-				'require': [],
-				'cacheLocation': '.sass-cache',
-				'noCache': false,
-				'bundleExec': false,
-				'banner': '',
-				'update': false
-			}
+	    babel : {
+		    options: { babelrc: ".babelrc" , sourceMap: true},
+		    //
+		    src_to_build: {
+		        files: [ {expand: true, cwd: 'src/js/',  src: ['**/*.js'],  dest: 'build/js/'} ]
+		    }
 		},
-		watch: {
-			task: {
-				src: ['source'],
-				dest: 'destination'
+	    watch: {
+			src_scripts: {
+				files: ['src/js/**/*.js'],
+				tasks: ['babel'],
 			},
 			options: {
 				'spawn': true,
-				'interrupt': false,
+				'interrupt': true,
 				'debounceDelay': 500,
 				'interval': 100,
 				'event': 'all',
@@ -72,9 +42,15 @@ module.exports = function(grunt) {
 	});
 
 	grunt.loadNpmTasks('grunt-contrib-clean');
-	grunt.loadNpmTasks('grunt-autoprefixer');
-	grunt.loadNpmTasks('grunt-contrib-sass');
+	grunt.loadNpmTasks('grunt-contrib-copy');
+	grunt.loadNpmTasks('grunt-babel');
 	grunt.loadNpmTasks('grunt-contrib-watch');
 
-	grunt.registerTask('default', ['clean', 'autoprefixer', 'sass', 'watch']);
+	grunt.registerTask('default', [
+		'clean:build_dir',
+		'copy:all_to_build',
+		'clean:build_scripts',
+		'babel:src_to_build',
+		'watch:src_scripts'
+	]);
 };
