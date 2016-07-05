@@ -1,25 +1,24 @@
 {
-  "manifest_version": 2,
-
-  "name": "Torrent Watch",
-  "description": "This extension alerts user when torrent file is released",
-  "version": "0.0.1",
-
-  "default_locale": "en",
-
-  "background": {
-    "scripts": ["lib/ObjTree.js" , "main.js"]
-  },
-
-  "browser_action": {
-    "default_icon": {
-      "19": "img/icon_19.png",
-      "38": "img/icon_38.png"
-    }
-  },
-
-  "permissions": [
-    "http://*/",
-    "https://*/"
-  ]
+	"version": "0.0.54",
+	"manifest_version": 2,
+	"name": "Torrent Watch : Alerts on torrent releases",
+	"description": "This extension alerts user when torrent file is released",
+	"default_locale": "en",
+	"background": {
+		"scripts": [
+			"scripts/lib/ObjTree.js",
+			"scripts/main.js"
+		]
+	},
+	"browser_action": {
+		"default_icon": {
+			"19": "img/icon_19.png",
+			"38": "img/icon_38.png"
+		}
+	},
+	"permissions": [
+		"storage",
+		"http://*/",
+		"https://*/"
+	]
 }

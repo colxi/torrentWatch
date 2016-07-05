@@ -1,18 +1,38 @@
 <!doctype html>
-<!--
- This page is shown when the extension button is clicked, because the
- "browser_action" field in manifest.json contains the "default_popup" key with
- value "popup.html".
- -->
 <html>
   <head>
+	<link rel="stylesheet" type="text/css" href="../../styles/reset.css">
+	<link rel="stylesheet" type="text/css" href="../../styles/styles.css">
+	<script src="../../scripts/popup.js"></script>
   </head>
   <body>
-    <ul id="options">
-      <li id="add_feed">Add a New RSS Feed</li>
-      <li>Update All RSS Feeds</li>
-    </ul>
-    <img id="image-result" hidden>
+    <div id="wrapper">
+    	<div id="add_category" class="btn btn-primary">Add a New RSS Feed</div>
+    	<div id="add_feed" class="btn btn-primary">Add a New RSS Feed</div>
+      	<form id="new_feed_form">
+			<div>
+				<label>Name:</label>
+				<input type="text" name="name">
+			</div>
+			<div>
+				<label>Url:</label>
+				<input type="url" name="url">
+			</div>
+			<div>
+				<label>Check Interval (ttl : <span class="new_feed_form__ttl_preview"></span>min.):</label>
+				<input type="range" name="ttl" min="0" max="120" value="60" step="5">
+			</div>
+			<div>
+				<label>Watched Property :</label>
+				<select name="property">
+					<option></option>
+					<option></option>
+					<option></option>
+				</select>
+			</div>
+      	</form>
+      	<div id="update_all_feed" class="btn btn-primary">Update All RSS Feeds</div>
+    </div>
   </body>
 </html>
 

@@ -1,0 +1,41 @@
+body{
+    background-color: #e0e0fc;
+    width: 400px;
+    margin: 0px;
+    padding: 0px;
+    font-size: 14px;
+    font-family: Arial;
+
+}
+
+*{ box-sizing:border-box; }
+
+#wrapper {
+    padding: 15px;
+    display: block;
+}
+
+#new_feed_form{
+	background: #c2c2d4;
+    padding: 30px;
+}
+
+#new_feed_form>div{
+	margin-bottom:10px
+}
+
+label{
+	display:block;
+}
+
+input{ width:100%}
+select{ width:100%}
+
+.btn{
+    padding: 10px 10px;
+    background-color: #6d6d7f;
+    color: #fff;
+    margin-top: 10px;
+    display: block;
+    cursor:pointer;
+}
