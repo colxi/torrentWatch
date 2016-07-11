@@ -1,33 +1,67 @@
+var chrome, rivets, view, app;
+
 (function(){
 	'use strict';
 
-	document.addEventListener('DOMContentLoaded', function() {
-		console.log('Popup opened!');
-		var popup = {
-			// main buttons
-			addFeed 				: querySelector('#add_feed'),
-			updateAllFeed 			: querySelector('#update_all_feed'),
-			// form
-			newFeedForm				: querySelector('#new_feed_form'),
-			newFeedForm_name		: querySelector('#new_feed_form [name]'),
-			newFeedForm_url			: querySelector('#new_feed_form [url]'),
-			newFeedForm_ttl			: querySelector('#new_feed_form [ttl]'),
-			newFeedForm_ttl_preview	: querySelector('#new_feed_form .new_feed_form__ttl_preview'),
-			newFeedForm_property	: querySelector('#new_feed_form [property]'),
-			newFeedForm_property_	: querySelector('#new_feed_form [property]'),
-		};
+	view = {
+		_init : document.addEventListener('DOMContentLoaded', function() {
+			console.log('Popup opened!');
+			app = chrome.extension.getBackgroundPage().app;
+			view.categories = app.categories;
+			view.feeds 		= app.feed;
+			view.logStore 	= app.logStore;
+			rivets.bind( document.querySelector('#app-wrapper') , { view : view } );
+		}),
+		categories 	: null,
+		feeds 		: null,
+		logStore	: null,
+		//
+		category : {
+			form : {
+				name 		: '',
+				validates 	: true,
+			},
+			add : function(){
+				view.category.form.name = view.category.form.name.trim().toLowerCase();
+				view.category.form.validates  = true;
+				// validate category name
+				if( view.category.form.name.length === 0 || app.getCategoryByName(view.category.form.name) !== -1 ) view.category.form.validates  = false;
+				if(!view.category.form.validates) return false;
 
+				// create category
+				view.categories.push({
+					id: app.createGuid(),
+					name: view.category.form.name,
+					feeds:0
+				});
 
-		var form = {
+				// reset input
+				view.category.form.name 		= '';
+				view.category.form.validates = true;
+				return true;
+			},
+			remove: function(e,i){
+				view.categories.splice(i.index, 1);
+				return true;
+			}
+		},
+		feed : {
+			form : {
+				step : 'form-data',
+				name : {
+					value : '',
+					validates : true
+				},
+				url : {
+					value: '',
+					validates: false
+				}
+			},
+			validate : function(){
+				app.getFeed(view.feed.form.url.value).then( r=>console.log(r) );
+			}
+		}
 
-		};
-		document.querySelector('#new_feed_form .new_feed_form__range').innerHTML = 12;
-
-		document.getElementById('add_feed').addEventListener("click",function(){
-
-		});
-	});
-
-
+	};
 
 })();

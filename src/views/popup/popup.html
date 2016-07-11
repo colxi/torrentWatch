@@ -3,35 +3,64 @@
   <head>
 	<link rel="stylesheet" type="text/css" href="../../styles/reset.css">
 	<link rel="stylesheet" type="text/css" href="../../styles/styles.css">
+	<link rel="stylesheet" type="text/css" href="../../styles/imports/font-awesome/css/font-awesome.css">
+	<script src="../../scripts/imports/sightglass/index.js"></script>
+	<script src="../../scripts/imports/rivets/rivets.js"></script>
+	<script src="../../scripts/lib/rivets.formaters.js"></script>
 	<script src="../../scripts/popup.js"></script>
   </head>
   <body>
-    <div id="wrapper">
-    	<div id="add_category" class="btn btn-primary">Add a New RSS Feed</div>
-    	<div id="add_feed" class="btn btn-primary">Add a New RSS Feed</div>
-      	<form id="new_feed_form">
-			<div>
-				<label>Name:</label>
-				<input type="text" name="name">
+    <div id="app-wrapper">
+    	<!-- categories -->
+    	<div class="btn btn-primary">RSS Categories<span class="fa fa-angle-double-down fa-pull-right"></span></div>
+    	<div class="form">
+    		<div class="row">
+    			<div class="column-80">
+    				<input type="text" rv-value="view.category.form.name" rv-class-invalid="view.category.form.validates | negate">
+    			</div>
+    			<div class="column-20" rv-on-click="view.category.add"><div class="btn btn-primary fa fa-plus"></div></div>
+    		</div>
+    		<div class="row">
+				<span rv-each-category="view.categories" class="tag" rv-on-click="view.category.remove">
+					{category.name} ({category.feeds} feeds)
+				</span>
+    		</div>
+    	</div>
+    	<!-- feeds -->
+    	<div class="btn btn-primary">RSS Feeds<span class="fa fa-angle-double-down fa-pull-right"></span></div>
+  		<div class="form">
+	  		<!-- feed form feedData -->
+	  		<div class="row" rv-show="view.feed.form.step | eq 'form-data'">
+				<div>
+					<input type="text" rv-value="view.feed.form.name.value">
+					<label>Name:</label>
+				</div>
+				<div>
+					<input type="url" rv-value="view.feed.form.url.value">
+					<label>Url:</label>
+				</div>
+				<div class="btn btn-primary" rv-on-click="view.feed.validate">Validate Feed<div class="fa fa-plus"></div></div>
 			</div>
-			<div>
-				<label>Url:</label>
-				<input type="url" name="url">
+	  		<!-- feed form feedConfig -->
+			<div class="row" rv-show="view.feed.form.step | eq 'form-config'">
+				<div>
+					<label>Check Interval (ttl : <span class="new_feed_form__ttl_preview">{}</span>min.):</label>
+					<input type="range" name="ttl" min="0" max="120" rv-value="item.name" step="5">
+				</div>
+				<div>
+					<label>Watched Property :</label>
+					<select name="property">
+						<option></option>
+						<option></option>
+						<option></option>
+					</select>
+				</div>
 			</div>
-			<div>
-				<label>Check Interval (ttl : <span class="new_feed_form__ttl_preview"></span>min.):</label>
-				<input type="range" name="ttl" min="0" max="120" value="60" step="5">
-			</div>
-			<div>
-				<label>Watched Property :</label>
-				<select name="property">
-					<option></option>
-					<option></option>
-					<option></option>
-				</select>
-			</div>
-      	</form>
+		</div>
       	<div id="update_all_feed" class="btn btn-primary">Update All RSS Feeds</div>
+      	<div class="log-output">
+      		<div rv-each-log="view.logStore">{log}</div>
+      	</div>
     </div>
   </body>
 </html>

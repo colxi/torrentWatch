@@ -1,4 +1,5 @@
 module.exports = function(grunt) {
+	'use strict';
 
 	grunt.loadNpmTasks('grunt-concurrent');
 	grunt.loadNpmTasks('grunt-increase');
@@ -10,25 +11,23 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-output');
 	grunt.loadNpmTasks('grunt-auto-install');
 
-
-	var nodeModule = {
-		fontAwesome : { cwd : 'node_modules/font-awesome/'	, src: ['css/**' , 'fonts/**'] 	 , 	dest: 'src/styles/imports/font-awesome/'	},
-		rivets 		: { cwd : 'node_modules/rivets/dist/'	, src: ['rivets.bundled.min.js'] , 	dest: 'src/scripts/imports/rivets/' 		}
+	// Declaration of each node Module Package...
+	const nodeModule = {
+		fontAwesome : { cwd : 'node_modules/font-awesome/'	, src: ['css/**' , 'fonts/**'] 	, dest: 'src/styles/imports/font-awesome/'	, expand: true },
+		rivets 		: { cwd : 'node_modules/rivets/dist/'	, src: ['rivets.js'] 			, dest: 'src/scripts/imports/rivets/' 		, expand: true },
+		sightglass	: { cwd : 'node_modules/sightglass/'	, src: ['index.js'] 			, dest: 'src/scripts/imports/sightglass/' 	, expand: true }
 	};
+	// Automatic generations ...
+	const src_PATH_nodeModules = Object.keys(nodeModule).map( i=> nodeModule[i].dest );
+	const nodeModules_TO_src = Object.keys(nodeModule).map( i=> nodeModule[i] );
 
-	var src_PATH_nodeModules = [];
-	for(var module in nodeModule) src_PATH_nodeModules.push( nodeModule[module].dest );
+
 
 	grunt.initConfig({
-		pkg: grunt.file.readJSON('package.json'),
 	    /*
-	    /* EXECUTE npm -install
+	    /* EXECUTE automatic 'npm -install'
 	    */
-	    auto_install: {
-	    	npm : {
-	    		/*no config needed*/
-	    	}
-	    },
+	    auto_install: { npm : { /*no config needed*/ } },
 		/*
 		/* ¿ GRUNT-OUTPUT install FAILS ? :
 		/* Manual Patch Required! Details in following link:
@@ -57,7 +56,8 @@ module.exports = function(grunt) {
 	    	}
 		},
 		/*
-		/* INCREMENT x.x.x Version Values : MAJOR  / MINOR / MICRO
+		/* INCREASE by 1 the selected counter of a 'major.minor.micro' type Version
+		/* string (eg: 1.6.54). Only targets JSON files, with a 'version' property.
 		*/
 		increase: {
 			major_IN_package 	: { degree: 1, json:  'package.json' 		},
@@ -73,19 +73,17 @@ module.exports = function(grunt) {
 		/* DELETE
 		*/
 		clean: {
-			build_all		: { src: ['build/'] 				},
-			build_scripts	: { src: ['build/scripts/**/*.js'] 	},
-			build_views		: { src: ['build/views/**'] 		},
-			build_styles	: { src: ['build/styles/**'] 		},
-			src_nodeModules : { src: src_PATH_nodeModules 		}
+			build_all			: { src: ['build/'] 				},
+			build_scripts		: { src: ['build/scripts/**/*.js'] 	},
+			build_scripts_es6 	: { src: ['build/scripts/**/*.es6'] },
+			build_views			: { src: ['build/views/'] 			},
+			build_styles		: { src: ['build/style/'] 			},
+			src_nodeModules 	: { src: src_PATH_nodeModules 		}
 		},
 		/* COPY */
 		copy: {
 			nodeModules_TO_src :{
-				files: [
-					{ expand: true, cwd: nodeModule.fontAwesome.cwd , src: nodeModule.fontAwesome.src 	, dest: nodeModule.fontAwesome.dest },
-					{ expand: true, cwd: nodeModule.rivets.cwd 		, src: nodeModule.rivets.src 		, dest: nodeModule.rivets.dest 		}
-				]
+				files:  nodeModules_TO_src
 			},
 		  	src_TO_build: {
 		    	files: [ {expand: true, cwd: 'src/', src: ['**'], dest: 'build/'} ]
@@ -102,29 +100,30 @@ module.exports = function(grunt) {
 		},
 		/* JS ES6 TRANSPILER */
 	    babel : {
-		    options: { babelrc: ".babelrc" , sourceMap: true },
-		    //
+		    options: { babelrc: '.babelrc' , sourceMap: true },
 		    src_scripts_TO_build: {
 		        files: [
 		        	{
 		        		expand: true,
 		        		cwd: 'src/scripts/',
 		        		dest: 'build/scripts/',
-		        		src: ['**/*.es6', '**/*.js'],
-						ext: '.js'
+		        		src: ['**/*.es6'],
+						ext: '.js',
+						extDot: 'last'
 		        	}
 		        ]
-
 		    }
 		},
 	    watch: {
 			src_scripts: {
-				files: ['src/scripts/**/*.es6', 'src/scripts/**/*.js'],
+				files: ['src/scripts/**/*'],
 				tasks: [
 					'output:divider:Watch Event (src_scripts)',
 					'clean:build_scripts',
+					'copy:src_TO_build',
+					'clean:build_scripts_es6',
 					'babel:src_scripts_TO_build',
-					'versionUp-u',
+					'versionUp.u',
 					'notify_hooks'
 				],
 			},
@@ -134,7 +133,7 @@ module.exports = function(grunt) {
 					'output:divider:Watch Event (src_views)',
 					'clean:build_views',
 					'copy:src_views_TO_build',
-					'versionUp-u',
+					'versionUp.u',
 					'notify_hooks'
 				]
 			},
@@ -144,7 +143,7 @@ module.exports = function(grunt) {
 					'output:divider:Watch Event (src_styles)',
 					'clean:build_styles',
 					'copy:src_styles_TO_build',
-					'versionUp-u',
+					'versionUp.u',
 					'notify_hooks'
 				]
 			},
@@ -176,13 +175,10 @@ module.exports = function(grunt) {
 	});
 
 
+	grunt.registerTask('versionUp.M', ['increase:major_IN_package', 'increase:major_IN_manifest', 'copy:src_manifest_TO_build']);
+	grunt.registerTask('versionUp.m', ['increase:minor_IN_package', 'increase:minor_IN_manifest', 'copy:src_manifest_TO_build']);
+	grunt.registerTask('versionUp.u', ['increase:micro_IN_package', 'increase:micro_IN_manifest', 'copy:src_manifest_TO_build']);
 
-
-
-
-	grunt.registerTask('versionUp-M', ['increase:major_IN_package', 'increase:major_IN_manifest', 'copy:src_manifest_TO_build']);
-	grunt.registerTask('versionUp-m', ['increase:minor_IN_package', 'increase:minor_IN_manifest', 'copy:src_manifest_TO_build']);
-	grunt.registerTask('versionUp-u', ['increase:micro_IN_package', 'increase:micro_IN_manifest', 'copy:src_manifest_TO_build']);
 
 	// GRUNT MAIN TASK!
 	grunt.registerTask('default', [
@@ -197,7 +193,7 @@ module.exports = function(grunt) {
 		'copy:src_TO_build',
 		// clean just copied ./build/scripts dir,
 		// and run transpiler to output there .src/scripts/**
-		'clean:build_scripts',
+		'clean:build_scripts_es6',
 		'babel:src_scripts_TO_build',
 		// run watches&notify
 		'concurrent:watches'
