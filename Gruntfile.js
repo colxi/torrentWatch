@@ -10,6 +10,8 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-notify');
 	grunt.loadNpmTasks('grunt-output');
 	grunt.loadNpmTasks('grunt-auto-install');
+	grunt.loadNpmTasks('grunt-contrib-compass');
+
 
 	// Declaration of each node Module Package...
 	const nodeModule = {
@@ -78,6 +80,7 @@ module.exports = function(grunt) {
 			build_scripts_es6 	: { src: ['build/scripts/**/*.es6'] },
 			build_views			: { src: ['build/views/'] 			},
 			build_styles		: { src: ['build/style/'] 			},
+			build_styles_scss	: { src: ['build/style/'] 			},
 			src_nodeModules 	: { src: src_PATH_nodeModules 		}
 		},
 		/* COPY */
@@ -88,20 +91,23 @@ module.exports = function(grunt) {
 		  	src_TO_build: {
 		    	files: [ {expand: true, cwd: 'src/', src: ['**'], dest: 'build/'} ]
 		  	},
-		  	src_manifest_TO_build: {
-		  		files: [ {expand: true, cwd: 'src/', src: ['manifest.json'], dest: 'build/'} ]
+		  	src_scripts_TO_build: {
+		    	files: [ {expand: true, cwd: 'src/scripts/', src: ['**'], dest: 'build/scripts/'} ]
 		  	},
 		  	src_views_TO_build: {
 		  		files: [ {expand: true, cwd: 'src/views/', src: ['**'], dest: 'build/views/'} ]
 		  	},
-		  	src_styles_TO_build: {
-		  		files: [ {expand: true, cwd: 'src/styles/', src: ['**'], dest: 'build/styles/'} ]
+		  	src_styles_css_TO_build: {
+		  		files: [ {expand: true, cwd: 'src/styles/', src: ['**/*.css'], dest: 'build/styles/'} ]
+		  	},
+		  	src_manifest_TO_build: {
+		  		files: [ {expand: true, cwd: 'src/', src: ['manifest.json'], dest: 'build/'} ]
 		  	}
 		},
 		/* JS ES6 TRANSPILER */
 	    babel : {
 		    options: { babelrc: '.babelrc' , sourceMap: true },
-		    src_scripts_TO_build: {
+		    src_scripts_es6_TO_build: {
 		        files: [
 		        	{
 		        		expand: true,
@@ -114,21 +120,30 @@ module.exports = function(grunt) {
 		        ]
 		    }
 		},
+		compass: {
+			src_styles_scss_TO_build: {
+				options: {
+					sassDir: 'src/css',
+					cssDir: 'build/css',
+					importPath : 'src/css'
+				}
+			}
+		},
 	    watch: {
 			src_scripts: {
 				files: ['src/scripts/**/*'],
 				tasks: [
 					'output:divider:Watch Event (src_scripts)',
 					'clean:build_scripts',
-					'copy:src_TO_build',
+					'copy:src_scripts_TO_build',
 					'clean:build_scripts_es6',
-					'babel:src_scripts_TO_build',
+					'babel:src_scripts_es6_TO_build',
 					'versionUp.u',
 					'notify_hooks'
 				],
 			},
 			src_views : {
-				files: ['src/views/**/*.html'],
+				files: ['src/views/**/*'],
 				tasks: [
 					'output:divider:Watch Event (src_views)',
 					'clean:build_views',
@@ -138,11 +153,12 @@ module.exports = function(grunt) {
 				]
 			},
 			src_styles : {
-				files: ['src/styles/**/*.css'],
+				files: ['src/styles/**/*'],
 				tasks: [
 					'output:divider:Watch Event (src_styles)',
 					'clean:build_styles',
-					'copy:src_styles_TO_build',
+					'copy:src_styles_css_TO_build',
+					'compass:src_styles_scss_TO_build',
 					'versionUp.u',
 					'notify_hooks'
 				]
@@ -191,10 +207,13 @@ module.exports = function(grunt) {
 		// clean ./build/** and dump ./src data inside
 		'clean:build_all',
 		'copy:src_TO_build',
-		// clean just copied ./build/scripts dir,
+		// clean es6 files , just copied to ./build/scripts/ dir,
 		// and run transpiler to output there .src/scripts/**
 		'clean:build_scripts_es6',
-		'babel:src_scripts_TO_build',
+		'babel:src_scripts_es6_TO_build',
+		//
+		'clean:build_styles_scss',
+		'compass:src_styles_scss_TO_build',
 		// run watches&notify
 		'concurrent:watches'
 		// ./build ready !

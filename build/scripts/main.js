@@ -7,6 +7,75 @@ var app, chrome;
 
 	app = {
 		/**
+   * [description]
+   * @param  {[type]} )
+   * @return {[type]}   [description]
+   */
+		_init: document.addEventListener('DOMContentLoaded', function () {
+			return app.require('lib/JSON.parseXML').then(function () {
+				app.getManifest();
+				app.log('Starting Torrent Observer v.' + app.getVersion());
+
+				// set html file for toolbar icon popup
+				chrome.browserAction.setPopup({ popup: 'views/popup/popup.html' });
+				chrome.browserAction.onClicked.addListener(function () {
+					app.popup = chrome.extension.getViews()[1].document;
+					app.log('Popup opened');
+				});
+
+				app.countFeedsinAllCategories();
+				app.getAllFeeds().then(function () {
+					app.log('Init done');
+				});
+
+				delete app._init;
+			});
+		}),
+		/**
+   * [require description]
+   * @param  {[type]} url [description]
+   * @return {[type]}     [description]
+   */
+		require: function () {
+			var config = {
+				baseUrl: 'scripts/'
+			};
+			var _require = function _require(src) {
+				return new Promise(function (resolve, reject) {
+					var filename = src.substring(src.lastIndexOf('/') + 1);
+					// if no extension, assume .JS and extract again the filenamename
+					if (filename.lastIndexOf('.js') === -1) {
+						src = src + '.js';
+						filename = src.substring(src.lastIndexOf('/') + 1);
+					}
+					// Adding the script tag to the head
+					var done = false;
+					var head = document.getElementsByTagName('head')[0];
+					var script = document.createElement('script');
+					script.type = 'text/javascript';
+					script.src = config.baseUrl + src;
+					app.log(script.src);
+					script.onload = script.onreadystatechange = function () {
+						// attach to both events for cross browser finish detection:
+						if (!done && (!this.readyState || this.readyState === 'loaded' || this.readyState === 'complete')) {
+							// done! execute PROMISE RESOLVE
+							done = true;
+							// cleans up a little memory, removing listener;
+							script.onload = script.onreadystatechange = null;
+							resolve();
+						}
+					};
+					// Fire the loading
+					head.appendChild(script);
+				});
+			};
+			_require.config = function (custom_config) {
+				Object.assign(config, custom_config);
+				return true;
+			};
+			return _require;
+		}(),
+		/**
    * [feeds description]
    * @type {Array}
    */
@@ -28,29 +97,37 @@ var app, chrome;
 			feeds: 0
 		}],
 		feeds: [{
-			id: 0,
+			id: 'eeed24d2-be2f-42bc-dc3a-3ebf9ba4eff3',
+			name: 'Kat (All)',
+			url: 'https://kat.cr/?rss=1',
+			properies: ['title'],
+			TTL: 10,
+			categories: ['f11d24b3-be2f-4bdd-d0e0-2ebf9ba0f5c7', 'dd63224e-b59c-4b41-5f99-c63cffbbafe4', '44748d67-be92-47a9-a5b6-de502f1e8cb5'],
+			lastUpdate: null
+		}, {
+			id: 'd44d24b3-af2f-12bd-abaa-2ebf9ba0f5c3',
 			name: 'Kat Movies',
 			url: 'https://kat.cr/movies/?rss=1',
-			property: 'title',
+			properies: ['title'],
 			TTL: 10,
 			categories: ['f11d24b3-be2f-4bdd-d0e0-2ebf9ba0f5c7'],
-			items: {}
+			lastUpdate: null
 		}, {
-			id: 1,
+			id: 'a34d24b3-cc2f-6add-b2f0-5ebe9ac0f521',
 			name: 'Mininova Movies',
 			url: 'http://www.mininova.org/rss.xml?cat=4',
-			property: 'title',
+			properies: ['title'],
 			TTL: 10,
 			categories: ['f11d24b3-be2f-4bdd-d0e0-2ebf9ba0f5c7'],
-			items: {}
+			lastUpdate: null
 		}, {
-			id: 2,
+			id: 'bdv424b6-cb1c-3aab-11b3-ac429bb0f530',
 			name: 'YIFY Movies',
 			url: 'https://yts.ag/rss',
-			property: 'title',
+			properies: ['title'],
 			TTL: 10,
 			categories: ['f11d24b3-be2f-4bdd-d0e0-2ebf9ba0f5c7'],
-			items: {}
+			lastUpdate: null
 		}],
 		logStore: [],
 		log: function log() {
@@ -75,29 +152,6 @@ var app, chrome;
 		getCurrentLocale: function getCurrentLocale() {
 			return chrome.app.getDetails().current_locale;
 		},
-		/**
-   * [description]
-   * @param  {[type]} )
-   * @return {[type]}   [description]
-   */
-		_init: document.addEventListener('DOMContentLoaded', function () {
-			app.getManifest();
-			app.log('Starting Torrent Observer v.' + app.getVersion());
-
-			// set html file for toolbar icon popup
-			chrome.browserAction.setPopup({ popup: 'views/popup/popup.html' });
-			chrome.browserAction.onClicked.addListener(function () {
-				app.popup = chrome.extension.getViews()[1].document;
-				app.log('Popup opened');
-			});
-
-			app.countFeedsinAllCategories();
-			app.getAllFeeds().then(function () {
-				app.log('Init done');
-			});
-
-			delete app._init;
-		}),
 		/**
    * [popup description]
    * @type {[type]}
@@ -179,17 +233,17 @@ var app, chrome;
 				request.open('get', feed.url, true);
 
 				// RESPONSE OK
-				request.onload = function (_http) {
+				request.onload = function () {
 					var parser = new DOMParser();
 					var xmlDoc = parser.parseFromString(request.responseText, 'text/xml');
-					app.log(xmlDoc);
-					//let xotree = new XML.ObjTree();
-					//request = null;
-					return resolve(true);
+					var JSONxml = JSON.parseXML(xmlDoc);
+
+					request = null;
+					return resolve(JSONxml);
 				};
 				// RESPONSE FAIL
-				request.onerror = function (_http) {
-					app.log('Error', request.statusText);
+				request.onerror = function () {
+					app.log('app.getFeed(): Error on request.', request.statusText);
 					request = null;
 					return resolve(false);
 				};

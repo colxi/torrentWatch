@@ -1,6 +1,14 @@
 'use strict';
 
-var rivets = rivets || null;
+if (typeof rivets === 'undefined') throw new Error('rivets.formaters.js : Rivets is not found. Formaters can\'t be setted!');
+
+rivets.formatters.call = function (value, arg1, arg2, arg3, arg4) {
+    return value(arg1, arg2, arg3, arg4);
+};
+
+rivets.formatters.set = function (value, variable) {
+    return variable = value;
+};
 
 // *** Data type
 
@@ -12,12 +20,24 @@ rivets.formatters.string = function (value) {
     return String(value);
 };
 
+rivets.formatters.trim = function (value) {
+    return typeof value === "undefined" ? '' : String(value).trim();
+};
+
 // *** Boolean negation
 
 rivets.formatters.negate = function (value) {
     return !value;
 };
 // eg: data-class-disabled="model.valid | negate"
+
+// *** inArray
+
+rivets.formatters.inArray = function (value, array) {
+    if (Object.prototype.toString.call(array) !== '[object Array]') return false;
+    return array.indexOf(value) === -1 ? false : true;
+};
+// eg: data-class-disable="model.foo | inArray namespace.myArray"
 
 // *** Equals
 

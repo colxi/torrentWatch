@@ -6,60 +6,124 @@
 	<link rel="stylesheet" type="text/css" href="../../styles/imports/font-awesome/css/font-awesome.css">
 	<script src="../../scripts/imports/sightglass/index.js"></script>
 	<script src="../../scripts/imports/rivets/rivets.js"></script>
-	<script src="../../scripts/lib/rivets.formaters.js"></script>
+	<script src="../../scripts/lib/rivets.stdlib.js"></script>
 	<script src="../../scripts/popup.js"></script>
   </head>
   <body>
     <div id="app-wrapper">
+    	<!-- header -->
+    	<div class="pg-row">
+    		<div class="pg-col-25">
+    			<div class="pg-btn" rv-on-click="view.currentTab | set 'tab-categories'">Groups<span class="fa fa-angle-double-down fa-pull-right"></span></div>
+    		</div>
+    		<div class="pg-col-25">
+    			<div class="pg-btn" rv-on-click="view.currentTab | set 'tab-feeds'">Feeds<span class="fa fa-angle-double-down fa-pull-right"></span></div>
+    		</div>
+    		<div class="pg-col-25">
+    			<div class="pg-btn" rv-on-click="view.currentTab | set 'tab-watchers'">Watchers<span class="fa fa-angle-double-down fa-pull-right"></span></div>
+    		</div>
+    		<div class="pg-col-25">
+    			<div class="pg-btn" rv-on-click="view.currentTab | set 'tab-config'">Config<span class="fa fa-angle-double-down fa-pull-right"></span></div>
+    		</div>
+    	</div>
+
     	<!-- categories -->
-    	<div class="btn btn-primary">RSS Categories<span class="fa fa-angle-double-down fa-pull-right"></span></div>
-    	<div class="form">
-    		<div class="row">
-    			<div class="column-80">
+    	<div class="pg-tab" rv-show="view.currentTab | === 'tab-categories'">
+    		<div class="pg-row">
+    			<div class="pg-col-80">
     				<input type="text" rv-value="view.category.form.name" rv-class-invalid="view.category.form.validates | negate">
     			</div>
-    			<div class="column-20" rv-on-click="view.category.add"><div class="btn btn-primary fa fa-plus"></div></div>
+    			<div class="pg-col-20" rv-on-click="view.category.add"><div class="pg-btn fa fa-plus"></div></div>
     		</div>
-    		<div class="row">
-				<span rv-each-category="view.categories" class="tag" rv-on-click="view.category.remove">
+    		<div class="pg-row">
+				<span rv-each-category="view.categories" class="pg-tag" rv-on-click="view.category.remove">
 					{category.name} ({category.feeds} feeds)
 				</span>
     		</div>
     	</div>
+
     	<!-- feeds -->
-    	<div class="btn btn-primary">RSS Feeds<span class="fa fa-angle-double-down fa-pull-right"></span></div>
-  		<div class="form">
+  		<div class="pg-tab" rv-show="view.currentTab | === 'tab-feeds'">
+	  		<!-- feeds listing -->
+			<header class="pg-row">
+				<h2 class="pg-col">Feeds :</h2>
+				<div class="pg-col pg-text-right">
+					<div class="pg-col pg-btn"><span class="fa fa-plus-circle"></span> Add</div>
+				</div>
+			</header>
+			<div class="pg-row">
+				<div class="pg-table pg-expand">
+					<div class="pg-row" rv-each-feed="view.feeds">
+						<div class="pg-col-30">
+							<div>{feed.name}</div>
+							<div class="pg-text-smaller">Last update: {feed.lastUpdate}</div>
+						</div>
+						<div class="pg-col pg-text-center">
+							<span class="pg-text-small" rv-each-category="feed.categories" >
+								{ view.categories | findBy 'id' category | getProperty 'name'} <span rv-hide="category | isLastIn feed.categories"> | </span>
+							</span>
+						</div>
+						<div class="pg-col-fixed">
+							<span class="fa fa-refresh pg-hover"></span>
+							<span class="fa fa-pencil pg-hover"></span>
+							<span class="fa fa-trash pg-hover"></span>
+						</div>
+					</div>
+				</div>
+			</div>
+
 	  		<!-- feed form feedData -->
-	  		<div class="row" rv-show="view.feed.form.step | eq 'form-data'">
-				<div>
-					<input type="text" rv-value="view.feed.form.name.value">
-					<label>Name:</label>
-				</div>
-				<div>
-					<input type="url" rv-value="view.feed.form.url.value">
-					<label>Url:</label>
-				</div>
-				<div class="btn btn-primary" rv-on-click="view.feed.validate">Validate Feed<div class="fa fa-plus"></div></div>
-			</div>
-	  		<!-- feed form feedConfig -->
-			<div class="row" rv-show="view.feed.form.step | eq 'form-config'">
-				<div>
-					<label>Check Interval (ttl : <span class="new_feed_form__ttl_preview">{}</span>min.):</label>
-					<input type="range" name="ttl" min="0" max="120" rv-value="item.name" step="5">
-				</div>
-				<div>
-					<label>Watched Property :</label>
-					<select name="property">
-						<option></option>
-						<option></option>
-						<option></option>
-					</select>
-				</div>
-			</div>
+	  		<form class="pg-row" hidden rv-on-submit="view.feed.showFormFeedConfig | preventDefault" rv-show="view.feed.helpers.formNav | === 'form-data'">
+				<label class="pg-form-control">
+					<input type="text" rv-value="view.feed.form.name" required pattern=".*\S+.*">
+					<span class="pg-label">Name:</span>
+				</label>
+				<label class="pg-form-control">
+					<input type="url" rv-value="view.feed.form.url" required pattern="https?://.+">
+					<span class="pg-label">Url:</span>
+				</label>
+				<div class="pg-form-control ph-text-center">
+					<label rv-each-category="view.categories">
+						<input type="checkbox" rv-on-click="view.toogleArrayItem | args category.name view.feed.form.categories" >
+						<span>{category.name}</span>
+					</label>
+					<input hidden type="text" rv-value="view.feed.form.categories | string" required pattern=".*\S+.*">
+					<span class="pg-label">Category:</span>
+    			</div>
+
+				 <button type="submit" >Validate Feed<div class="fa fa-plus"></div></button>
+			</form>
+			<form class="pg-row" rv-on-submit="view.feed.save | preventDefault" rv-show="view.feed.helpers.formNav | === 'form-config'">
+				<label class="pg-form-control">
+					<input type="range" min="0" max="120" rv-value="view.feed.form.TTL" step="5">
+					<span class="pg-label">Check Interval (ttl : <span>{view.feed.form.TTL}</span> minutes):</span>
+				</label>
+				<div class="pg-form-control pg-text-center">
+					<label rv-each-property="view.feed.helpers.feedProperties">
+						<input type="checkbox" rv-on-click="view.toogleArrayItem | args property view.feed.form.properties" >
+						<span>{property}</span>
+					</label>
+					<input hidden type="text" rv-value="view.feed.form.properties | string" required pattern=".*\S+.*">
+					<span class="pg-label">Search in Properties...</span>
+    			</div>
+
+    			<div class="pg-row">
+	    			<div class="pg-col-50">
+						 <button  type="button" rv-on-click="view.feed.showFormFeedData">Back...<div class="fa fa-plus"></div></button>
+	    			</div>
+	    			<div class="pg-col-50">
+					 	<button  type="submit" >Save Feed<div class="fa fa-plus"></div></button>
+	    			</div>
+    			</div>
+			</form>
 		</div>
-      	<div id="update_all_feed" class="btn btn-primary">Update All RSS Feeds</div>
-      	<div class="log-output">
-      		<div rv-each-log="view.logStore">{log}</div>
+
+		<!-- config -->
+      	<div class="pg-tab" rv-show="view.currentTab | === 'tab-config'">
+      		<h2>Log output:</h2>
+      		<div class="log-output">
+      			<div rv-each-log="view.logStore">{log}</div>
+      		</div>
       	</div>
     </div>
   </body>
