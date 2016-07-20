@@ -1,0 +1,57 @@
+$conf-reset-styles 		: true;
+
+/* FONTS & SIZES */
+@import 				'https://fonts.googleapis.com/css?family=Roboto:400,700';
+@import 				'https://fonts.googleapis.com/css?family=Roboto+Slab:400,700';
+
+$f-primary 				: 'Roboto' , Arial;
+$f-secondary 			: 'Roboto Slab' , Arial;
+
+$f-biggest 				: 20px;
+$f-bigger 				: 18px;
+$f-big 					: 16px;
+$f-size 				: 14px; // <--- Main size
+$f-small 				: 12px;
+$f-smaller 				: 10px;
+$f-smallest 			: 9px;
+
+/* COLORS */
+$c-text 	 			: #76767d;
+
+$c-brightest 			: #ffc540;
+$c-brighter 			: #ffa520;
+$c-bright 				: #ff7500;
+$c-main 				: #ff4500;  // <--- Main color
+$c-dark 				: #df3500;
+$c-darker 				: #bf2500;
+$c-darkest 				: #ab1000;
+
+$c-background-brightest	: #ffffff;
+$c-background-brighter 	: #eeeeee;
+$c-background-bright 	: #eee0fc;
+$c-background 			: #e0e0fc; 	// <--- Main background
+$c-background-dark		: #d1d1e6;
+$c-background-darker	: #c1c1c6;
+$c-background-darkest	: #555555;
+
+$c-ok 					: #09709c;
+$c-error 				: #cd3347;
+$c-warn 				: #F4B400;
+$c-info 				: #83b31b;
+
+$c-gray-brigth   		: #9a9d9e;
+$c-gray 				: #6d8293;
+$c-gray-dark 			: #222;
+
+
+/* SPACING */
+
+$s-biggest 				: 30px;
+$s-bigger 				: 25px;
+$s-big 					: 20px;
+$s-default 				: 15px;   // <--- Default Spacing
+$s-small 				: 10px;
+$s-smaller 				: 5px;
+$s-smallest 			: 2px;
+
+$b-radius 				: 0px;

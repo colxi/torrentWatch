@@ -1,7 +1,6 @@
 <!doctype html>
 <html>
   <head>
-	<link rel="stylesheet" type="text/css" href="../../styles/reset.css">
 	<link rel="stylesheet" type="text/css" href="../../styles/styles.css">
 	<link rel="stylesheet" type="text/css" href="../../styles/imports/font-awesome/css/font-awesome.css">
 	<script src="../../scripts/imports/sightglass/index.js"></script>
@@ -9,26 +8,26 @@
 	<script src="../../scripts/lib/rivets.stdlib.js"></script>
 	<script src="../../scripts/popup.js"></script>
   </head>
-  <body>
-    <div id="app-wrapper">
-    	<!-- header -->
-    	<div class="pg-row">
-    		<div class="pg-col-25">
-    			<div class="pg-btn" rv-on-click="view.currentTab | set 'tab-categories'">Groups<span class="fa fa-angle-double-down fa-pull-right"></span></div>
-    		</div>
-    		<div class="pg-col-25">
-    			<div class="pg-btn" rv-on-click="view.currentTab | set 'tab-feeds'">Feeds<span class="fa fa-angle-double-down fa-pull-right"></span></div>
-    		</div>
-    		<div class="pg-col-25">
-    			<div class="pg-btn" rv-on-click="view.currentTab | set 'tab-watchers'">Watchers<span class="fa fa-angle-double-down fa-pull-right"></span></div>
-    		</div>
-    		<div class="pg-col-25">
-    			<div class="pg-btn" rv-on-click="view.currentTab | set 'tab-config'">Config<span class="fa fa-angle-double-down fa-pull-right"></span></div>
-    		</div>
-    	</div>
-
+  <body id="app-wrapper" class="pg-unselectable">
+	<!-- nav -->
+    <nav class="pg-row">
+		<div class="pg-col-25">
+			<div class="pg-btn" rv-on-click="view.currentTab | set 'tab-categories'">Groups<span class="fa fa-angle-double-down fa-pull-right"></span></div>
+		</div>
+		<div class="pg-col-25">
+			<div class="pg-btn" rv-on-click="view.currentTab | set 'tab-feeds'">Feeds<span class="fa fa-angle-double-down fa-pull-right"></span></div>
+		</div>
+		<div class="pg-col-25">
+			<div class="pg-btn" rv-on-click="view.currentTab | set 'tab-watchers'">Watchers<span class="fa fa-angle-double-down fa-pull-right"></span></div>
+		</div>
+		<div class="pg-col-25">
+			<div class="pg-btn" rv-on-click="view.currentTab | set 'tab-config'">Config<span class="fa fa-angle-double-down fa-pull-right"></span></div>
+		</div>
+	</nav>
+	<!-- main -->
+    <main class="pg-padding-biggest">
     	<!-- categories -->
-    	<div class="pg-tab" rv-show="view.currentTab | === 'tab-categories'">
+    	<section class="pg-tab" rv-show="view.currentTab | === 'tab-categories'">
     		<div class="pg-row">
     			<div class="pg-col-80">
     				<input type="text" rv-value="view.category.form.name" rv-class-invalid="view.category.form.validates | negate">
@@ -40,17 +39,17 @@
 					{category.name} ({category.feeds} feeds)
 				</span>
     		</div>
-    	</div>
+    	</section>
 
     	<!-- feeds -->
-  		<div class="pg-tab" rv-show="view.currentTab | === 'tab-feeds'">
+  		<section class="tab" rv-show="view.currentTab | === 'tab-feeds'">
 	  		<!-- feeds listing -->
-			<header class="pg-row">
+			<div class="pg-row pg-vertical-center pg-margin-bottom-biggest">
 				<h2 class="pg-col">Feeds :</h2>
 				<div class="pg-col pg-text-right">
 					<div class="pg-col pg-btn"><span class="fa fa-plus-circle"></span> Add</div>
 				</div>
-			</header>
+			</div>
 			<div class="pg-row">
 				<div class="pg-table pg-expand">
 					<div class="pg-row" rv-each-feed="view.feeds">
@@ -64,16 +63,16 @@
 							</span>
 						</div>
 						<div class="pg-col-fixed">
-							<span class="fa fa-refresh pg-hover"></span>
-							<span class="fa fa-pencil pg-hover"></span>
-							<span class="fa fa-trash pg-hover"></span>
+							<span class="fa fa-refresh pg-hover pg-margin-right-smallest"></span>
+							<span class="fa fa-pencil pg-hover pg-margin-right-smallest pg-margin-left-smallest"></span>
+							<span class="fa fa-trash pg-hover pg-margin-left-smallest"></span>
 						</div>
 					</div>
 				</div>
 			</div>
 
 	  		<!-- feed form feedData -->
-	  		<form class="pg-row" hidden rv-on-submit="view.feed.showFormFeedConfig | preventDefault" rv-show="view.feed.helpers.formNav | === 'form-data'">
+	  		<form class="pg-row" hidden rv-on-submit="view.feed.showFormConfig" rv-show="view.feed.location | === 'form:data'">
 				<label class="pg-form-control">
 					<input type="text" rv-value="view.feed.form.name" required pattern=".*\S+.*">
 					<span class="pg-label">Name:</span>
@@ -93,7 +92,7 @@
 
 				 <button type="submit" >Validate Feed<div class="fa fa-plus"></div></button>
 			</form>
-			<form class="pg-row" rv-on-submit="view.feed.save | preventDefault" rv-show="view.feed.helpers.formNav | === 'form-config'">
+			<form class="pg-row" rv-on-submit="view.feed.saveForm" rv-show="view.feed.location | === 'form:config'">
 				<label class="pg-form-control">
 					<input type="range" min="0" max="120" rv-value="view.feed.form.TTL" step="5">
 					<span class="pg-label">Check Interval (ttl : <span>{view.feed.form.TTL}</span> minutes):</span>
@@ -109,23 +108,23 @@
 
     			<div class="pg-row">
 	    			<div class="pg-col-50">
-						 <button  type="button" rv-on-click="view.feed.showFormFeedData">Back...<div class="fa fa-plus"></div></button>
+						 <button  type="button" rv-on-click="view.feed.showFormData">Back...<div class="fa fa-plus"></div></button>
 	    			</div>
 	    			<div class="pg-col-50">
 					 	<button  type="submit" >Save Feed<div class="fa fa-plus"></div></button>
 	    			</div>
     			</div>
 			</form>
-		</div>
+		</section>
 
 		<!-- config -->
-      	<div class="pg-tab" rv-show="view.currentTab | === 'tab-config'">
+      	<section class="pg-tab" rv-show="view.currentTab | === 'tab-config'">
       		<h2>Log output:</h2>
       		<div class="log-output">
       			<div rv-each-log="view.logStore">{log}</div>
       		</div>
-      	</div>
-    </div>
+      	</section>
+    </main>
   </body>
 </html>
 

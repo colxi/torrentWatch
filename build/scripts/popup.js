@@ -1,6 +1,6 @@
 'use strict';
 
-var chrome, rivets, view, app;
+var chrome, rivets, view, pg;
 
 (function () {
 	'use strict';
@@ -8,10 +8,16 @@ var chrome, rivets, view, app;
 	view = {};
 	view._init = document.addEventListener('DOMContentLoaded', function () {
 		console.log('Popup opened!');
-		app = chrome.extension.getBackgroundPage().app;
-		view.categories = app.categories;
-		view.feeds = app.feeds;
-		view.logStore = app.logStore;
+		pg = chrome.extension.getBackgroundPage().pg;
+
+		pg.configure({
+			controller: window.view
+		});
+		pg.loadController('feeds');
+
+		view.categories = pg.categories;
+		view.feeds = pg.feeds;
+		view.logStore = pg.logStore;
 
 		rivets.configure({
 			// Attribute prefix in templates
@@ -50,12 +56,12 @@ var chrome, rivets, view, app;
 			view.category.form.name = view.category.form.name.trim().toLowerCase();
 			view.category.form.validates = true;
 			// validate category name
-			if (view.category.form.name.length === 0 || app.getCategoryByName(view.category.form.name) !== -1) view.category.form.validates = false;
+			if (view.category.form.name.length === 0 || pg.getCategoryByName(view.category.form.name) !== -1) view.category.form.validates = false;
 			if (!view.category.form.validates) return false;
 
 			// create category
 			view.categories.push({
-				id: app.createGuid(),
+				id: pg.createGuid(),
 				name: view.category.form.name,
 				feeds: 0
 			});
@@ -68,68 +74,6 @@ var chrome, rivets, view, app;
 		remove: function remove(e, i) {
 			view.categories.splice(i.index, 1);
 			return true;
-		}
-	};
-
-	view.feed = {
-		helpers: {
-			formNav: 'form-data',
-			feedProperties: [],
-			mode: 'new'
-		},
-
-		form: {
-			name: '',
-			url: 'https://kat.cr/movies/?rss=1',
-			categories: [],
-			TTL: 60,
-			properties: []
-		},
-
-		save: function save() {
-			var feed = {
-				id: '',
-				name: '',
-				url: '',
-				properies: [],
-				TTL: 0,
-				categories: []
-			};
-
-			feed.id = app.createGuid();
-			feed.name = view.feed.form.name.trim();
-			feed.url = view.feed.form.url.trim();
-			feed.categories = view.feed.form.categories;
-			feed.TTL = view.feed.form.TTL;
-			feed.properties = view.feed.form.properties;
-
-			view.feeds.push(feed);
-			app.countFeedsinAllCategories();
-			return true;
-		},
-
-		showFormFeedData: function showFormFeedData() {
-			view.feed.helpers.formNav = 'form-data';
-		},
-
-		showFormFeedConfig: function showFormFeedConfig() {
-			console.log('Validating RSS feed...');
-
-			app.getFeed(view.feed.form.url).then(function (result) {
-				console.log(result);
-
-				view.feed.helpers.feedProperties = [];
-				view.feed.form.properties = [];
-				if (result === false) {
-					alert('RSS invalid');
-					return false;
-				}
-
-				view.feed.helpers.formNav = 'form-config';
-				for (var i in result.rss.channel.item[0]) {
-					if (result.rss.channel.item[0].hasOwnProperty(i) && i.charAt(0).match(/[A-Z|a-z]/i)) view.feed.helpers.feedProperties.push(i);
-				}
-			});
 		}
 	};
 })();

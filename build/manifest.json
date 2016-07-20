@@ -1,5 +1,5 @@
 {
-	"version": "0.0.820",
+	"version": "0.0.914",
 	"manifest_version": 2,
 	"name": "Torrent Watch : Alerts on torrent releases",
 	"description": "This extension alerts user when torrent file is released",
@@ -19,5 +19,6 @@
 		"storage",
 		"http://*/",
 		"https://*/"
-	]
+	],
+	"content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'"
 }

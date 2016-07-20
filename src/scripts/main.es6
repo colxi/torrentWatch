@@ -1,31 +1,57 @@
-var app,
+var pg,
 	chrome;
-
 (function(){
 	'use strict';
+	pg = {
+		/**
+		 * [configure description]
+		 * @param  {[type]} obj [description]
+		 * @return {[type]}     [description]
+		 */
+		configure : function(obj){} ,
+		/**
+		 * [loadController description]
+		 * @param  {[type]} controller [description]
+		 * @return {[type]}            [description]
+		 */
+		loadController : function(controller){
+			pg.log('loadController() : Loading controller module :' + controller);
+			System.import('/controllers/'+ controller +".js").then(function(controller){
+   				console.log(controller);
+			});
+		},
+		/**
+		 * [controller description]
+		 * @type {Object}
+		 */
+		controller : {
 
-	app = {
+		},
 		/**
 		 * [description]
 		 * @param  {[type]} )
 		 * @return {[type]}   [description]
 		 */
 		_init : document.addEventListener('DOMContentLoaded', function() {
-  			return app.require('lib/JSON.parseXML').then(function(){
-				app.getManifest();
-	  			app.log('Starting Torrent Observer v.' + app.getVersion() );
+  			pg.require('imports/babel-polyfill/polyfill.min.js').then(function(){
+  				pg.require('imports/systemjs/system.js').then(function(){
+  					System.config({ baseURL: '/scripts' });
+		  			pg.require('lib/JSON.parseXML').then(function(){
+			  			pg.log('Starting Torrent Observer v.' + pg.getVersion() );
 
-	  			// set html file for toolbar icon popup
-	  			chrome.browserAction.setPopup( {popup:'views/popup/popup.html'} );
-				chrome.browserAction.onClicked.addListener(function(){
-					app.popup = chrome.extension.getViews()[1].document;
-					app.log('Popup opened');
-				});
+			  			// set html file for toolbar icon popup
+			  			chrome.browserAction.setPopup( {popup:'views/popup/popup.html'} );
+						chrome.browserAction.onClicked.addListener(function(){
+							pg.popup = chrome.extension.getViews()[1].document;
+							pg.log('Popup opened');
+						});
 
-	  			app.countFeedsinAllCategories();
-				app.getAllFeeds().then(function(){ app.log('Init done'); });
+			  			pg.countFeedsinAllCategories();
+						pg.getAllFeeds().then(function(){ pg.log('Init done'); });
 
-				delete app._init;
+						delete pg._init;
+		  			});
+  				});
   			});
 		}),
 		/**
@@ -51,7 +77,7 @@ var app,
 				    let script = document.createElement('script');
 				    script.type = 'text/javascript';
 				    script.src = config.baseUrl + src;
-				    app.log(script.src);
+				    pg.log(script.src);
 					script.onload = script.onreadystatechange = function() {
 						// attach to both events for cross browser finish detection:
 						if ( !done && (!this.readyState || this.readyState === 'loaded' || this.readyState === 'complete') ) {
@@ -132,7 +158,7 @@ var app,
 		],
 		logStore : [],
 		log : function(msg = '{empty}' , method = 'log'){
-			app.logStore.push(msg);
+			pg.logStore.push(msg);
 			console[method](msg);
 			return true;
 		},
@@ -155,23 +181,23 @@ var app,
 		 * @return {[type]}    [description]
 		 */
 		getCategoryById : function(id){
-			let i = app.categories.findIndex( cat=>(cat.id === id ) ? true : false );
-			return (i === -1) ? -1 : app.categories[i];
+			let i = pg.categories.findIndex( cat=>(cat.id === id ) ? true : false );
+			return (i === -1) ? -1 : pg.categories[i];
 		},
 		getCategoryByName : function(id){
-			let i = app.categories.findIndex( cat=>(cat.name === id ) ? true : false );
-			return (i === -1) ? -1 : app.categories[i];
+			let i = pg.categories.findIndex( cat=>(cat.name === id ) ? true : false );
+			return (i === -1) ? -1 : pg.categories[i];
 		},
 		countFeedsinCategory: function(id){
-			let category = app.getCategoryById(id);
+			let category = pg.getCategoryById(id);
 			if(category === -1) return -1;
 
 			category.feeds = 0;
-			for (let i=0; i < app.feeds.length; i++ ) if(app.feeds[i].categories.indexOf(id) !== -1) category.feeds++;
+			for (let i=0; i < pg.feeds.length; i++ ) if(pg.feeds[i].categories.indexOf(id) !== -1) category.feeds++;
 			return category.feeds;
 		},
 		countFeedsinAllCategories: function(){
-			for (let i=0; i < app.categories.length; i++ ) app.countFeedsinCategory( app.categories[i].id );
+			for (let i=0; i < pg.categories.length; i++ ) pg.countFeedsinCategory( pg.categories[i].id );
 			return true;
 		},
 
@@ -181,16 +207,16 @@ var app,
 		 */
 		getAllFeeds : function(){
 			return new Promise(function(resolve, reject){
-				app.log('app.updateAllFeeds(): Updating all Feeds...');
+				pg.log('pg.updateAllFeeds(): Updating all Feeds...');
 				var currentFeed = -1;
 				// Loop through the Feeds with array.reduce...
-				app.feeds.reduce(function(sequence) {
+				pg.feeds.reduce(function(sequence) {
 					return sequence.then(function() {
 						currentFeed++;
-				 		return app.getFeed(currentFeed);
+				 		return pg.getFeed(currentFeed);
 					}).then(function(result) {
-						if(result) app.log('app.updateAllFeeds(): Feed #'+ ( currentFeed + 1) +' ' + app.feeds[currentFeed].name + ' UPDATED (' + result + ')' );
-				    	else  app.log('app.updateAllFeeds(): Feed #'+ ( currentFeed + 1) +' ' + app.feeds[currentFeed].name + ' FAILED (' + result + ')' );
+						if(result) pg.log('pg.updateAllFeeds(): Feed #'+ ( currentFeed + 1) +' ' + pg.feeds[currentFeed].name + ' UPDATED (' + result + ')' );
+				    	else  pg.log('pg.updateAllFeeds(): Feed #'+ ( currentFeed + 1) +' ' + pg.feeds[currentFeed].name + ' FAILED (' + result + ')' );
 				  	});
 				} , Promise.resolve());
 			});
@@ -207,12 +233,12 @@ var app,
 				// get feed (allow feed array index or string url feed)
 				let feed;
 				if( isNaN(i) && typeof i === 'string' ) feed= { url : i , name : '***'};
-				else feed = app.feeds[i];
+				else feed = pg.feeds[i];
 
 				// block if requested feed does not exist
 				if(feed === undefined) return reject(-1);
 
-				app.log('app.updateFeed() : Updating Feed from :'+ feed.url +' ( ' + feed.name + ' )' );
+				pg.log('pg.updateFeed() : Updating Feed from :'+ feed.url +' ( ' + feed.name + ' )' );
 
 				//
 				// Prepare Ajax request
@@ -231,7 +257,7 @@ var app,
 				};
 				// RESPONSE FAIL
 				request.onerror  = function(){
-					app.log('app.getFeed(): Error on request.', request.statusText);
+					pg.log('pg.getFeed(): Error on request.', request.statusText);
 					request = null;
 					return resolve(false);
 				};

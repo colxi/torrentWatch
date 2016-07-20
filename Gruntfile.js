@@ -15,9 +15,10 @@ module.exports = function(grunt) {
 
 	// Declaration of each node Module Package...
 	const nodeModule = {
-		fontAwesome : { cwd : 'node_modules/font-awesome/'	, src: ['css/**' , 'fonts/**'] 	, dest: 'src/styles/imports/font-awesome/'	, expand: true },
-		rivets 		: { cwd : 'node_modules/rivets/dist/'	, src: ['rivets.js'] 			, dest: 'src/scripts/imports/rivets/' 		, expand: true },
-		sightglass	: { cwd : 'node_modules/sightglass/'	, src: ['index.js'] 			, dest: 'src/scripts/imports/sightglass/' 	, expand: true }
+		fontAwesome 	: { cwd : 'node_modules/font-awesome/'			, src: ['css/**' , 'fonts/**'] 		, dest: 'src/styles/imports/font-awesome/'		, expand: true },
+		rivets 			: { cwd : 'node_modules/rivets/dist/'			, src: ['rivets.js'] 				, dest: 'src/scripts/imports/rivets/' 			, expand: true },
+		sightglass		: { cwd : 'node_modules/sightglass/'			, src: ['index.js'] 				, dest: 'src/scripts/imports/sightglass/' 		, expand: true },
+		systemjs 		:{ cwd : 'node_modules/systemjs/dist/'			, src: ['system.js'] 				, dest: 'src/scripts/imports/systemjs/'			, expand: true }
 	};
 	// Automatic generations ...
 	const src_PATH_nodeModules = Object.keys(nodeModule).map( i=> nodeModule[i].dest );
@@ -36,11 +37,11 @@ module.exports = function(grunt) {
 		/* https://github.com/lucaslopez/grunt-output/commit/6b66c0db5826ec04646709a6957d4eab96e2b414
 		/* Until developer publishes the upgrade on npm, follow this steps  :
 		/*
-		/* 1- 	In <repositoy_root>/node_modules/grunt-options/package.json - line 38 (peerDependencies)
+		/* 1- 	In <repositoy_root>/node_modules/grunt-output/package.json - line 38 (peerDependencies)
 		/* 		"grunt": "~0.4.5"
 		/* 		--must be replaced with--
 		/* 		"grunt": ">=0.4.0"
-		/* 2- 	After save, execute in console (with prompt in <repositoy_root>/node_modules/grunt-options/)
+		/* 2- 	After save, execute in console (with prompt in <repositoy_root>/node_modules/grunt-output/)
 		/* 		npm cache clear
 		/* 		npm install
 		/* 		...to allow plugin dependencies being completely installed
@@ -79,8 +80,8 @@ module.exports = function(grunt) {
 			build_scripts		: { src: ['build/scripts/**/*.js'] 	},
 			build_scripts_es6 	: { src: ['build/scripts/**/*.es6'] },
 			build_views			: { src: ['build/views/'] 			},
-			build_styles		: { src: ['build/style/'] 			},
-			build_styles_scss	: { src: ['build/style/'] 			},
+			build_styles		: { src: ['build/styles/'] 			},
+			build_styles_scss	: { src: ['build/styles/**/*.scss'] 			},
 			src_nodeModules 	: { src: src_PATH_nodeModules 		}
 		},
 		/* COPY */
@@ -97,8 +98,8 @@ module.exports = function(grunt) {
 		  	src_views_TO_build: {
 		  		files: [ {expand: true, cwd: 'src/views/', src: ['**'], dest: 'build/views/'} ]
 		  	},
-		  	src_styles_css_TO_build: {
-		  		files: [ {expand: true, cwd: 'src/styles/', src: ['**/*.css'], dest: 'build/styles/'} ]
+		  	src_styles_TO_build: {
+		  		files: [ {expand: true, cwd: 'src/styles/', src: ['**'], dest: 'build/styles/'} ]
 		  	},
 		  	src_manifest_TO_build: {
 		  		files: [ {expand: true, cwd: 'src/', src: ['manifest.json'], dest: 'build/'} ]
@@ -106,26 +107,44 @@ module.exports = function(grunt) {
 		},
 		/* JS ES6 TRANSPILER */
 	    babel : {
-		    options: { babelrc: '.babelrc' , sourceMap: true },
-		    src_scripts_es6_TO_build: {
+		    options: {
+		    	babelrc: '.babelrc' ,
+		    	sourceMap: true,
+		    },
+		    build_scripts_TRANSPILE_es6: {
 		        files: [
 		        	{
 		        		expand: true,
-		        		cwd: 'src/scripts/',
+		        		cwd: 'build/scripts/',
 		        		dest: 'build/scripts/',
 		        		src: ['**/*.es6'],
 						ext: '.js',
 						extDot: 'last'
 		        	}
 		        ]
+		    },
+		    build_scripts_TRANSFORM_modules : {
+		    	files: [
+		    		{
+			    		expand: true,
+			        	cwd: 'build/scripts/controllers/',
+			        	dest: 'build/scripts/controllers/',
+			        	src: ['**/*.js'],
+						ext: '.js',
+						extDot: 'last'
+					}
+		    	],
+		    	options: {
+			    	plugins : ['transform-es2015-modules-systemjs']
+		    	}
 		    }
 		},
 		compass: {
 			src_styles_scss_TO_build: {
 				options: {
-					sassDir: 'src/css',
-					cssDir: 'build/css',
-					importPath : 'src/css'
+					sassDir: 'src/styles/',
+					cssDir: 'build/styles/',
+					importPath : 'src/styles/'
 				}
 			}
 		},
@@ -136,8 +155,9 @@ module.exports = function(grunt) {
 					'output:divider:Watch Event (src_scripts)',
 					'clean:build_scripts',
 					'copy:src_scripts_TO_build',
+					'babel:build_scripts_TRANSPILE_es6',
+					'babel:build_scripts_TRANSFORM_modules',
 					'clean:build_scripts_es6',
-					'babel:src_scripts_es6_TO_build',
 					'versionUp.u',
 					'notify_hooks'
 				],
@@ -157,7 +177,8 @@ module.exports = function(grunt) {
 				tasks: [
 					'output:divider:Watch Event (src_styles)',
 					'clean:build_styles',
-					'copy:src_styles_css_TO_build',
+					'copy:src_styles_TO_build',
+					'clean:build_styles_scss',
 					'compass:src_styles_scss_TO_build',
 					'versionUp.u',
 					'notify_hooks'
@@ -207,10 +228,11 @@ module.exports = function(grunt) {
 		// clean ./build/** and dump ./src data inside
 		'clean:build_all',
 		'copy:src_TO_build',
-		// clean es6 files , just copied to ./build/scripts/ dir,
-		// and run transpiler to output there .src/scripts/**
+		// TRANSPILE es6 files, convert .js MODULES to UMD
+		// and finally clean  ./build/scripts/ of es6 files,
+		'babel:build_scripts_TRANSPILE_es6',
+		'babel:build_scripts_TRANSFORM_modules',
 		'clean:build_scripts_es6',
-		'babel:src_scripts_es6_TO_build',
 		//
 		'clean:build_styles_scss',
 		'compass:src_styles_scss_TO_build',

@@ -1,0 +1,46 @@
+/* FORM AND FORM CONTROLS */
+
+.pg-form-control{}
+
+.pg-form-control label>input[type="checkbox"]{display:none;}
+.pg-form-control label>input[type="checkbox"]+span{
+    display: inline-block;
+    background-color: #808080;
+    padding: 8px 14px;
+    border-radius: 15px;
+    cursor: pointer;
+    min-width: 70px;
+    text-align: center;
+    color: #fff;
+    margin-top: 5px;
+    margin-right: 5px;
+}
+.pg-form-control label>input[type="checkbox"]:checked+span {
+	background-color: #696363;
+    box-shadow: 1px 1px 2px 2px rgba(0,0,0,0.1) inset;
+}
+.pg-form-control label>label {
+    display: inline-block;
+}
+.pg-form-control {
+    position: relative;
+    margin-bottom: 10px;
+    clear:both;
+    display: block;
+    padding-top: 18px;
+}
+
+.pg-form-control > input{
+    position: relative;
+  	border:none;
+    width: 100%;
+    padding:5px
+}
+.pg-form-control input:invalid {   background-color: red !important; color:white; }
+.pg-form-control input:invalid+span {   color: red !important; }
+
+.pg-form-control > .pg-label {
+    display: block;
+    top: 0px;
+    position: absolute;
+}

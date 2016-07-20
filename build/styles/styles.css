@@ -1,0 +1,954 @@
+/* FONTS & SIZES */
+@import "https://fonts.googleapis.com/css?family=Roboto:400,700";
+@import "https://fonts.googleapis.com/css?family=Roboto+Slab:400,700";
+/* COLORS */
+/* SPACING */
+/* http://meyerweb.com/eric/tools/css/reset/
+   v2.0 | 20110126
+   License: none (public domain)
+*/
+/* line 7, ../../src/styles/pg-partials/_reset.scss */
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
+}
+
+/* HTML5 display-role reset for older browsers */
+/* line 28, ../../src/styles/pg-partials/_reset.scss */
+article, aside, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section {
+  display: block;
+}
+
+/* line 32, ../../src/styles/pg-partials/_reset.scss */
+body {
+  line-height: 1;
+}
+
+/* line 35, ../../src/styles/pg-partials/_reset.scss */
+ol, ul {
+  list-style: none;
+}
+
+/* line 38, ../../src/styles/pg-partials/_reset.scss */
+blockquote, q {
+  quotes: none;
+}
+
+/* line 41, ../../src/styles/pg-partials/_reset.scss */
+blockquote:before, blockquote:after,
+q:before, q:after {
+  content: '';
+  content: none;
+}
+
+/* line 46, ../../src/styles/pg-partials/_reset.scss */
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+/* COLUMNIZATION */
+/* based in specs from : https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Flexible_Box_Layout/Advanced_layouts_with_flexbox */
+/* line 5, ../../src/styles/pg-partials/_columnization.scss */
+.pg-row {
+  position: relative;
+  margin-left: 0px !important;
+  margin-right: 0px !important;
+  overflow: hidden;
+  width: 100%;
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -moz-flex;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-flex-wrap: nowrap;
+  -moz-flex-wrap: nowrap;
+  -ms-flex-wrap: none;
+  flex-wrap: nowrap;
+  -webkit-box-align: stretch;
+  -moz-box-align: stretch;
+  -ms-flex-align: stretch;
+  -moz-align-items: stretch;
+  -ms-align-items: stretch;
+  -webkit-align-items: stretch;
+  align-items: stretch;
+  -webkit-box-direction: normal;
+  -moz-box-direction: normal;
+  -webkit-box-orient: horizontal;
+  /* responsive : vertical */
+  -moz-box-orient: horizontal;
+  /* responsive : vertical */
+  -webkit-flex-direction: row;
+  /* responsive : column */
+  -ms-flex-direction: row;
+  /* responsive : column */
+  flex-direction: row;
+  /* responsive : column */
+}
+
+/* line 42, ../../src/styles/pg-partials/_columnization.scss */
+.pg-row::after {
+  clear: both;
+  content: "";
+  display: block;
+}
+
+/* line 49, ../../src/styles/pg-partials/_columnization.scss */
+[class^=pg-col-] {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  transition: width .5s ease-in-out;
+}
+
+/* line 56, ../../src/styles/pg-partials/_columnization.scss */
+[class^=pg-col-]::after {
+  clear: both;
+  content: "";
+  display: block;
+}
+
+/* line 62, ../../src/styles/pg-partials/_columnization.scss */
+[class^=pg-col-]:empty::before {
+  content: "\200B";
+  display: block;
+}
+
+/* line 67, ../../src/styles/pg-partials/_columnization.scss */
+.pg-col-collapsed {
+  width: 0px !important;
+  opacity: 0;
+}
+
+/* line 68, ../../src/styles/pg-partials/_columnization.scss */
+.pg-col-5 {
+  width: 5%;
+}
+
+/* line 69, ../../src/styles/pg-partials/_columnization.scss */
+.pg-col-10 {
+  width: 10%;
+}
+
+/* line 70, ../../src/styles/pg-partials/_columnization.scss */
+.pg-col-15 {
+  width: 15%;
+}
+
+/* line 71, ../../src/styles/pg-partials/_columnization.scss */
+.pg-col-20 {
+  width: 20%;
+}
+
+/* line 72, ../../src/styles/pg-partials/_columnization.scss */
+.pg-col-25 {
+  width: 25%;
+}
+
+/* line 73, ../../src/styles/pg-partials/_columnization.scss */
+.pg-col-30 {
+  width: 30%;
+}
+
+/* line 74, ../../src/styles/pg-partials/_columnization.scss */
+.pg-col-33 {
+  width: 33%;
+}
+
+/* line 75, ../../src/styles/pg-partials/_columnization.scss */
+.pg-col-35 {
+  width: 35%;
+}
+
+/* line 76, ../../src/styles/pg-partials/_columnization.scss */
+.pg-col-40 {
+  width: 40%;
+}
+
+/* line 77, ../../src/styles/pg-partials/_columnization.scss */
+.pg-col-45 {
+  width: 45%;
+}
+
+/* line 78, ../../src/styles/pg-partials/_columnization.scss */
+.pg-col-50 {
+  width: 50%;
+}
+
+/* line 79, ../../src/styles/pg-partials/_columnization.scss */
+.pg-col-55 {
+  width: 55%;
+}
+
+/* line 80, ../../src/styles/pg-partials/_columnization.scss */
+.pg-col-60 {
+  width: 60%;
+}
+
+/* line 81, ../../src/styles/pg-partials/_columnization.scss */
+.pg-col-65 {
+  width: 65%;
+}
+
+/* line 82, ../../src/styles/pg-partials/_columnization.scss */
+.pg-col-70 {
+  width: 70%;
+}
+
+/* line 83, ../../src/styles/pg-partials/_columnization.scss */
+.pg-col-75 {
+  width: 75%;
+}
+
+/* line 84, ../../src/styles/pg-partials/_columnization.scss */
+.pg-col-80 {
+  width: 80%;
+}
+
+/* line 85, ../../src/styles/pg-partials/_columnization.scss */
+.pg-col-85 {
+  width: 85%;
+}
+
+/* line 86, ../../src/styles/pg-partials/_columnization.scss */
+.pg-col-90 {
+  width: 90%;
+}
+
+/* line 87, ../../src/styles/pg-partials/_columnization.scss */
+.pg-col-95 {
+  width: 95%;
+}
+
+/* line 88, ../../src/styles/pg-partials/_columnization.scss */
+.pg-col-100 {
+  width: 100%;
+}
+
+/* line 90, ../../src/styles/pg-partials/_columnization.scss */
+.pg-col {
+  flex-grow: 1;
+}
+
+/* line 91, ../../src/styles/pg-partials/_columnization.scss */
+.pg-col-x1 {
+  flex-grow: 1;
+}
+
+/* line 92, ../../src/styles/pg-partials/_columnization.scss */
+.pg-col-x2 {
+  flex-grow: 2;
+}
+
+/* line 93, ../../src/styles/pg-partials/_columnization.scss */
+.pg-col-x3 {
+  flex-grow: 3;
+}
+
+/* line 94, ../../src/styles/pg-partials/_columnization.scss */
+.pg-col-x4 {
+  flex-grow: 4;
+}
+
+/* line 95, ../../src/styles/pg-partials/_columnization.scss */
+.pg-col-x5 {
+  flex-grow: 5;
+}
+
+/* line 96, ../../src/styles/pg-partials/_columnization.scss */
+.pg-col-x6 {
+  flex-grow: 6;
+}
+
+/* line 97, ../../src/styles/pg-partials/_columnization.scss */
+.pg-col-x7 {
+  flex-grow: 7;
+}
+
+/* line 98, ../../src/styles/pg-partials/_columnization.scss */
+.pg-col-x8 {
+  flex-grow: 8;
+}
+
+/* line 99, ../../src/styles/pg-partials/_columnization.scss */
+.pg-col-fixed {
+  flex-grow: 0;
+}
+
+/* MARGINS */
+/* line 2, ../../src/styles/pg-partials/_spacing.scss */
+.pg-margin-biggest {
+  margin: 30px;
+}
+
+/* line 3, ../../src/styles/pg-partials/_spacing.scss */
+.pg-margin-bigger {
+  margin: 25px;
+}
+
+/* line 4, ../../src/styles/pg-partials/_spacing.scss */
+.pg-margin-big {
+  margin: 20px;
+}
+
+/* line 5, ../../src/styles/pg-partials/_spacing.scss */
+.pg-margin {
+  margin: 15px;
+}
+
+/* line 6, ../../src/styles/pg-partials/_spacing.scss */
+.pg-margin-small {
+  margin: 10px;
+}
+
+/* line 7, ../../src/styles/pg-partials/_spacing.scss */
+.pg-margin-smaller {
+  margin: 5px;
+}
+
+/* line 8, ../../src/styles/pg-partials/_spacing.scss */
+.pg-margin-smallest {
+  margin: 2px;
+}
+
+/* line 10, ../../src/styles/pg-partials/_spacing.scss */
+.pg-margin-bottom-biggest {
+  margin-bottom: 30px;
+}
+
+/* line 11, ../../src/styles/pg-partials/_spacing.scss */
+.pg-margin-bottom-bigger {
+  margin-bottom: 25px;
+}
+
+/* line 12, ../../src/styles/pg-partials/_spacing.scss */
+.pg-margin-bottom-big {
+  margin-bottom: 20px;
+}
+
+/* line 13, ../../src/styles/pg-partials/_spacing.scss */
+.pg-margin-bottom {
+  margin-bottom: 15px;
+}
+
+/* line 14, ../../src/styles/pg-partials/_spacing.scss */
+.pg-margin-bottom-small {
+  margin-bottom: 10px;
+}
+
+/* line 15, ../../src/styles/pg-partials/_spacing.scss */
+.pg-margin-bottom-smaller {
+  margin-bottom: 5px;
+}
+
+/* line 16, ../../src/styles/pg-partials/_spacing.scss */
+.pg-margin-bottom-smallest {
+  margin-bottom: 2px;
+}
+
+/* line 18, ../../src/styles/pg-partials/_spacing.scss */
+.pg-margin-top-biggest {
+  margin-top: 30px;
+}
+
+/* line 19, ../../src/styles/pg-partials/_spacing.scss */
+.pg-margin-top-bigger {
+  margin-top: 25px;
+}
+
+/* line 20, ../../src/styles/pg-partials/_spacing.scss */
+.pg-margin-top-big {
+  margin-top: 20px;
+}
+
+/* line 21, ../../src/styles/pg-partials/_spacing.scss */
+.pg-margin-top {
+  margin-top: 15px;
+}
+
+/* line 22, ../../src/styles/pg-partials/_spacing.scss */
+.pg-margin-top-small {
+  margin-top: 10px;
+}
+
+/* line 23, ../../src/styles/pg-partials/_spacing.scss */
+.pg-margin-top-smaller {
+  margin-top: 5px;
+}
+
+/* line 24, ../../src/styles/pg-partials/_spacing.scss */
+.pg-margin-top-smallest {
+  margin-top: 2px;
+}
+
+/* line 26, ../../src/styles/pg-partials/_spacing.scss */
+.pg-margin-left-biggest {
+  margin-left: 30px;
+}
+
+/* line 27, ../../src/styles/pg-partials/_spacing.scss */
+.pg-margin-left-bigger {
+  margin-left: 25px;
+}
+
+/* line 28, ../../src/styles/pg-partials/_spacing.scss */
+.pg-margin-left-big {
+  margin-left: 20px;
+}
+
+/* line 29, ../../src/styles/pg-partials/_spacing.scss */
+.pg-margin-left {
+  margin-left: 15px;
+}
+
+/* line 30, ../../src/styles/pg-partials/_spacing.scss */
+.pg-margin-left-small {
+  margin-left: 10px;
+}
+
+/* line 31, ../../src/styles/pg-partials/_spacing.scss */
+.pg-margin-left-smaller {
+  margin-left: 5px;
+}
+
+/* line 32, ../../src/styles/pg-partials/_spacing.scss */
+.pg-margin-left-smallest {
+  margin-left: 2px;
+}
+
+/* line 34, ../../src/styles/pg-partials/_spacing.scss */
+.pg-margin-right-biggest {
+  margin-right: 30px;
+}
+
+/* line 35, ../../src/styles/pg-partials/_spacing.scss */
+.pg-margin-right-bigger {
+  margin-right: 25px;
+}
+
+/* line 36, ../../src/styles/pg-partials/_spacing.scss */
+.pg-margin-right-big {
+  margin-right: 20px;
+}
+
+/* line 37, ../../src/styles/pg-partials/_spacing.scss */
+.pg-margin-right {
+  margin-right: 15px;
+}
+
+/* line 38, ../../src/styles/pg-partials/_spacing.scss */
+.pg-margin-right-small {
+  margin-right: 10px;
+}
+
+/* line 39, ../../src/styles/pg-partials/_spacing.scss */
+.pg-margin-right-smaller {
+  margin-right: 5px;
+}
+
+/* line 40, ../../src/styles/pg-partials/_spacing.scss */
+.pg-margin-right-smallest {
+  margin-right: 2px;
+}
+
+/* PADDINGS */
+/* line 44, ../../src/styles/pg-partials/_spacing.scss */
+.pg-padding-biggest {
+  padding: 30px;
+}
+
+/* line 45, ../../src/styles/pg-partials/_spacing.scss */
+.pg-padding-bigger {
+  padding: 25px;
+}
+
+/* line 46, ../../src/styles/pg-partials/_spacing.scss */
+.pg-padding-big {
+  padding: 20px;
+}
+
+/* line 47, ../../src/styles/pg-partials/_spacing.scss */
+.pg-padding {
+  padding: 15px;
+}
+
+/* line 48, ../../src/styles/pg-partials/_spacing.scss */
+.pg-padding-small {
+  padding: 10px;
+}
+
+/* line 49, ../../src/styles/pg-partials/_spacing.scss */
+.pg-padding-smaller {
+  padding: 5px;
+}
+
+/* line 50, ../../src/styles/pg-partials/_spacing.scss */
+.pg-padding-smallest {
+  padding: 2px;
+}
+
+/* line 52, ../../src/styles/pg-partials/_spacing.scss */
+.pg-padding-bottom-biggest {
+  padding-bottom: 30px;
+}
+
+/* line 53, ../../src/styles/pg-partials/_spacing.scss */
+.pg-padding-bottom-bigger {
+  padding-bottom: 25px;
+}
+
+/* line 54, ../../src/styles/pg-partials/_spacing.scss */
+.pg-padding-bottom-big {
+  padding-bottom: 20px;
+}
+
+/* line 55, ../../src/styles/pg-partials/_spacing.scss */
+.pg-padding-bottom {
+  padding-bottom: 15px;
+}
+
+/* line 56, ../../src/styles/pg-partials/_spacing.scss */
+.pg-padding-bottom-small {
+  padding-bottom: 10px;
+}
+
+/* line 57, ../../src/styles/pg-partials/_spacing.scss */
+.pg-padding-bottom-smaller {
+  padding-bottom: 5px;
+}
+
+/* line 58, ../../src/styles/pg-partials/_spacing.scss */
+.pg-padding-bottom-smallest {
+  padding-bottom: 2px;
+}
+
+/* line 60, ../../src/styles/pg-partials/_spacing.scss */
+.pg-padding-top-biggest {
+  padding-top: 30px;
+}
+
+/* line 61, ../../src/styles/pg-partials/_spacing.scss */
+.pg-padding-top-bigger {
+  padding-top: 25px;
+}
+
+/* line 62, ../../src/styles/pg-partials/_spacing.scss */
+.pg-padding-top-big {
+  padding-top: 20px;
+}
+
+/* line 63, ../../src/styles/pg-partials/_spacing.scss */
+.pg-padding-top {
+  padding-top: 15px;
+}
+
+/* line 64, ../../src/styles/pg-partials/_spacing.scss */
+.pg-padding-top-small {
+  padding-top: 10px;
+}
+
+/* line 65, ../../src/styles/pg-partials/_spacing.scss */
+.pg-padding-top-smaller {
+  padding-top: 5px;
+}
+
+/* line 66, ../../src/styles/pg-partials/_spacing.scss */
+.pg-padding-top-smallest {
+  padding-top: 2px;
+}
+
+/* line 68, ../../src/styles/pg-partials/_spacing.scss */
+.pg-padding-left-biggest {
+  padding-left: 30px;
+}
+
+/* line 69, ../../src/styles/pg-partials/_spacing.scss */
+.pg-padding-left-bigger {
+  padding-left: 25px;
+}
+
+/* line 70, ../../src/styles/pg-partials/_spacing.scss */
+.pg-padding-left-big {
+  padding-left: 20px;
+}
+
+/* line 71, ../../src/styles/pg-partials/_spacing.scss */
+.pg-padding-left {
+  padding-left: 15px;
+}
+
+/* line 72, ../../src/styles/pg-partials/_spacing.scss */
+.pg-padding-left-small {
+  padding-left: 10px;
+}
+
+/* line 73, ../../src/styles/pg-partials/_spacing.scss */
+.pg-padding-left-smaller {
+  padding-left: 5px;
+}
+
+/* line 74, ../../src/styles/pg-partials/_spacing.scss */
+.pg-padding-left-smallest {
+  padding-left: 2px;
+}
+
+/* line 76, ../../src/styles/pg-partials/_spacing.scss */
+.pg-padding-right-biggest {
+  padding-right: 30px;
+}
+
+/* line 77, ../../src/styles/pg-partials/_spacing.scss */
+.pg-padding-right-bigger {
+  padding-right: 25px;
+}
+
+/* line 78, ../../src/styles/pg-partials/_spacing.scss */
+.pg-padding-right-big {
+  padding-right: 20px;
+}
+
+/* line 79, ../../src/styles/pg-partials/_spacing.scss */
+.pg-padding-right {
+  padding-right: 15px;
+}
+
+/* line 80, ../../src/styles/pg-partials/_spacing.scss */
+.pg-padding-right-small {
+  padding-right: 10px;
+}
+
+/* line 81, ../../src/styles/pg-partials/_spacing.scss */
+.pg-padding-right-smaller {
+  padding-right: 5px;
+}
+
+/* line 82, ../../src/styles/pg-partials/_spacing.scss */
+.pg-padding-right-smallest {
+  padding-right: 2px;
+}
+
+/* TEXT */
+/* line 2, ../../src/styles/pg-partials/_text.scss */
+.pg-text-center {
+  text-align: center;
+}
+
+/* line 3, ../../src/styles/pg-partials/_text.scss */
+.pg-text-left {
+  text-align: left;
+}
+
+/* line 4, ../../src/styles/pg-partials/_text.scss */
+.pg-text-right {
+  text-align: right;
+}
+
+/* line 6, ../../src/styles/pg-partials/_text.scss */
+.pg-text-biggest {
+  font-size: 20px;
+}
+
+/* line 7, ../../src/styles/pg-partials/_text.scss */
+.pg-text-bigger {
+  font-size: 18px;
+}
+
+/* line 8, ../../src/styles/pg-partials/_text.scss */
+.pg-text-big {
+  font-size: 16px;
+}
+
+/* line 9, ../../src/styles/pg-partials/_text.scss */
+.pg-text-regular {
+  font-size: 14px;
+}
+
+/* line 10, ../../src/styles/pg-partials/_text.scss */
+.pg-text-small {
+  font-size: 12px;
+}
+
+/* line 11, ../../src/styles/pg-partials/_text.scss */
+.pg-text-smaller {
+  font-size: 10px;
+}
+
+/* line 12, ../../src/styles/pg-partials/_text.scss */
+.pg-text-smallest {
+  font-size: 9px;
+}
+
+/* FORM AND FORM CONTROLS */
+/* line 5, ../../src/styles/pg-partials/_form.scss */
+.pg-form-control label > input[type="checkbox"] {
+  display: none;
+}
+
+/* line 6, ../../src/styles/pg-partials/_form.scss */
+.pg-form-control label > input[type="checkbox"] + span {
+  display: inline-block;
+  background-color: #808080;
+  padding: 8px 14px;
+  border-radius: 15px;
+  cursor: pointer;
+  min-width: 70px;
+  text-align: center;
+  color: #fff;
+  margin-top: 5px;
+  margin-right: 5px;
+}
+
+/* line 18, ../../src/styles/pg-partials/_form.scss */
+.pg-form-control label > input[type="checkbox"]:checked + span {
+  background-color: #696363;
+  box-shadow: 1px 1px 2px 2px rgba(0, 0, 0, 0.1) inset;
+}
+
+/* line 22, ../../src/styles/pg-partials/_form.scss */
+.pg-form-control label > label {
+  display: inline-block;
+}
+
+/* line 25, ../../src/styles/pg-partials/_form.scss */
+.pg-form-control {
+  position: relative;
+  margin-bottom: 10px;
+  clear: both;
+  display: block;
+  padding-top: 18px;
+}
+
+/* line 33, ../../src/styles/pg-partials/_form.scss */
+.pg-form-control > input {
+  position: relative;
+  border: none;
+  width: 100%;
+  padding: 5px;
+}
+
+/* line 39, ../../src/styles/pg-partials/_form.scss */
+.pg-form-control input:invalid {
+  background-color: red !important;
+  color: white;
+}
+
+/* line 40, ../../src/styles/pg-partials/_form.scss */
+.pg-form-control input:invalid + span {
+  color: red !important;
+}
+
+/* line 42, ../../src/styles/pg-partials/_form.scss */
+.pg-form-control > .pg-label {
+  display: block;
+  top: 0px;
+  position: absolute;
+}
+
+/* line 10, ../../src/styles/styles.scss */
+* {
+  box-sizing: border-box;
+}
+
+/* line 13, ../../src/styles/styles.scss */
+body {
+  font-family: "Roboto", Arial;
+  font-size: 14px;
+  color: #76767d;
+  background-color: #e0e0fc;
+  width: 450px;
+  margin: 0px;
+  padding: 0px;
+  font-weight: 500;
+}
+
+/* line 24, ../../src/styles/styles.scss */
+body *[hidden], body *.pg-hidden {
+  display: none;
+}
+
+/* line 27, ../../src/styles/styles.scss */
+h1, h2, h3, h4, h5 {
+  font-family: "Roboto Slab", Arial;
+  font-weight: 700;
+}
+
+/* line 32, ../../src/styles/styles.scss */
+h1 {
+  font-size: 20px;
+}
+
+/* line 33, ../../src/styles/styles.scss */
+h2 {
+  font-size: 18px;
+}
+
+/* line 34, ../../src/styles/styles.scss */
+h3 {
+  font-size: 16px;
+}
+
+/* line 35, ../../src/styles/styles.scss */
+h4 {
+  font-size: 14px;
+}
+
+/* line 36, ../../src/styles/styles.scss */
+h5 {
+  font-size: 12px;
+}
+
+/* line 37, ../../src/styles/styles.scss */
+h6 {
+  font-size: 10px;
+}
+
+/* MOUSE INTERACTIONS */
+/* line 42, ../../src/styles/styles.scss */
+.pg-hover {
+  cursor: pointer;
+}
+
+/* line 43, ../../src/styles/styles.scss */
+.pg-hover:hover {
+  color: #ff4500;
+}
+
+/* line 45, ../../src/styles/styles.scss */
+.pg-unselectable {
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* line 51, ../../src/styles/styles.scss */
+.pg-selectable {
+  -moz-user-select: text;
+  -webkit-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+}
+
+/* SIZE & POSITION */
+/* line 61, ../../src/styles/styles.scss */
+.pg-expand {
+  width: 100%;
+}
+
+/* line 62, ../../src/styles/styles.scss */
+.pg-collapse {
+  width: 0px;
+  overflow: hidden;
+  display: inline-block;
+}
+
+/* line 68, ../../src/styles/styles.scss */
+.pg-float-left {
+  float: left;
+}
+
+/* line 69, ../../src/styles/styles.scss */
+.pg-float-right {
+  float: right;
+}
+
+/* line 70, ../../src/styles/styles.scss */
+.pg-float-none {
+  float: none;
+}
+
+/* line 72, ../../src/styles/styles.scss */
+.pg-vertical-center {
+  vertical-align: middle;
+  align-items: center;
+}
+
+/* BUTTON */
+/* line 80, ../../src/styles/styles.scss */
+.pg-btn, button {
+  padding: 10px 10px;
+  background-color: #6d6d7f;
+  color: #fff;
+  cursor: pointer;
+  display: inline-block;
+  text-align: center;
+}
+
+/* TABLE */
+/* line 92, ../../src/styles/styles.scss */
+.pg-table > .pg-row {
+  align-items: center;
+  padding: 10px 10px;
+}
+
+/* line 96, ../../src/styles/styles.scss */
+.pg-table > .pg-row:nth-child(odd) {
+  background-color: #d1d1e6;
+}
+
+/* line 102, ../../src/styles/styles.scss */
+.pg-tag {
+  background-color: #555555;
+  padding: 5px 10px;
+  border: none;
+  margin-right: 10px;
+  border-radius: 10px;
+  display: inline-block;
+  text-align: center;
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+
+/* line 115, ../../src/styles/styles.scss */
+.pg-tab {
+  padding: 20px;
+}
+
+/* line 120, ../../src/styles/styles.scss */
+.pg-row > .pg-row {
+  flex-wrap: wrap;
+  width: 100%;
+  flex-direction: column;
+}
+
+/* PROJECT */
+/* line 129, ../../src/styles/styles.scss */
+.log-output > div {
+  font-size: 10px;
+  margin-bottom: 3px;
+  color: #555561;
+}
+
+/* line 134, ../../src/styles/styles.scss */
+.log-output > div:nth-child(even) {
+  color: darkgray;
+}
+
+/* line 138, ../../src/styles/styles.scss */
+#new_feed_form {
+  background: #c2c2d4;
+  padding: 30px;
+}
+
+/* line 143, ../../src/styles/styles.scss */
+#new_feed_form > div {
+  margin-bottom: 10px;
+}
