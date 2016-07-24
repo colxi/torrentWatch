@@ -1,5 +1,9 @@
-var pg,
-	chrome;
+/* jsHint inline configuration : */
+/* jshint undef: true, unused: false */
+/* global chrome , System , rivets  */
+
+let pg;
+
 (function(){
 	'use strict';
 	pg = {
@@ -8,23 +12,78 @@ var pg,
 		 * @param  {[type]} obj [description]
 		 * @return {[type]}     [description]
 		 */
+		 /*
+		__Controller : class{
+			constructor(name, module ) {
+    			//module.__pg_controller = name; // ¿ injected native / babel ?
+    			if(name === 'main') module.log = function(msg,type){ return pg.log(msg,type) };
+    			module._expose = function(){
+    				return Object.getOwnPropertyNames(module).filter( p => {
+						return( ['_expose','prototype'].indexOf(p) === -1);
+					});
+				};
+    			return module;
+  			}
+		},
+		*/
+		__Controller: function(name, module){
+			module.name = name;
+			if(name === 'main') module.log = function(msg,type){ return pg.log(msg,type) };
+			module._expose = function(){
+				return Object.getOwnPropertyNames(module).filter( p => {
+					return( ['_expose','prototype'].indexOf(p) === -1);
+				});
+			};
+			return module;
+		},
+
 		configure : function(obj){} ,
+		config : {
+			import_baseUrl : '/',
+			appReference : 'app'
+		},
 		/**
 		 * [loadController description]
 		 * @param  {[type]} controller [description]
 		 * @return {[type]}            [description]
 		 */
-		loadController : function(controller){
-			pg.log('loadController() : Loading controller module :' + controller);
-			System.import('/controllers/'+ controller +".js").then(function(controller){
-   				console.log(controller);
+		loadController : function(controllerId){
+			pg.log( 'pg.loadController() : Loading controller module "' + controllerId + '"' );
+			return new Promise(function(_resolve, _reject){
+				// internal function used to end loadController routine, cleaning
+				// CONTROLLER module and resolving promise...
+				let __resolve_loadController = function(){
+					if( controllerId === 'main') window[pg.config.appReference] = pg.controllers[controllerId];
+					delete pg.controllers[controllerId].length; // babel transpiler autogen ¿?
+					delete pg.controllers[controllerId].__constructor; // ensure one time executable
+				 	_resolve( controllerId ,  pg.controllers[controllerId] );
+				};
+				// import CONTROLLER module
+				System.import('/scripts/controllers/'+ controllerId +'.js').then(function(controller){
+	   				// create CONTROLLER module instance
+	   				window.a = controller;
+	   				// ****
+	   				// RIVETS cant read ES6 classes (..or babel transpilation)
+	   				// soo using standard objects in modules...
+	   				// pg.controllers[controllerId] = new controller.default(controllerId,controller.default );
+	   				// ****
+	   				pg.controllers[controllerId] = new pg.__Controller(controllerId, controller.default);
+	   				// check if has custom constructor/igniter
+	   				if( pg.controllers[controllerId].hasOwnProperty('__constructor') ){
+	   					// execute CONTROLLER module custom constructor
+	   					let _c = pg.controllers[controllerId].__constructor();
+	   					// resolve pg.loadController (handle promise in CONTROLLER module __constructor)
+	   					if(typeof _c.then === 'function') _c.then( r =>  __resolve_loadController() );
+	   					else __resolve_loadController();
+	   				}else __resolve_loadController();
+				});
 			});
 		},
 		/**
 		 * [controller description]
 		 * @type {Object}
 		 */
-		controller : {
+		controllers : {
 
 		},
 		/**
@@ -33,26 +92,45 @@ var pg,
 		 * @return {[type]}   [description]
 		 */
 		_init : document.addEventListener('DOMContentLoaded', function() {
+  			/* ES6 polyfill */
+  			pg.log('pg._init() : Requiring Babel Polyfill...');
   			pg.require('imports/babel-polyfill/polyfill.min.js').then(function(){
+  				// System js (import modules from the future)
+  				pg.log('pg._init() : Requiring SystmJS...');
   				pg.require('imports/systemjs/system.js').then(function(){
-  					System.config({ baseURL: '/scripts' });
-		  			pg.require('lib/JSON.parseXML').then(function(){
-			  			pg.log('Starting Torrent Observer v.' + pg.getVersion() );
-
-			  			// set html file for toolbar icon popup
-			  			chrome.browserAction.setPopup( {popup:'views/popup/popup.html'} );
-						chrome.browserAction.onClicked.addListener(function(){
-							pg.popup = chrome.extension.getViews()[1].document;
-							pg.log('Popup opened');
-						});
-
-			  			pg.countFeedsinAllCategories();
-						pg.getAllFeeds().then(function(){ pg.log('Init done'); });
-
-						delete pg._init;
-		  			});
-  				});
-  			});
+  					System.config({ baseURL: pg.config.import_baseUrl });
+		  			/* Sightglass ... data binding */
+		  			pg.log('pg._init() : Requiring Sightglass...');
+		  			pg.require('imports/sightglass/index.js').then(function(){
+		  				/* Rivers data binding on steroids....*/
+		  				pg.log('pg._init() : Requiring Rivets...');
+			  			pg.require('imports/rivets/rivets.js').then(function(){
+		  					/* Steroids expansion */
+		  					pg.log('pg._init() : Requiring Rivets Formaters Lib... ( rivets.stdlib )');
+			  				pg.require('lib/rivets.stdlib.js').then(function(){
+			  					// configure RIVETS
+			  					rivets.configure({
+									prefix: 'rv', 					// Attribute prefix in templates
+									preloadData: true,				// Preload templates with initial data on bind
+									rootInterface: '.',				// Root sightglass interface for keypaths
+									templateDelimiters: ['{', '}'],	// Template delimiters for text bindings
+									// Augment the event handler of the on-* binder
+									handler: function(target, ev, binding) { return this.call(target, event, binding.view.models,binding); }
+								});
+								sightglass.adapters = rivets.adapters;
+								sightglass.root = rivets.rootInterface;
+								pg.bind = rivets.bind;
+								pg.watch = sightglass;
+			  					/* Ready ! Load main module */
+			  					pg.log('pg._init() : Loading MAIN controller...');
+					  			pg.loadController('main').then( r =>{
+			  						pg.log('pg._init() : Main Controller Loaded!');
+					  			});
+			  				});
+		  				});
+	  				});
+	  			});
+			});
 		}),
 		/**
 		 * [require description]
@@ -64,7 +142,7 @@ var pg,
 				baseUrl : 'scripts/'
 			};
 			let _require = function(src) {
-		    	return new Promise(function(resolve, reject){
+		    	return new Promise(function(_resolve, _reject){
 				   	let filename = src.substring(src.lastIndexOf('/')+1);
 					// if no extension, assume .JS and extract again the filenamename
 					if(filename.lastIndexOf('.js') === -1){
@@ -77,15 +155,15 @@ var pg,
 				    let script = document.createElement('script');
 				    script.type = 'text/javascript';
 				    script.src = config.baseUrl + src;
-				    pg.log(script.src);
+				    //pg.log(script.src);
 					script.onload = script.onreadystatechange = function() {
 						// attach to both events for cross browser finish detection:
 						if ( !done && (!this.readyState || this.readyState === 'loaded' || this.readyState === 'complete') ) {
-							// done! execute PROMISE RESOLVE
+							// done! execute PROMISE _resolve
 							done = true;
 							// cleans up a little memory, removing listener;
 							script.onload = script.onreadystatechange = null;
-							resolve();
+							_resolve();
 						}
 					};
 				    // Fire the loading
@@ -122,6 +200,7 @@ var pg,
 			}
 		],
 		feeds : [
+			/*
 			{
 				id 			: 'eeed24d2-be2f-42bc-dc3a-3ebf9ba4eff3',
 				name 		: 'Kat (All)',
@@ -130,7 +209,8 @@ var pg,
 				TTL 		: 10,
 				categories 	: ['f11d24b3-be2f-4bdd-d0e0-2ebf9ba0f5c7','dd63224e-b59c-4b41-5f99-c63cffbbafe4','44748d67-be92-47a9-a5b6-de502f1e8cb5'],
 				lastUpdate 	: null
-			},{
+			},
+			{
 				id 			: 'd44d24b3-af2f-12bd-abaa-2ebf9ba0f5c3',
 				name 		: 'Kat Movies',
 				url 		: 'https://kat.cr/movies/?rss=1',
@@ -138,7 +218,9 @@ var pg,
 				TTL 		: 10,
 				categories 	: ['f11d24b3-be2f-4bdd-d0e0-2ebf9ba0f5c7'],
 				lastUpdate 	: null
-			},{
+			},
+			*/
+			{
 				id 			: 'a34d24b3-cc2f-6add-b2f0-5ebe9ac0f521',
 				name 		: 'Mininova Movies',
 				url 		: 'http://www.mininova.org/rss.xml?cat=4',
@@ -206,7 +288,7 @@ var pg,
 		 * @return {[type]} [description]
 		 */
 		getAllFeeds : function(){
-			return new Promise(function(resolve, reject){
+			return new Promise(function(_resolve, _reject){
 				pg.log('pg.updateAllFeeds(): Updating all Feeds...');
 				var currentFeed = -1;
 				// Loop through the Feeds with array.reduce...
@@ -215,8 +297,9 @@ var pg,
 						currentFeed++;
 				 		return pg.getFeed(currentFeed);
 					}).then(function(result) {
-						if(result) pg.log('pg.updateAllFeeds(): Feed #'+ ( currentFeed + 1) +' ' + pg.feeds[currentFeed].name + ' UPDATED (' + result + ')' );
-				    	else  pg.log('pg.updateAllFeeds(): Feed #'+ ( currentFeed + 1) +' ' + pg.feeds[currentFeed].name + ' FAILED (' + result + ')' );
+						if(result) pg.log('pg.updateAllFeeds(): Feed #'+ ( currentFeed + 1) +' ' + pg.feeds[currentFeed].name + ' UPDATED' );
+				    	else  pg.log('pg.updateAllFeeds(): Feed #'+ ( currentFeed + 1) +' ' + pg.feeds[currentFeed].name + ' FAILED' );
+				  		if( (currentFeed + 1)=== pg.feeds.length) _resolve();
 				  	});
 				} , Promise.resolve());
 			});
@@ -227,8 +310,8 @@ var pg,
 		 * @return {[type]}   [description]
 		 */
 		getFeed: function(i){
-			return new Promise( function(resolve, reject){
-				if(i === undefined || i === null || i === '') return reject(-1);
+			return new Promise( function(_resolve, _reject){
+				if(i === undefined || i === null || i === '') return _reject(-1);
 
 				// get feed (allow feed array index or string url feed)
 				let feed;
@@ -236,7 +319,7 @@ var pg,
 				else feed = pg.feeds[i];
 
 				// block if requested feed does not exist
-				if(feed === undefined) return reject(-1);
+				if(feed === undefined) return _reject(-1);
 
 				pg.log('pg.updateFeed() : Updating Feed from :'+ feed.url +' ( ' + feed.name + ' )' );
 
@@ -253,13 +336,13 @@ var pg,
 					let JSONxml = JSON.parseXML(xmlDoc);
 
 					request = null;
-					return resolve(JSONxml);
+					return _resolve(JSONxml);
 				};
 				// RESPONSE FAIL
 				request.onerror  = function(){
 					pg.log('pg.getFeed(): Error on request.', request.statusText);
 					request = null;
-					return resolve(false);
+					return _resolve(false);
 				};
 				// Send Request
 				request.send(null);

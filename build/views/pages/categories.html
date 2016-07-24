@@ -1,0 +1,14 @@
+<!-- categories -->
+<section class="pg-tab" rv-show="app.currentTab | === 'tab-categories'">
+	<div class="pg-row">
+		<div class="pg-col-80">
+			<input type="text" rv-value="app.view.form.name" rv-class-invalid="app.view.form.validates | negate">
+		</div>
+		<div class="pg-col-20" rv-on-click="app.view.add"><div class="pg-btn fa fa-plus"></div></div>
+	</div>
+	<div class="pg-row">
+		<span rv-each-category="app.categories" class="pg-tag" rv-on-click="app.view.remove">
+			{category.name} ({category.feeds} feeds)
+		</span>
+	</div>
+</section>

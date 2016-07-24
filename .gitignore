@@ -1,5 +1,13 @@
+#OS junk files
+[Tt]humbs.db
+*.DS_Store
+
+#Sublime
+*.sublime-workspace
+*.sublime-project
+
+#Common
 /node_modules
-./npm-debug.log
-'node_modules' 
-torrentWatch.sublime-project 
-torrentWatch.sublime-workspace 
+/npm-debug.log
+/torrentWatch.sublime-project
+/torrentWatch.sublime-workspace

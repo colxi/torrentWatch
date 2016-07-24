@@ -1,20 +1,5 @@
-
-const pi = 3.14159265359;
-export var calcCircumference = (radius) => {
-    return 2 * radius * pi;
-};
-
-/*
- export class q {
-    constructor() {
-      console.log('this is an es6 class!');
-    }
-  }
-*/
-
-/*
 class feeds{
-	constructor(){
+	__constructor(){
 		this.currentView  = 'listing';
 		this.helpers = {
 			feedProperties 	: [],
@@ -82,6 +67,4 @@ class feeds{
 	}
 }
 
-let _feeds = new feeds();
-export default _feeds;
-*/
+export default feeds;

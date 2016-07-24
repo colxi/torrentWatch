@@ -127,15 +127,17 @@ module.exports = function(grunt) {
 		    	files: [
 		    		{
 			    		expand: true,
-			        	cwd: 'build/scripts/controllers/',
+			        	cwd: 'src/scripts/controllers/',
 			        	dest: 'build/scripts/controllers/',
-			        	src: ['**/*.js'],
+			        	src: ['**/*'],
 						ext: '.js',
 						extDot: 'last'
 					}
 		    	],
 		    	options: {
-			    	plugins : ['transform-es2015-modules-systemjs']
+			    	'plugins': [
+					    ["transform-es2015-modules-systemjs"]
+  					]
 		    	}
 		    }
 		},
@@ -236,6 +238,8 @@ module.exports = function(grunt) {
 		//
 		'clean:build_styles_scss',
 		'compass:src_styles_scss_TO_build',
+		// increase compilation
+		'versionUp.u',
 		// run watches&notify
 		'concurrent:watches'
 		// ./build ready !

@@ -1,0 +1,98 @@
+<!-- categories -->
+<section class="pg-tab" rv-show="view.currentTab | === 'tab-categories'">
+	<div class="pg-row">
+		<div class="pg-col-80">
+			<input type="text" rv-value="view.category.form.name" rv-class-invalid="view.category.form.validates | negate">
+		</div>
+		<div class="pg-col-20" rv-on-click="view.category.add"><div class="pg-btn fa fa-plus"></div></div>
+	</div>
+	<div class="pg-row">
+		<span rv-each-category="view.categories" class="pg-tag" rv-on-click="view.category.remove">
+			{category.name} ({category.feeds} feeds)
+		</span>
+	</div>
+</section>
+
+<!-- feeds -->
+	<section class="tab" rv-show="view.currentTab | === 'tab-feeds'">
+		<!-- feeds listing -->
+	<div class="pg-row pg-vertical-center pg-margin-bottom-biggest">
+		<h2 class="pg-col">Feeds :</h2>
+		<div class="pg-col pg-text-right">
+			<div class="pg-col pg-btn"><span class="fa fa-plus-circle"></span> Add</div>
+		</div>
+	</div>
+	<div class="pg-row">
+		<div class="pg-table pg-expand">
+			<div class="pg-row" rv-each-feed="view.feeds">
+				<div class="pg-col-30">
+					<div>{feed.name}</div>
+					<div class="pg-text-smaller">Last update: {feed.lastUpdate}</div>
+				</div>
+				<div class="pg-col pg-text-center">
+					<span class="pg-text-small" rv-each-category="feed.categories" >
+						{ view.categories | findBy 'id' category | getProperty 'name'} <span rv-hide="category | isLastIn feed.categories"> | </span>
+					</span>
+				</div>
+				<div class="pg-col-fixed">
+					<span class="fa fa-refresh pg-hover pg-margin-right-smallest"></span>
+					<span class="fa fa-pencil pg-hover pg-margin-right-smallest pg-margin-left-smallest"></span>
+					<span class="fa fa-trash pg-hover pg-margin-left-smallest"></span>
+				</div>
+			</div>
+		</div>
+	</div>
+
+		<!-- feed form feedData -->
+		<form class="pg-row" hidden rv-on-submit="view.feed.showFormConfig" rv-show="view.feed.location | === 'form:data'">
+		<label class="pg-form-control">
+			<input type="text" rv-value="view.feed.form.name" required pattern=".*\S+.*">
+			<span class="pg-label">Name:</span>
+		</label>
+		<label class="pg-form-control">
+			<input type="url" rv-value="view.feed.form.url" required pattern="https?://.+">
+			<span class="pg-label">Url:</span>
+		</label>
+		<div class="pg-form-control ph-text-center">
+			<label rv-each-category="view.categories">
+				<input type="checkbox" rv-on-click="view.toogleArrayItem | args category.name view.feed.form.categories" >
+				<span>{category.name}</span>
+			</label>
+			<input hidden type="text" rv-value="view.feed.form.categories | string" required pattern=".*\S+.*">
+			<span class="pg-label">Category:</span>
+		</div>
+
+		 <button type="submit" >Validate Feed<div class="fa fa-plus"></div></button>
+	</form>
+	<form class="pg-row" rv-on-submit="view.feed.saveForm" rv-show="view.feed.location | === 'form:config'">
+		<label class="pg-form-control">
+			<input type="range" min="0" max="120" rv-value="view.feed.form.TTL" step="5">
+			<span class="pg-label">Check Interval (ttl : <span>{view.feed.form.TTL}</span> minutes):</span>
+		</label>
+		<div class="pg-form-control pg-text-center">
+			<label rv-each-property="view.feed.helpers.feedProperties">
+				<input type="checkbox" rv-on-click="view.toogleArrayItem | args property view.feed.form.properties" >
+				<span>{property}</span>
+			</label>
+			<input hidden type="text" rv-value="view.feed.form.properties | string" required pattern=".*\S+.*">
+			<span class="pg-label">Search in Properties...</span>
+		</div>
+
+		<div class="pg-row">
+			<div class="pg-col-50">
+				 <button  type="button" rv-on-click="view.feed.showFormData">Back...<div class="fa fa-plus"></div></button>
+			</div>
+			<div class="pg-col-50">
+			 	<button  type="submit" >Save Feed<div class="fa fa-plus"></div></button>
+			</div>
+		</div>
+	</form>
+</section>
+
+<!-- config -->
+	<section class="pg-tab" rv-show="view.currentTab | === 'tab-config'">
+		<h2>Log output:</h2>
+		<div class="log-output">
+			<div rv-each-log="view.logStore">{log}</div>
+		</div>
+	</section>

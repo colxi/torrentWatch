@@ -22,6 +22,8 @@
         factory(root.rivets, root.moment);
     }
 })(this, function(rivets, moment) {
+
+
     rivets.stdlib = {
         defaultPrecision: 2,
         defaultThousandSeparator: '\'',
