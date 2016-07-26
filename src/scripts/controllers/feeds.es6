@@ -1,5 +1,7 @@
-class feeds{
+let feeds = {
 	__constructor(){
+		feeds.feeds=app.feeds;
+
 		this.currentView  = 'listing';
 		this.helpers = {
 			feedProperties 	: [],
@@ -13,18 +15,22 @@ class feeds{
 			properties :  [],
 		};
 
-	}
+	},
 
-	static showListing(){
+	test : 'fdkmfskgfs',
 
-	}
+	asd : [23,45,24,64,24],
 
-	static showFormData(){
+	showListing() {
+
+	},
+
+	showFormData(){
 		//
 		this.currentView = 'form:data';
-	}
+	},
 
-	static showFormConfig(){
+	showFormConfig(){
 		console.log('Validating RSS feed...');
 
 		pg.getFeed(this.form.url).then(function(result){
@@ -42,9 +48,9 @@ class feeds{
 			 	if( result.rss.channel.item[0].hasOwnProperty(i) &&  i.charAt(0).match(/[A-Z|a-z]/i) ) this.helpers.feedProperties.push(i);
 			}
 		});
-	}
+	},
 
-	static saveForm(){
+	saveForm(){
 		var feed = {
 			id 			: '',
 			name 		: '',

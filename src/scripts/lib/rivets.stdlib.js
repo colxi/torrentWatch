@@ -35,63 +35,65 @@
     };
 
 
+    rivets._.Util.resolveKeyPath = function(binding){
+        // break string keypath into each object level name
+        var keypathArray = binding.keypath.split(rivets.rootInterface);
+        // must exist at least the model name and a property
+        if(keypathArray.length < 2 ) throw new Error('Invalid keypath :' + binding.keypath);
+        // resolve the reference to modelRoot
+        var modelRoot =  binding.view.models[keypathArray[0]];
+        console.log(binding)
+        // remove model string from keypath array
+        keypathArray.shift();
+        // extract the name of the requewted property
+        var key =  keypathArray.pop();
+        // iterate keypathArray to obtain a Object reference to property parent
+        var model = ( keypathArray.length === 1) ? keypathArray[0] : keypathArray.reduce( (o,i)=>o[i], modelRoot );
+        console.log("model: ", model);
+        console.log("key: " + key);
+        return {
+            model : model,
+            key : key,
+            value : rivets.adapters[rivets.rootInterface].get(model,key)
+        };
+    };
+
+
+    /* Assignation */
+
     rivets.formatters.set = function(oldValue,newValue) {
         return function(event, obj, binding){
-            window.binding = binding;
+            //window.binding = binding;
             // var model = obj;
-            // break string keypath into each object level name
-            var keypathArray = binding.keypath.split(rivets.rootInterface);
-            // must exist at least the model name and a property
-            if(keypathArray.length < 2 ) throw new Error('Invalid keypath :' + binding.keypath);
-            // resolve the reference to modelRoot
-            var modelRoot =  binding.view.models[keypathArray[0]];
-            // remove model string from keypath array
-            keypathArray.shift();
-            // extract the name of the requewted property
-            var key =  keypathArray.pop();
-            // iterate keypathArray to obtain a Object reference to property parent
-            var model = ( keypathArray.length === 1) ? keypathArray[0] : keypathArray.reduce( (o,i)=>o[i], modelRoot );
-            //console.log("model: ", model);
-            //console.log("key: " + key);
+            var kp = rivets._.Util.resolveKeyPath(binding);
             //console.log("newValue: "+newValue);
             // set the value
             var adapter = rivets.adapters[rivets.rootInterface];
-            adapter.set(model, key, newValue);
+            adapter.set(kp.model, kp.key, newValue);
             return true;
         };
     };
 
 
-    rivets.formatters.args = function(target) {
-        var args = Array.prototype.slice.call(arguments);
-        args.splice(0,1);
-
-        return function(evt) {
-            var args_cpy = args.slice();
-            Array.prototype.push.apply(args_cpy, Array.prototype.slice.call(arguments));
-            return target.apply(this, args_cpy);
-        };
-    };
 
 
     /* Arrays */
 
     rivets.formatters.findIndexBy = function(_array, _property , _value){
         if( !rivets.formatters.isArray(_array) ) throw new Error('rivets.formatters.findIndexBy(): Can\'t operate on non Array object');
-        return _array.findIndex( function(i){
-        return (i[_property] === _value) ? true : false; }); // -1, not found
+        return _array.findIndex( function(i){ return (i[_property] === _value) ? true : false; }); // -1, not found
     };
 
     rivets.formatters.findBy = function(_array, _property , _value){
-        if( !rivets.formatters.isArray(_array) ) throw new Error('rivets.formatters.findIndexBy(): Can\'t operate on non Array object');
-        return _array.find( function(i){ return (i[_property] === _value) ? true : false; }); // return undefined if not found
+        if( !rivets.formatters.isArray(_array) ) throw new Error('rivets.formatters.findBy(): Can\'t operate on non Array object');
+        return  _array.find( function(i){ return (i[_property] === _value) ? true : false; }); // return undefined if not found
     };
 
 
     /* Objectts */
 
     rivets.formatters.getProperty = function(_object, _property){
-        return _object[_property];
+        return (_object === undefined) ? false :_object[_property];
     };
 
     /* Each Iterator */
@@ -108,6 +110,185 @@
 
     rivets.formatters['!=='] = function(target, val) { return target !== val; };
     rivets.formatters['!='] = function(target, val) { return target != val; };
+
+    /* Function */
+
+    rivets.formatters['args'] = function(target) {
+        var args = Array.prototype.slice.call(arguments);
+        args.splice(0,1);
+        return function(evt) {
+            var args_cpy = args.slice();
+            Array.prototype.push.apply(args_cpy, Array.prototype.slice.call(arguments));
+            return target.apply(this, args_cpy);
+        };
+    };
+    // alias
+    rivets.formatters['()'] = rivets.formatters['args'];
+
+
+
+    rivets.binders.controller = {
+        bind: function(el) {
+           // console.log('rv-controller routine bind ', arguments);
+
+        },
+
+        unbind: function(el) {
+            console.log('rv-controller unbind args', arguments);
+            if (this.nested)  this.nested.unbind();
+        },
+
+        routine: function(el , controllerId) {
+            if(typeof controllerId === 'object') return false;
+            console.log('rv-controller routine args', arguments);
+            rivets.Controllers = rivets.Controllers || {};
+            var basePath = 'scripts/controllers/';
+            var customConstructor = '__constructor';
+
+            // if controllerId is not a model property, try to get the attribute value
+            if(controllerId === undefined){
+                controllerId = el.getAttribute(rivets.prefix+'-controller');
+                if(controllerId === undefined || controllerId === '' ) return false;
+            }
+            console.log(controllerId)
+            controllerId = String( controllerId ).trim();
+            var controllerPath = basePath + controllerId + '.js';
+            var bindConstructor = function(controller){
+                //if( controllerId === 'main') window[pg.config.appReference] = pg.controllers[controllerId];
+                //delete pg.controllers[controllerId].length; // babel transpiler autogen ¿?
+                //delete pg.controllers[controllerId].__constructor; // ensure one time executable
+                var _binding ={};
+                _binding[controllerId] = controller;
+                var rv_view = rivets.bind( el , _binding );
+                Object.defineProperty(controller, '__view__', {
+                    value: rv_view,
+                    enumerable: false,
+                    writable:true,
+                    configurable: true
+                });
+                // make App controller accessible to loaded view , appending it
+                //_binding.app = app;
+                //controller.__view__.update(_binding );
+                console.log(el, _binding, rv_view)
+            };
+            // import CONTROLLER module
+            System.import(controllerPath).then(function(controller){
+                // create CONTROLLER module instance
+                controller = rivets.Controllers[controllerId] = controller.default;
+                // check if has custom constructor/igniter
+                if( customConstructor !== undefined &&  controller.hasOwnProperty(customConstructor) &&  typeof controller[customConstructor] === 'function' ){
+                    // execute CONTROLLER module custom constructor
+                    var _c = controller[customConstructor]();
+                    // execute constructor (if returns promise resolve promise before binding)
+                    if( _c !== undefined && _c.hasOwnProperty('then') &&  typeof _c.then === 'function') _c.then( function(){ bindConstructor(controller) });
+                    else bindConstructor(controller);
+                }else bindConstructor(controller);
+            });
+            return;
+
+            /*
+            var path = rivets._.Util.resolveKeyPath(this);
+            if(path.value === undefined || path.value === false || path.value === '') return false;
+            else console.log('rivets.blinder.include.routine() : Proceeding to load ' + String(path.value));
+            this.load( String(path.value) );
+            */
+        }
+  };
+
+
+
+
+    rivets.binders.include = {
+        bind: function(el) {
+            var self = this;
+
+            this.clear = function() {
+                if (this.nested)  this.nested.unbind();
+                el.innerHTML = '';
+            };
+
+            this.load = function(path) {
+                //console.log("$$$$$$$$$$$$$$$$$$$$$$$")
+                //console.log(path)
+                this.clear();
+                if (typeof path === 'function') path = path();
+                if (!path || path === undefined || path === '')  return false;
+
+
+                var _html = new XMLHttpRequest();
+                var done = false;
+                _html.overrideMimeType("text/html");
+                _html.open('GET', path , true);
+                _html.onload = _html.onreadystatechange = function () {
+                    if ( !done && (!this.readyState || this.readyState === 4) ) {
+                        // done! execute PROMISE RESOLVE
+                        done = true;
+                        self.loadComplete( _html );
+                        // cleans up a little memory, removing listener;
+                        return (_html.onload = _html.onreadystatechange = null);
+                    }
+                };
+                _html.onerror = function( _err ){ self.loadComplete( _html, _err ); };
+                _html.send(null);
+            };
+
+            this.loadComplete = function(response) {
+                //console.log(err, response);
+                var body = response.responseText;
+                /*
+
+                if (err) {
+                    self.clear();
+                    if (console) console.error(err);
+                    return;
+                }
+                */
+                console.log(el);
+                el.innerHTML = body;
+
+                // copy models into new view
+                var models = {};
+                for(var key in self.view.models) if( models.hasOwnProperty(key) ) models[key] = self.view.models[key];
+
+                var options = {};
+                if (typeof self.view['options'] === 'function') options = self.view.options();
+
+                var els = Array.prototype.slice.call(el.childNodes);
+                self.nested = rivets.bind(els, models, options);
+
+                // dispatch include event
+                /*
+                var event = new CustomEvent('include', {
+                detail: {
+                  path: path
+                },
+                bubbles: true,
+                cancelable: true
+                });
+
+                el.dispatchEvent(event);
+                */
+            };
+        },
+
+        unbind: function(el) {
+
+            if (this.clear) this.clear();
+        },
+
+        routine: function(el, value) {
+            //console.log("--------------")
+            //console.log(el, value,this)
+            var path = rivets._.Util.resolveKeyPath(this);
+            //console.log(path);
+            if(path.value === undefined || path.value === false || path.value === '') return false;
+            else console.log('rivets.blinder.include.routine() : Proceeding to load ' + String(path.value));
+            this.load( String(path.value) );
+        }
+  };
+
+
+
 
 
 

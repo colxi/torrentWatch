@@ -10,26 +10,31 @@
 -->
 	<script src="../../scripts/popup.js"></script>
   </head>
-  <body id="app-wrapper" class="pg-unselectable">
+  <body id="pg-app" class="pg-unselectable">
 	<!-- nav -->
     <nav class="pg-row">
 		<div class="pg-col-25">
-			<div class="pg-btn" rv-on-click="app.currentTab | set 'tab-categories'">Groups<span class="fa fa-angle-double-down fa-pull-right"></span></div>
+			<div class="pg-btn" rv-on-click="app.loadPage | () 'categories' ">Groups<span class="fa fa-angle-double-down fa-pull-right"></span></div>
 		</div>
 		<div class="pg-col-25">
-			<div class="pg-btn" rv-on-click="app.currentTab | set 'tab-feeds'">Feeds<span class="fa fa-angle-double-down fa-pull-right"></span></div>
+			<div class="pg-btn" rv-on-click="app.loadPage | () 'feeds'  ">Feeds<span class="fa fa-angle-double-down fa-pull-right"></span></div>
 		</div>
 		<div class="pg-col-25">
-			<div class="pg-btn" rv-on-click="app.currentTab | set 'tab-watchers'">Watchers<span class="fa fa-angle-double-down fa-pull-right"></span></div>
+			<div class="pg-btn" rv-on-click="app.loadPage | () 'watchers'  ">Watchers<span class="fa fa-angle-double-down fa-pull-right"></span></div>
 		</div>
 		<div class="pg-col-25">
-			<div class="pg-btn" rv-on-click="app.currentTab | set 'tab-config'">Config<span class="fa fa-angle-double-down fa-pull-right"></span></div>
+			<div class="pg-btn" rv-on-click="app.loadPage | () 'config'  ">Config<span class="fa fa-angle-double-down fa-pull-right"></span></div>
 		</div>
 	</nav>
-	<!-- main -->
-    <main class="pg-padding-biggest" >
-    tab : {app.currentTab}
-    </main>
+
+
+
+
+
+
+
+	<!-- page viewport -->
+    <main id="pg-view" class="pg-padding-biggest"></main>
   </body>
 </html>
 

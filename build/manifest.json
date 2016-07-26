@@ -1,5 +1,5 @@
 {
-	"version": "0.0.1115",
+	"version": "0.0.1385",
 	"manifest_version": 2,
 	"name": "Torrent Watch : Alerts on torrent releases",
 	"description": "This extension alerts user when torrent file is released",

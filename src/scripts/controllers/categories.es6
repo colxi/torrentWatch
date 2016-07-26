@@ -1,4 +1,4 @@
-class categories{
+let categories={
 	__constructor(){
 		this.currentView  = 'listing';
 		this.helpers = {
@@ -9,22 +9,22 @@ class categories{
 			validates 	: true,
 		};
 
-	}
+	},
 
-	static showListing(){
+	showListing(){
 		this.currentView  = 'listing';
-	}
+	},
 
-	static showForm(){
+	showForm(){
 		this.currentView  = 'form';
-	}
+	},
 
-	static delete (e,i){
+	delete (e,i){
 			view.categories.splice(i.index, 1);
 			return true;
-		}
+	},
 
-	static saveForm(){
+	saveForm(){
 		view.category.form.name = view.category.form.name.trim().toLowerCase();
 		view.category.form.validates  = true;
 		// validate category name
