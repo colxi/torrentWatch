@@ -72,7 +72,7 @@ var pg = void 0;
 						done = true;
 						// free memory, explicit  listener removal;
 						_resolve(_html.responseText);
-						_html.onload = _html.onreadystatechange = null;
+						_html = _html.onload = _html.onreadystatechange = null;
 					}
 				};
 				_html.onerror = function () {
@@ -105,13 +105,11 @@ var pg = void 0;
 					// soo using standard objects in modules...
 					// pg.controllers[controllerId] = new controller.default(controllerId,controller.default );
 					// ****
-
 					pg.controllers[controllerId] = new pg.__Controller(controllerId, controller.default);
-
 					// check if has custom constructor/igniter
 					if (pg.controllers[controllerId].hasOwnProperty('__constructor') && typeof pg.controllers[controllerId].__constructor === 'function') {
 						// execute CONTROLLER module custom constructor
-						var _c = pg.controllers[controllerId].__constructor.call(pg.controllers[controllerId]);
+						var _c = pg.controllers[controllerId].__constructor();
 						// resolve pg.loadController (handle promise in CONTROLLER module __constructor)
 						if (_c !== undefined && _c.hasOwnProperty('then') && typeof _c.then === 'function') _c.then(function (r) {
 							return __resolve_loadController();
@@ -164,7 +162,6 @@ var pg = void 0;
 								pg.bind = rivets.bind;
 								pg.watch = sightglass;
 								/* Ready ! Load main module */
-
 								pg.log('pg._init() : Loading MAIN controller...');
 								pg.loadController('main').then(function (r) {
 									pg.log('pg._init() : Main Controller Loaded!');
@@ -223,7 +220,61 @@ var pg = void 0;
    * [feeds description]
    * @type {Array}
    */
-
+		categories: [{
+			id: 'f11d24b3-be2f-4bdd-d0e0-2ebf9ba0f5c7',
+			name: 'movies',
+			feeds: 0
+		}, {
+			id: 'dd63224e-b59c-4b41-5f99-c63cffbbafe4',
+			name: 'music',
+			feeds: 0
+		}, {
+			id: '44748d67-be92-47a9-a5b6-de502f1e8cb5',
+			name: 'software',
+			feeds: 0
+		}, {
+			id: '91aa33c5-5099-48e8-b6a4-4a5946c0b617',
+			name: 'others',
+			feeds: 0
+		}],
+		feeds: [
+		/*
+  {
+  	id 			: 'eeed24d2-be2f-42bc-dc3a-3ebf9ba4eff3',
+  	name 		: 'Kat (All)',
+  	url 		: 'https://kat.cr/?rss=1',
+  	properies	: ['title'],
+  	TTL 		: 10,
+  	categories 	: ['f11d24b3-be2f-4bdd-d0e0-2ebf9ba0f5c7','dd63224e-b59c-4b41-5f99-c63cffbbafe4','44748d67-be92-47a9-a5b6-de502f1e8cb5'],
+  	lastUpdate 	: null
+  },
+  {
+  	id 			: 'd44d24b3-af2f-12bd-abaa-2ebf9ba0f5c3',
+  	name 		: 'Kat Movies',
+  	url 		: 'https://kat.cr/movies/?rss=1',
+  	properies	: ['title'],
+  	TTL 		: 10,
+  	categories 	: ['f11d24b3-be2f-4bdd-d0e0-2ebf9ba0f5c7'],
+  	lastUpdate 	: null
+  },
+  */
+		{
+			id: 'a34d24b3-cc2f-6add-b2f0-5ebe9ac0f521',
+			name: 'Mininova Movies',
+			url: 'http://www.mininova.org/rss.xml?cat=4',
+			properies: ['title'],
+			TTL: 10,
+			categories: ['f11d24b3-be2f-4bdd-d0e0-2ebf9ba0f5c7'],
+			lastUpdate: null
+		}, {
+			id: 'bdv424b6-cb1c-3aab-11b3-ac429bb0f530',
+			name: 'YIFY Movies',
+			url: 'https://yts.ag/rss',
+			properies: ['title'],
+			TTL: 10,
+			categories: ['f11d24b3-be2f-4bdd-d0e0-2ebf9ba0f5c7'],
+			lastUpdate: null
+		}],
 		logStore: [],
 		log: function log() {
 			var msg = arguments.length <= 0 || arguments[0] === undefined ? '{empty}' : arguments[0];
@@ -252,7 +303,101 @@ var pg = void 0;
    * @type {[type]}
    */
 		popup: null,
+		/**
+   * [getCategoryById description]
+   * @param  {[type]} id [description]
+   * @return {[type]}    [description]
+   */
+		getCategoryById: function getCategoryById(id) {
+			var i = pg.categories.findIndex(function (cat) {
+				return cat.id === id ? true : false;
+			});
+			return i === -1 ? -1 : pg.categories[i];
+		},
+		getCategoryByName: function getCategoryByName(id) {
+			var i = pg.categories.findIndex(function (cat) {
+				return cat.name === id ? true : false;
+			});
+			return i === -1 ? -1 : pg.categories[i];
+		},
+		countFeedsinCategory: function countFeedsinCategory(id) {
+			var category = pg.getCategoryById(id);
+			if (category === -1) return -1;
 
+			category.feeds = 0;
+			for (var i = 0; i < pg.feeds.length; i++) {
+				if (pg.feeds[i].categories.indexOf(id) !== -1) category.feeds++;
+			}return category.feeds;
+		},
+		countFeedsinAllCategories: function countFeedsinAllCategories() {
+			for (var i = 0; i < pg.categories.length; i++) {
+				pg.countFeedsinCategory(pg.categories[i].id);
+			}return true;
+		},
+
+		/**
+   * [updateAllFeeds description]
+   * @return {[type]} [description]
+   */
+		getAllFeeds: function getAllFeeds() {
+			return new Promise(function (_resolve, _reject) {
+				pg.log('pg.updateAllFeeds(): Updating all Feeds...');
+				var currentFeed = -1;
+				// Loop through the Feeds with array.reduce...
+				pg.feeds.reduce(function (sequence) {
+					return sequence.then(function () {
+						currentFeed++;
+						return pg.getFeed(currentFeed);
+					}).then(function (result) {
+						if (result) pg.log('pg.updateAllFeeds(): Feed #' + (currentFeed + 1) + ' ' + pg.feeds[currentFeed].name + ' UPDATED');else pg.log('pg.updateAllFeeds(): Feed #' + (currentFeed + 1) + ' ' + pg.feeds[currentFeed].name + ' FAILED');
+						if (currentFeed + 1 === pg.feeds.length) _resolve();
+					});
+				}, Promise.resolve());
+			});
+		},
+		/**
+   * [updateFeed description]
+   * @param  {[type]} i [description]
+   * @return {[type]}   [description]
+   */
+		getFeed: function getFeed(i) {
+			return new Promise(function (_resolve, _reject) {
+				if (i === undefined || i === null || i === '') return _reject(-1);
+
+				// get feed (allow feed array index or string url feed)
+				var feed = void 0;
+				if (isNaN(i) && typeof i === 'string') feed = { url: i, name: '***' };else feed = pg.feeds[i];
+
+				// block if requested feed does not exist
+				if (feed === undefined) return _reject(-1);
+
+				pg.log('pg.updateFeed() : Updating Feed from :' + feed.url + ' ( ' + feed.name + ' )');
+
+				//
+				// Prepare Ajax request
+				//
+				var request = new XMLHttpRequest();
+				request.open('get', feed.url, true);
+
+				// RESPONSE OK
+				request.onload = function () {
+					var parser = new DOMParser();
+					var xmlDoc = parser.parseFromString(request.responseText, 'text/xml');
+					var JSONxml = JSON.parseXML(xmlDoc);
+
+					request = null;
+					return _resolve(JSONxml);
+				};
+				// RESPONSE FAIL
+				request.onerror = function () {
+					pg.log('pg.getFeed(): Error on request.', request.statusText);
+					request = null;
+					return _resolve(false);
+				};
+				// Send Request
+				request.send(null);
+			});
+		},
 		/**
    * [createGuid description]
    * @return {[type]} [description]

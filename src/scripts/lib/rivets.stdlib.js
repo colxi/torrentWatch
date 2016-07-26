@@ -128,38 +128,62 @@
 
 
     rivets.binders.controller = {
+        block: true,
+        priority: 4000,
         bind: function(el) {
-           // console.log('rv-controller routine bind ', arguments);
+            console.log('***** rv-controller bind ');
+            console.log(this);
+
+            //this._ControllerReady = this._ControllerReady || false;
+            //console.log('***** rv-controller bind . ready ?', this._ControllerReady);
+            //console.log(this);
+            //if( !this._ControllerReady ) this.bound = false;
 
         },
 
         unbind: function(el) {
-            console.log('rv-controller unbind args', arguments);
-            if (this.nested)  this.nested.unbind();
+            console.log('***** rv-controller unbind ');
+
+        },
+
+        update: function(models) {
+            var _ref1;
+            return (_ref1 = this.nested) != null ? _ref1.update(models) : void 0;
         },
 
         routine: function(el , controllerId) {
             if(typeof controllerId === 'object') return false;
-            console.log('rv-controller routine args', arguments);
+            console.log('***** rv-controller routine ');
+            console.log(this);
+
+
             rivets.Controllers = rivets.Controllers || {};
             var basePath = 'scripts/controllers/';
             var customConstructor = '__constructor';
-
+            var _self = this;
             // if controllerId is not a model property, try to get the attribute value
             if(controllerId === undefined){
                 controllerId = el.getAttribute(rivets.prefix+'-controller');
                 if(controllerId === undefined || controllerId === '' ) return false;
             }
-            console.log(controllerId)
             controllerId = String( controllerId ).trim();
             var controllerPath = basePath + controllerId + '.js';
+
+
             var bindConstructor = function(controller){
                 //if( controllerId === 'main') window[pg.config.appReference] = pg.controllers[controllerId];
                 //delete pg.controllers[controllerId].length; // babel transpiler autogen ¿?
                 //delete pg.controllers[controllerId].__constructor; // ensure one time executable
                 var _binding ={};
                 _binding[controllerId] = controller;
-                var rv_view = rivets.bind( el , _binding );
+
+                //var document  = chrome.extension.getViews({ type: 'popup' })[0].document;
+                //document.querySelector('#controller-feeds').innerHTML = '<div>{feeds.currentView}</div>';
+               var el2 = el.cloneNode(true);
+               el2.removeAttribute('rv-controller');
+               el.parentNode.insertBefore( el2 , el );
+               el.parentNode.removeChild( el );
+               var rv_view =  rivets.bind( el2 ,_binding );
                 Object.defineProperty(controller, '__view__', {
                     value: rv_view,
                     enumerable: false,
@@ -167,10 +191,10 @@
                     configurable: true
                 });
                 // make App controller accessible to loaded view , appending it
-                //_binding.app = app;
-                //controller.__view__.update(_binding );
-                console.log(el, _binding, rv_view)
+                _binding.app = app;
+                rv_view.update(_binding );
             };
+
             // import CONTROLLER module
             System.import(controllerPath).then(function(controller){
                 // create CONTROLLER module instance

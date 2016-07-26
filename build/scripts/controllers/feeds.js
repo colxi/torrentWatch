@@ -9,7 +9,6 @@ System.register([], function (_export, _context) {
 		execute: function () {
 			feeds = {
 				__constructor: function __constructor() {
-					feeds.feeds = app.feeds;
 
 					this.currentView = 'listing';
 					this.helpers = {
@@ -24,12 +23,6 @@ System.register([], function (_export, _context) {
 						properties: []
 					};
 				},
-
-
-				test: 'fdkmfskgfs',
-
-				asd: [23, 45, 24, 64, 24],
-
 				showListing: function showListing() {},
 				showFormData: function showFormData() {
 					//

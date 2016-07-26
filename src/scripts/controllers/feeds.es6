@@ -1,6 +1,5 @@
 let feeds = {
 	__constructor(){
-		feeds.feeds=app.feeds;
 
 		this.currentView  = 'listing';
 		this.helpers = {
@@ -16,10 +15,6 @@ let feeds = {
 		};
 
 	},
-
-	test : 'fdkmfskgfs',
-
-	asd : [23,45,24,64,24],
 
 	showListing() {
 

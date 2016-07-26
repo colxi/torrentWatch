@@ -3,6 +3,99 @@
 /* global chrome , rivets , pg  */
 
 // let main extends pg.__Controller{
+let app ={
+	__constructor(){
+		return new Promise( (resolve,reject) =>{
+			app.currentTab  	= 'tab-feeds';
+			app.categories 		= pg.categories;
+			app.feeds 			= pg.feeds;
+			app.logStore		= pg.logStore;
+			app.Data = {
+				Feeds : pg.feeds,
+				Categories : pg.categories,
+			}
+
+			// Define pg App Name Reference
+			pg.config.appReference = 'app'; // window.app
+
+  			// set html file popup
+  			chrome.browserAction.setPopup( {popup:'views/popup/popup.html'} );
+
+			pg.log('*** Starting Torrent Observer v.' + pg.getVersion() );
+
+			// require module libraries
+			pg.log('app.__constructor() : Requiring JSON.parseXML...');
+			pg.require('lib/JSON.parseXML').then( r => {
+	  			pg.countFeedsinAllCategories();
+				pg.getAllFeeds().then( r => {
+					resolve( );
+				});
+			});
+		});
+
+	},
+
+	initialize(){
+		app.log('app.initialize(): Popup opened! Binding view...');
+		// overwrite DOCUMENT with popup document instance
+		let document  = chrome.extension.getViews({ type: 'popup' })[0].document;
+		// Bind & attach rivets view to App controller as non-enumerable property
+		let rv_view = pg.bind( document.querySelector('#pg-app') , { 'app' : app } );
+		// if first popup open , assign view; else update binding
+		if( !app.hasOwnProperty('__view__') ){
+			Object.defineProperty(app, '__view__', {
+				value: rv_view,
+				enumerable: false ,
+				writable:true,
+				configurable: true
+			});
+		}else app.__view__.update();
+	},
+
+
+
+	loadPage(page){
+		app.log('app.loadPage() : Loading Page "' + page + '"  ( Controller & View )');
+		// overwrite DOCUMENT with popup document instance
+		let document  = chrome.extension.getViews({ type: 'popup' })[0].document;
+		// pg.loadController(page).then( (controller) => {
+			pg.loadView(page).then( _html =>{
+				document.querySelector('#pg-view').innerHTML = _html;
+				app.__view__.update();
+				app.__view__.build();
+				app.__view__.unbind();
+				app.__view__.bind();
+				// Bind & attach rivets view to controller as non-enumerable property
+				/*
+				let rv_view =  pg.bind( document.querySelector('#pg-view') , { [page] : controller } );
+				Object.defineProperty(controller, '__view__', {
+					value: rv_view,
+					enumerable: false,
+					writable:true,
+					configurable: true
+				});
+				// make App controller accessible to loaded view , appending it
+				controller.__view__.update({ [page] : controller , app:app} );
+				*/
+			});
+		// });
+	},
+
+
+	toogleArrayItem(item, array, event, object){
+		let i = array.indexOf(item);
+		if(i === -1) array.push(item);
+		else array.splice(i, 1);
+		console.log(arguments);
+	}
+};
+
+let main = app;
+export default main;
+
+
+/*
+// let main extends pg.__Controller{
 let main ={
 	__constructor(){
 		return new Promise( (resolve,reject) =>{
@@ -46,7 +139,7 @@ let main ={
 	},
 
 	loadPage(page){
-		/*
+
 
 		pg.log('main.loadPage() : Loading Page "' + page + '"  ( Controller & View )');
 		// overwrite DOCUMENT with popup document instance
@@ -67,7 +160,7 @@ let main ={
 				controller.__view__.update({ [page] : controller , app:this} );
 			});
 		});
-		*/
+
 	},
 
 	Data : {
@@ -91,26 +184,6 @@ let main ={
 			}
 		],
 		Feeds : [
-			/*
-			{
-				id 			: 'eeed24d2-be2f-42bc-dc3a-3ebf9ba4eff3',
-				name 		: 'Kat (All)',
-				url 		: 'https://kat.cr/?rss=1',
-				properies	: ['title'],
-				TTL 		: 10,
-				categories 	: ['f11d24b3-be2f-4bdd-d0e0-2ebf9ba0f5c7','dd63224e-b59c-4b41-5f99-c63cffbbafe4','44748d67-be92-47a9-a5b6-de502f1e8cb5'],
-				lastUpdate 	: null
-			},
-			{
-				id 			: 'd44d24b3-af2f-12bd-abaa-2ebf9ba0f5c3',
-				name 		: 'Kat Movies',
-				url 		: 'https://kat.cr/movies/?rss=1',
-				properies	: ['title'],
-				TTL 		: 10,
-				categories 	: ['f11d24b3-be2f-4bdd-d0e0-2ebf9ba0f5c7'],
-				lastUpdate 	: null
-			},
-			*/
 			{
 				id 			: 'a34d24b3-cc2f-6add-b2f0-5ebe9ac0f521',
 				name 		: 'Mininova Movies',
@@ -155,10 +228,6 @@ let main ={
 		return true;
 	},
 
-	/**
-	 * [updateAllFeeds description]
-	 * @return {[type]} [description]
-	 */
 	getAllFeeds(){
 		return new Promise( (_resolve, _reject)=>{
 			pg.log('pg.updateAllFeeds(): Updating all Feeds...');
@@ -176,11 +245,8 @@ let main ={
 			} , Promise.resolve());
 		});
 	},
-	/**
-	 * [updateFeed description]
-	 * @param  {[type]} i [description]
-	 * @return {[type]}   [description]
-	 */
+
+
 	getFeed(i){
 		return new Promise( (_resolve, _reject)=>{
 			if(i === undefined || i === null || i === '') return _reject(-1);
@@ -230,3 +296,4 @@ let main ={
 };
 
 export default main;
+*/
