@@ -837,9 +837,10 @@ h6 {
   -webkit-user-select: none;
   -ms-user-select: none;
   user-select: none;
+  cursor: default;
 }
 
-/* line 51, ../../src/styles/styles.scss */
+/* line 52, ../../src/styles/styles.scss */
 .pg-selectable {
   -moz-user-select: text;
   -webkit-user-select: text;
@@ -848,41 +849,41 @@ h6 {
 }
 
 /* SIZE & POSITION */
-/* line 61, ../../src/styles/styles.scss */
+/* line 62, ../../src/styles/styles.scss */
 .pg-expand {
   width: 100%;
 }
 
-/* line 62, ../../src/styles/styles.scss */
+/* line 63, ../../src/styles/styles.scss */
 .pg-collapse {
   width: 0px;
   overflow: hidden;
   display: inline-block;
 }
 
-/* line 68, ../../src/styles/styles.scss */
+/* line 69, ../../src/styles/styles.scss */
 .pg-float-left {
   float: left;
 }
 
-/* line 69, ../../src/styles/styles.scss */
+/* line 70, ../../src/styles/styles.scss */
 .pg-float-right {
   float: right;
 }
 
-/* line 70, ../../src/styles/styles.scss */
+/* line 71, ../../src/styles/styles.scss */
 .pg-float-none {
   float: none;
 }
 
-/* line 72, ../../src/styles/styles.scss */
+/* line 73, ../../src/styles/styles.scss */
 .pg-vertical-center {
   vertical-align: middle;
   align-items: center;
 }
 
 /* BUTTON */
-/* line 80, ../../src/styles/styles.scss */
+/* line 81, ../../src/styles/styles.scss */
 .pg-btn, button {
   padding: 10px 10px;
   background-color: #6d6d7f;
@@ -893,18 +894,18 @@ h6 {
 }
 
 /* TABLE */
-/* line 92, ../../src/styles/styles.scss */
+/* line 93, ../../src/styles/styles.scss */
 .pg-table > .pg-row {
   align-items: center;
   padding: 10px 10px;
 }
 
-/* line 96, ../../src/styles/styles.scss */
+/* line 97, ../../src/styles/styles.scss */
 .pg-table > .pg-row:nth-child(odd) {
   background-color: #d1d1e6;
 }
 
-/* line 102, ../../src/styles/styles.scss */
+/* line 103, ../../src/styles/styles.scss */
 .pg-tag {
   background-color: #555555;
   padding: 5px 10px;
@@ -917,12 +918,12 @@ h6 {
   cursor: pointer;
 }
 
-/* line 115, ../../src/styles/styles.scss */
+/* line 116, ../../src/styles/styles.scss */
 .pg-tab {
   padding: 20px;
 }
 
-/* line 120, ../../src/styles/styles.scss */
+/* line 121, ../../src/styles/styles.scss */
 .pg-row > .pg-row {
   flex-wrap: wrap;
   width: 100%;
@@ -930,25 +931,25 @@ h6 {
 }
 
 /* PROJECT */
-/* line 129, ../../src/styles/styles.scss */
+/* line 130, ../../src/styles/styles.scss */
 .log-output > div {
   font-size: 10px;
   margin-bottom: 3px;
   color: #555561;
 }
 
-/* line 134, ../../src/styles/styles.scss */
+/* line 135, ../../src/styles/styles.scss */
 .log-output > div:nth-child(even) {
   color: darkgray;
 }
 
-/* line 138, ../../src/styles/styles.scss */
+/* line 139, ../../src/styles/styles.scss */
 #new_feed_form {
   background: #c2c2d4;
   padding: 30px;
 }
 
-/* line 143, ../../src/styles/styles.scss */
+/* line 144, ../../src/styles/styles.scss */
 #new_feed_form > div {
   margin-bottom: 10px;
 }

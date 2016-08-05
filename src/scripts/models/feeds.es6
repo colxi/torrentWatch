@@ -6,14 +6,18 @@ let feeds = {
 			feedProperties 	: [],
 			mode 			: 'new'
 		};
-		this.form = {
-			name: '',
-			url : 'https://kat.cr/movies/?rss=1',
-			categories : [],
-			TTL : 60,
-			properties :  [],
-		};
 
+	},
+
+	location : 'feeds/list',
+
+	form : {
+		step :'1',
+		name: '',
+		url : 'https://kat.cr/movies/?rss=1',
+		categories : [],
+		TTL : 60,
+		properties :  [],
 	},
 
 	showListing() {

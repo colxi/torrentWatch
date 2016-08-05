@@ -61,6 +61,7 @@
 
     /* Assignation */
 
+
     rivets.formatters.set = function(oldValue,newValue) {
         return function(event, obj, binding){
             //window.binding = binding;
@@ -73,7 +74,7 @@
             return true;
         };
     };
-
+    rivets.formatters['='] = rivets.formatters.set;
 
 
 
@@ -124,192 +125,6 @@
     };
     // alias
     rivets.formatters['()'] = rivets.formatters['args'];
-
-
-
-    rivets.binders.controller = {
-        block: true,
-        priority: 4000,
-        bind: function(el) {
-            console.log('***** rv-controller bind ');
-            console.log(this);
-
-            //this._ControllerReady = this._ControllerReady || false;
-            //console.log('***** rv-controller bind . ready ?', this._ControllerReady);
-            //console.log(this);
-            //if( !this._ControllerReady ) this.bound = false;
-
-        },
-
-        unbind: function(el) {
-            console.log('***** rv-controller unbind ');
-
-        },
-
-        update: function(models) {
-            var _ref1;
-            return (_ref1 = this.nested) != null ? _ref1.update(models) : void 0;
-        },
-
-        routine: function(el , controllerId) {
-            if(typeof controllerId === 'object') return false;
-            console.log('***** rv-controller routine ');
-            console.log(this);
-
-
-            rivets.Controllers = rivets.Controllers || {};
-            var basePath = 'scripts/controllers/';
-            var customConstructor = '__constructor';
-            var _self = this;
-            // if controllerId is not a model property, try to get the attribute value
-            if(controllerId === undefined){
-                controllerId = el.getAttribute(rivets.prefix+'-controller');
-                if(controllerId === undefined || controllerId === '' ) return false;
-            }
-            controllerId = String( controllerId ).trim();
-            var controllerPath = basePath + controllerId + '.js';
-
-
-            var bindConstructor = function(controller){
-                //if( controllerId === 'main') window[pg.config.appReference] = pg.controllers[controllerId];
-                //delete pg.controllers[controllerId].length; // babel transpiler autogen ¿?
-                //delete pg.controllers[controllerId].__constructor; // ensure one time executable
-                var _binding ={};
-                _binding[controllerId] = controller;
-
-                //var document  = chrome.extension.getViews({ type: 'popup' })[0].document;
-                //document.querySelector('#controller-feeds').innerHTML = '<div>{feeds.currentView}</div>';
-               var el2 = el.cloneNode(true);
-               el2.removeAttribute('rv-controller');
-               el.parentNode.insertBefore( el2 , el );
-               el.parentNode.removeChild( el );
-               var rv_view =  rivets.bind( el2 ,_binding );
-                Object.defineProperty(controller, '__view__', {
-                    value: rv_view,
-                    enumerable: false,
-                    writable:true,
-                    configurable: true
-                });
-                // make App controller accessible to loaded view , appending it
-                _binding.app = app;
-                rv_view.update(_binding );
-            };
-
-            // import CONTROLLER module
-            System.import(controllerPath).then(function(controller){
-                // create CONTROLLER module instance
-                controller = rivets.Controllers[controllerId] = controller.default;
-                // check if has custom constructor/igniter
-                if( customConstructor !== undefined &&  controller.hasOwnProperty(customConstructor) &&  typeof controller[customConstructor] === 'function' ){
-                    // execute CONTROLLER module custom constructor
-                    var _c = controller[customConstructor]();
-                    // execute constructor (if returns promise resolve promise before binding)
-                    if( _c !== undefined && _c.hasOwnProperty('then') &&  typeof _c.then === 'function') _c.then( function(){ bindConstructor(controller) });
-                    else bindConstructor(controller);
-                }else bindConstructor(controller);
-            });
-            return;
-
-            /*
-            var path = rivets._.Util.resolveKeyPath(this);
-            if(path.value === undefined || path.value === false || path.value === '') return false;
-            else console.log('rivets.blinder.include.routine() : Proceeding to load ' + String(path.value));
-            this.load( String(path.value) );
-            */
-        }
-  };
-
-
-
-
-    rivets.binders.include = {
-        bind: function(el) {
-            var self = this;
-
-            this.clear = function() {
-                if (this.nested)  this.nested.unbind();
-                el.innerHTML = '';
-            };
-
-            this.load = function(path) {
-                //console.log("$$$$$$$$$$$$$$$$$$$$$$$")
-                //console.log(path)
-                this.clear();
-                if (typeof path === 'function') path = path();
-                if (!path || path === undefined || path === '')  return false;
-
-
-                var _html = new XMLHttpRequest();
-                var done = false;
-                _html.overrideMimeType("text/html");
-                _html.open('GET', path , true);
-                _html.onload = _html.onreadystatechange = function () {
-                    if ( !done && (!this.readyState || this.readyState === 4) ) {
-                        // done! execute PROMISE RESOLVE
-                        done = true;
-                        self.loadComplete( _html );
-                        // cleans up a little memory, removing listener;
-                        return (_html.onload = _html.onreadystatechange = null);
-                    }
-                };
-                _html.onerror = function( _err ){ self.loadComplete( _html, _err ); };
-                _html.send(null);
-            };
-
-            this.loadComplete = function(response) {
-                //console.log(err, response);
-                var body = response.responseText;
-                /*
-
-                if (err) {
-                    self.clear();
-                    if (console) console.error(err);
-                    return;
-                }
-                */
-                console.log(el);
-                el.innerHTML = body;
-
-                // copy models into new view
-                var models = {};
-                for(var key in self.view.models) if( models.hasOwnProperty(key) ) models[key] = self.view.models[key];
-
-                var options = {};
-                if (typeof self.view['options'] === 'function') options = self.view.options();
-
-                var els = Array.prototype.slice.call(el.childNodes);
-                self.nested = rivets.bind(els, models, options);
-
-                // dispatch include event
-                /*
-                var event = new CustomEvent('include', {
-                detail: {
-                  path: path
-                },
-                bubbles: true,
-                cancelable: true
-                });
-
-                el.dispatchEvent(event);
-                */
-            };
-        },
-
-        unbind: function(el) {
-
-            if (this.clear) this.clear();
-        },
-
-        routine: function(el, value) {
-            //console.log("--------------")
-            //console.log(el, value,this)
-            var path = rivets._.Util.resolveKeyPath(this);
-            //console.log(path);
-            if(path.value === undefined || path.value === false || path.value === '') return false;
-            else console.log('rivets.blinder.include.routine() : Proceeding to load ' + String(path.value));
-            this.load( String(path.value) );
-        }
-  };
 
 
 

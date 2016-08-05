@@ -79,7 +79,7 @@ module.exports = function(grunt) {
 			build_all			: { src: ['build/'] 				},
 			build_scripts		: { src: ['build/scripts/**/*.js'] 	},
 			build_scripts_es6 	: { src: ['build/scripts/**/*.es6'] },
-			build_views			: { src: ['build/views/'] 			},
+			build_html			: { src: ['build/html/'] 			},
 			build_styles		: { src: ['build/styles/'] 			},
 			build_styles_scss	: { src: ['build/styles/**/*.scss'] 			},
 			src_nodeModules 	: { src: src_PATH_nodeModules 		}
@@ -95,8 +95,8 @@ module.exports = function(grunt) {
 		  	src_scripts_TO_build: {
 		    	files: [ {expand: true, cwd: 'src/scripts/', src: ['**'], dest: 'build/scripts/'} ]
 		  	},
-		  	src_views_TO_build: {
-		  		files: [ {expand: true, cwd: 'src/views/', src: ['**'], dest: 'build/views/'} ]
+		  	src_html_TO_build: {
+		  		files: [ {expand: true, cwd: 'src/html/', src: ['**'], dest: 'build/html/'} ]
 		  	},
 		  	src_styles_TO_build: {
 		  		files: [ {expand: true, cwd: 'src/styles/', src: ['**'], dest: 'build/styles/'} ]
@@ -164,12 +164,12 @@ module.exports = function(grunt) {
 					'notify_hooks'
 				],
 			},
-			src_views : {
-				files: ['src/views/**/*'],
+			src_html : {
+				files: ['src/html/**/*'],
 				tasks: [
-					'output:divider:Watch Event (src_views)',
-					'clean:build_views',
-					'copy:src_views_TO_build',
+					'output:divider:Watch Event (src_html)',
+					'clean:build_html',
+					'copy:src_html_TO_build',
 					'versionUp.u',
 					'notify_hooks'
 				]
@@ -205,7 +205,7 @@ module.exports = function(grunt) {
 		// EXECUTES IN PARALEL WATCHERS (with actvity log)
 	    concurrent: {
 	    	options: { logConcurrentOutput: true },
-	        watches: ['watch:src_scripts', 'watch:src_views', 'watch:src_styles', 'notify_hooks']
+	        watches: ['watch:src_scripts', 'watch:src_html', 'watch:src_styles', 'notify_hooks']
 	    },
 		// LAUNCH A DESKTOP NOTIFICATION : READY
 		notify_hooks: {

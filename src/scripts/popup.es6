@@ -4,5 +4,7 @@
 
 'use strict';
 window.onload = function() {
-	chrome.runtime.getBackgroundPage(function (back) { back.app.initialize(); });
+	var _d = document;
+	chrome.runtime.getBackgroundPage( _w => _w.rivets.configure_importer({debug:true} , _w , _d) );
+	chrome.runtime.connect({name:'popup'});
 };

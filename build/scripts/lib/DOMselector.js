@@ -1,13 +1,15 @@
 'use strict';
 
-/**
- * Get the closest matching element up the DOM tree.
- * @param  {Element} elem     Starting element
- * @param  {String}  selector Selector to match against (class, ID, data attribute, or tag)
- * @return {Boolean|Element}  Returns null if not match found
- */
-
 var DOMselector = {
+    /**
+     * closest() Returns the closest matching element up the DOM tree (provided
+     * element is a candidate).
+     * @param  {DOM Element}            elem        Starting element
+     * @param  {String}                 selector    Selector to match against
+     *                                              (class, ID, data attribute, or tag)
+     *
+     * @return {DOM Element | null}                 Returns DOM ELEMENT or null if not match found
+     */
     closest: function closest(elem, selector) {
         // Variables
         var firstChar = selector.charAt(0);
@@ -49,9 +51,32 @@ var DOMselector = {
         }
         return null;
     },
+    /**
+     * parent() will return the closest element matching with the provided selector
+     * without considering provided node ( like closest() does )
+     * @param  {DOM element}            elem        Starting element
+     * @param  {string}                 selector    Selector to match against
+     *                                              (class, ID, data attribute, or tag)
+     *
+     * @return {DOM element | null}                 Returns DOM element or null if not match found
+     */
     parent: function parent(elem, selector) {
-        var selection = closest(elem.parentNode, selector);
+        var selection = DOMselector.closest(elem.parentNode, selector);
         if (typeof selection === 'undefined') return null;else return selection;
+    },
+    /**
+     * parents() will return an ascending ordered array, with all the parents
+     * nodes for the provided DOM element, until BODY node is reached
+     * @param  {DOM element}            elem    Starting element
+     *
+     * @return {Array}                          Returns an array
+     */
+    parents: function parents(elem) {
+        var _a = arguments[1];
+        if (_a === undefined) _a = []; // initial call
+        else _a.push(elem); // add current element
+        // do recursion until BODY is reached
+        if (elem.tagName !== 'BODY') return DOMselector.parents(elem.parentNode, _a);else return _a;
     },
     find: function find(elem, selector) {
         var selection = elem.querySelectorAll(selector);

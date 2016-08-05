@@ -7,9 +7,6 @@ let pg;
 (function(){
 	'use strict';
 	pg = {
-		binder :{}, // rivets.binder
-		bind : function(){}, // rivets.bind
-		watch : function(){}, // sightglass
 		/**
 		 * [configure description]
 		 * @param  {[type]} obj [description]
@@ -44,9 +41,10 @@ let pg;
 
 			return module;
 		},
-
 		configure : function(obj){} ,
 		config : {
+			importedModels_basePath : 'scripts/models/',
+			importedModels_constructor : '__constructor',
 			import_baseUrl : '/',
 			appReference : 'app'
 		},
@@ -67,7 +65,7 @@ let pg;
 	                    done = true;
 	                    // free memory, explicit  listener removal;
 	                    _resolve(_html.responseText);
-	                    _html = _html.onload = _html.onreadystatechange = null;
+	                    _html.onload = _html.onreadystatechange = null;
 	                }
 	            };
 	            _html.onerror = function(){ _resolve(false); };
@@ -82,6 +80,8 @@ let pg;
 		loadController : function(controllerId){
 			pg.log( 'pg.loadController() : Loading controller module "' + controllerId + '"' );
 			return new Promise(function(_resolve, __reject){
+				//
+				//
 				// internal function used to end loadController routine, cleaning
 				// CONTROLLER module and resolving promise...
 				let __resolve_loadController = function(){
@@ -90,6 +90,9 @@ let pg;
 					delete pg.controllers[controllerId].__constructor; // ensure one time executable
 				 	_resolve(   pg.controllers[controllerId] );
 				};
+				//
+				//
+				//
 				// import CONTROLLER module
 				System.import('/scripts/controllers/'+ controllerId +'.js').then(function(controller){
 	   				// create CONTROLLER module instance
@@ -98,12 +101,14 @@ let pg;
 	   				// soo using standard objects in modules...
 	   				// pg.controllers[controllerId] = new controller.default(controllerId,controller.default );
 	   				// ****
+
 	   				pg.controllers[controllerId] = new pg.__Controller(controllerId, controller.default);
+
 	   				// check if has custom constructor/igniter
 	   				if( pg.controllers[controllerId].hasOwnProperty('__constructor') &&
 	   					typeof pg.controllers[controllerId].__constructor === 'function' ){
 	   					// execute CONTROLLER module custom constructor
-	   					let _c = pg.controllers[controllerId].__constructor();
+	   					let _c = pg.controllers[controllerId].__constructor.call( pg.controllers[controllerId] );
 	   					// resolve pg.loadController (handle promise in CONTROLLER module __constructor)
 	   					if( _c !== undefined &&
 	   						_c.hasOwnProperty('then') &&
@@ -142,31 +147,98 @@ let pg;
 		  					/* Steroids expansion */
 		  					pg.log('pg._init() : Requiring Rivets Formaters Lib... ( rivets.stdlib )');
 			  				pg.require('lib/rivets.stdlib.js').then(function(){
-			  					// configure RIVETS
-			  					rivets.configure({
-									prefix: 'rv', 					// Attribute prefix in templates
-									preloadData: true,				// Preload templates with initial data on bind
-									rootInterface: '.',				// Root sightglass interface for keypaths
-									templateDelimiters: ['{', '}'],	// Template delimiters for text bindings
-									// Augment the event handler of the on-* binder
-									handler: function(target, ev, binding) { return this.call(target, event, binding.view.models,binding); }
-								});
-								sightglass.adapters = rivets.adapters;
-								sightglass.root = rivets.rootInterface;
-								pg.binder = rivets;
-								pg.bind = rivets.bind;
-								pg.watch = sightglass;
-			  					/* Ready ! Load main module */
-			  					pg.log('pg._init() : Loading MAIN controller...');
-					  			pg.loadController('main').then( r =>{
-			  						pg.log('pg._init() : Main Controller Loaded!');
-					  			});
+		  						pg.log('pg._init() : Requiring Rivets Model Importer Lib... ( rivets-import-view-model )');
+			  					pg.require('lib/rivets-import-view-model.js').then(function(){
+		  							pg.log('pg._init() : Configure Rivets & Rivets Model Importer...');
+									// configure RIVETS
+				  					rivets.configure({
+										prefix: 'rv', 					// Attribute prefix in templates
+										preloadData: true,				// Preload templates with initial data on bind
+										rootInterface: '.',				// Root sightglass interface for keypaths
+										templateDelimiters: ['{', '}'],	// Template delimiters for text bindings
+										// Augment the event handler of the on-* binder
+										handler: function(target, ev, binding) { return this.call(target, event, binding.view.models,binding); }
+									});
+									rivets.configure_importer({
+										basePath : pg.config.importedModels_basePath,
+										constructor : pg.config.importedModels_constructor
+									});
+		  							pg.log('pg._init() : Integrate Bindser in Pomegranade...');
+									sightglass.adapters = rivets.adapters;
+									sightglass.root = rivets.rootInterface;
+				  					/* Ready ! Load main module */
+				  					pg.log('pg._init() : Done! Pomegranade Ready!');
+				  					//let rv_view = pg.bind( document.querySelector('body') , { '_global' : {} } );
+
+				  					//pg.log('pg._init() : Loading MAIN controller...');
+						  			//pg.loadController('main').then( r =>{
+				  					//	pg.log('pg._init() : Main Controller Loaded!');
+						  			//});
+			  					});
 			  				});
 		  				});
 	  				});
 	  			});
 			});
 		}),
+		watch : function(el, key, callback, options){
+			return sightglass(el, key, callback, options);
+		},
+		bindings : {},
+		bind : function(el, data){
+			var view = rivets.bind(el,data);
+			var id = pg.guid();
+			Object.defineProperty(view, '__pg_id__', {  value: id, enumerable: false, writable:false,  configurable: false });
+			pg.bindings[id] = view;
+			return id;
+		},
+		unbind: function(id){
+			if( pg.bindings.hasOwnProperty(id) ){
+				pg.bindings[id].unbind();
+				delete pg.bindings[id];
+				return true;
+			}else{
+				console.warn('pg.unbind() : Provided binding ID does not match to any previous registered binding.');
+				return false;
+			}
+		},
+		unbindAll: function(){
+			pg.log('pg.unbindAll(): Unbinding all bindings ( pg.bind and rv:model:import)...');
+			// automatic bindings in model imports....
+			for(var model in rivets.importedModels){
+				if(!rivets.importedModels.hasOwnProperty(model) ) continue;
+				console.log(model);
+				for(var view in rivets.importedModels[model].__views__){
+					if(!rivets.importedModels[model].__views__.hasOwnProperty(view) ) continue;
+					rivets.importedModels[model].__views__[view].unbind();
+					delete rivets.importedModels[model].__views__[view];
+				}
+			}
+			// manual bindings in in pomegradade...
+			for(var binding in pg.bindings){
+				if(!pg.bindings.hasOwnProperty(binding) ) continue;
+				console.log(binding);
+				pg.unbind(binding);
+			}
+			return true;
+		},
+		chromeExt: {
+			popupBinding : undefined,
+			popupObserver: chrome.runtime.onConnect.addListener(function(port){
+				// popup OPEN
+				pg.log('pg.chromeExt.popupObserver(): Popup opened!...');
+				let document  = chrome.extension.getViews({ type: 'popup' })[0].document;
+				pg.chromeExt.popupBinding = pg.bind( document.querySelector('html'), {} );
+
+				// popup CLOSE listener
+				let disconect = port.onDisconnect.addListener(function(){
+					pg.unbindAll();
+					pg.log('pg.chromeExt.popupObserver(): Popup closed!...');
+					pg.chromeExt.popupBinding = null;
+					disconect = null;
+				});
+			}),
+		},
 		/**
 		 * [require description]
 		 * @param  {[type]} url [description]
@@ -215,64 +287,7 @@ let pg;
 		 * [feeds description]
 		 * @type {Array}
 		 */
-		categories : [
-			{
-				id 		: 'f11d24b3-be2f-4bdd-d0e0-2ebf9ba0f5c7',
-				name 	: 'movies',
-				feeds 	: 0
-			},{
-				id 		: 'dd63224e-b59c-4b41-5f99-c63cffbbafe4',
-				name 	: 'music',
-				feeds 	: 0
-			},{
-				id 		: '44748d67-be92-47a9-a5b6-de502f1e8cb5',
-				name 	: 'software',
-				feeds 	: 0
-			},{
-				id 		: '91aa33c5-5099-48e8-b6a4-4a5946c0b617',
-				name 	: 'others',
-				feeds 	: 0
-			}
-		],
-		feeds : [
-			/*
-			{
-				id 			: 'eeed24d2-be2f-42bc-dc3a-3ebf9ba4eff3',
-				name 		: 'Kat (All)',
-				url 		: 'https://kat.cr/?rss=1',
-				properies	: ['title'],
-				TTL 		: 10,
-				categories 	: ['f11d24b3-be2f-4bdd-d0e0-2ebf9ba0f5c7','dd63224e-b59c-4b41-5f99-c63cffbbafe4','44748d67-be92-47a9-a5b6-de502f1e8cb5'],
-				lastUpdate 	: null
-			},
-			{
-				id 			: 'd44d24b3-af2f-12bd-abaa-2ebf9ba0f5c3',
-				name 		: 'Kat Movies',
-				url 		: 'https://kat.cr/movies/?rss=1',
-				properies	: ['title'],
-				TTL 		: 10,
-				categories 	: ['f11d24b3-be2f-4bdd-d0e0-2ebf9ba0f5c7'],
-				lastUpdate 	: null
-			},
-			*/
-			{
-				id 			: 'a34d24b3-cc2f-6add-b2f0-5ebe9ac0f521',
-				name 		: 'Mininova Movies',
-				url 		: 'http://www.mininova.org/rss.xml?cat=4',
-				properies	: ['title'],
-				TTL 		: 10,
-				categories 	: ['f11d24b3-be2f-4bdd-d0e0-2ebf9ba0f5c7'],
-				lastUpdate 	: null
-			},{
-				id 			: 'bdv424b6-cb1c-3aab-11b3-ac429bb0f530',
-				name 		: 'YIFY Movies',
-				url 		: 'https://yts.ag/rss',
-				properies	: ['title'],
-				TTL 		: 10,
-				categories 	: ['f11d24b3-be2f-4bdd-d0e0-2ebf9ba0f5c7'],
-				lastUpdate 	: null
-			}
-		],
+
 		logStore : [],
 		log : function(msg = '{empty}' , method = 'log'){
 			pg.logStore.push(msg);
@@ -287,107 +302,13 @@ let pg;
 		getManifest : function(){ return chrome.app.getDetails(); },
 		getVersion : function(){ return chrome.app.getDetails().version; },
 		getCurrentLocale : function(){ return chrome.app.getDetails().current_locale; },
-		/**
-		 * [popup description]
-		 * @type {[type]}
-		 */
-		popup : null,
-		/**
-		 * [getCategoryById description]
-		 * @param  {[type]} id [description]
-		 * @return {[type]}    [description]
-		 */
-		getCategoryById : function(id){
-			let i = pg.categories.findIndex( cat=>(cat.id === id ) ? true : false );
-			return (i === -1) ? -1 : pg.categories[i];
-		},
-		getCategoryByName : function(id){
-			let i = pg.categories.findIndex( cat=>(cat.name === id ) ? true : false );
-			return (i === -1) ? -1 : pg.categories[i];
-		},
-		countFeedsinCategory: function(id){
-			let category = pg.getCategoryById(id);
-			if(category === -1) return -1;
 
-			category.feeds = 0;
-			for (let i=0; i < pg.feeds.length; i++ ) if(pg.feeds[i].categories.indexOf(id) !== -1) category.feeds++;
-			return category.feeds;
-		},
-		countFeedsinAllCategories: function(){
-			for (let i=0; i < pg.categories.length; i++ ) pg.countFeedsinCategory( pg.categories[i].id );
-			return true;
-		},
-
-		/**
-		 * [updateAllFeeds description]
-		 * @return {[type]} [description]
-		 */
-		getAllFeeds : function(){
-			return new Promise(function(_resolve, _reject){
-				pg.log('pg.updateAllFeeds(): Updating all Feeds...');
-				var currentFeed = -1;
-				// Loop through the Feeds with array.reduce...
-				pg.feeds.reduce(function(sequence) {
-					return sequence.then(function() {
-						currentFeed++;
-				 		return pg.getFeed(currentFeed);
-					}).then(function(result) {
-						if(result) pg.log('pg.updateAllFeeds(): Feed #'+ ( currentFeed + 1) +' ' + pg.feeds[currentFeed].name + ' UPDATED' );
-				    	else  pg.log('pg.updateAllFeeds(): Feed #'+ ( currentFeed + 1) +' ' + pg.feeds[currentFeed].name + ' FAILED' );
-				  		if( (currentFeed + 1)=== pg.feeds.length) _resolve();
-				  	});
-				} , Promise.resolve());
-			});
-		},
-		/**
-		 * [updateFeed description]
-		 * @param  {[type]} i [description]
-		 * @return {[type]}   [description]
-		 */
-		getFeed: function(i){
-			return new Promise( function(_resolve, _reject){
-				if(i === undefined || i === null || i === '') return _reject(-1);
-
-				// get feed (allow feed array index or string url feed)
-				let feed;
-				if( isNaN(i) && typeof i === 'string' ) feed= { url : i , name : '***'};
-				else feed = pg.feeds[i];
-
-				// block if requested feed does not exist
-				if(feed === undefined) return _reject(-1);
-
-				pg.log('pg.updateFeed() : Updating Feed from :'+ feed.url +' ( ' + feed.name + ' )' );
-
-				//
-				// Prepare Ajax request
-				//
-				let request = new XMLHttpRequest();
-				request.open('get', feed.url, true);
-
-				// RESPONSE OK
-				request.onload  = function(){
-					let parser = new DOMParser();
-				   	let xmlDoc = parser.parseFromString(request.responseText,'text/xml');
-					let JSONxml = JSON.parseXML(xmlDoc);
-
-					request = null;
-					return _resolve(JSONxml);
-				};
-				// RESPONSE FAIL
-				request.onerror  = function(){
-					pg.log('pg.getFeed(): Error on request.', request.statusText);
-					request = null;
-					return _resolve(false);
-				};
-				// Send Request
-				request.send(null);
-			});
-		},
 		/**
 		 * [createGuid description]
 		 * @return {[type]} [description]
 		 */
-		createGuid : function(){
+		createGuid : function(){ alert("use pg.gui!")},
+		guid : function(){
 			function S4() {  return (((1+Math.random())*0x10000)|0).toString(16).substring(1) }
  			// then to call it, plus stitch in '4' in the third group
 			return (S4() + S4() + '-' + S4() + '-4' + S4().substr(0,3) + '-' + S4() + '-' + S4() + S4() + S4()).toLowerCase();

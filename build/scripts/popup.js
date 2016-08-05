@@ -5,8 +5,10 @@
 'use strict';
 
 window.onload = function () {
-	chrome.runtime.getBackgroundPage(function (back) {
-		back.app.initialize();
+	var _d = document;
+	chrome.runtime.getBackgroundPage(function (_w) {
+		return _w.rivets.configure_importer({ debug: true }, _w, _d);
 	});
+	chrome.runtime.connect({ name: 'popup' });
 };
 //# sourceMappingURL=popup.js.map

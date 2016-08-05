@@ -47,6 +47,7 @@ h6{ font-size: $f-smaller;}
 	-webkit-user-select: none;
 	-ms-user-select: none;
 	user-select: none;
+	cursor: default;
 }
 .pg-selectable{
 	-moz-user-select: text;
