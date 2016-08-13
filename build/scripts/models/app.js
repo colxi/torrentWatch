@@ -5,7 +5,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 /* jsHint inline configuration : */
 /* jshint undef: true, unused: false */
-/* global chrome , System , pg , rivets , sightglass, app */
+/* global chrome , System , pg , rivets , sightglass */
 
 // let main extends pg.__Controller{
 var app = {
@@ -51,18 +51,85 @@ var app = {
 			id: 'a34d24b3-cc2f-6add-b2f0-5ebe9ac0f521',
 			name: 'Mininova Movies',
 			url: 'http://www.mininova.org/rss.xml?cat=4',
-			properies: ['title'],
+			fields: {
+				available: ['title'],
+				assignations: {
+					title: 'title',
+					magnet: undefined,
+					url: undefined
+				}
+			},
+			propertiesWatched: ['title'],
 			TTL: 10,
 			categories: ['f11d24b3-be2f-4bdd-d0e0-2ebf9ba0f5c7'],
-			lastUpdate: null
-		}, {
+			status: {
+				lastUpdate: null,
+				code: 200,
+				details: undefined
+			}
+		},
+		//
+		{
 			id: 'bdv424b6-cb1c-3aab-11b3-ac429bb0f530',
 			name: 'YIFY Movies',
 			url: 'https://yts.ag/rss',
-			properies: ['title'],
+			fields: {
+				available: ['title'],
+				assignations: {
+					title: 'title',
+					magnet: undefined,
+					url: undefined
+				}
+			},
 			TTL: 10,
 			categories: ['f11d24b3-be2f-4bdd-d0e0-2ebf9ba0f5c7'],
-			lastUpdate: null
+			status: {
+				lastUpdate: null,
+				code: 200,
+				details: undefined
+			}
+		},
+		//
+		{
+			id: 'bdv424b6-cb1c-3aab-11b3-ac429bb0f531',
+			name: 'Cucu Movies',
+			url: 'https://yts.ag/rss',
+			fields: {
+				available: ['title'],
+				assignations: {
+					title: 'title',
+					magnet: undefined,
+					url: undefined
+				}
+			},
+			TTL: 10,
+			categories: ['f11d24b3-be2f-4bdd-d0e0-2ebf9ba0f5c7'],
+			status: {
+				lastUpdate: null,
+				code: 200,
+				details: undefined
+			}
+		},
+		//
+		{
+			id: 'bdv424b6-cb1c-3aab-11b3-ac429bb0f532',
+			name: 'Nini Movies',
+			url: 'https://yts.ag/rss',
+			fields: {
+				available: ['title'],
+				assignations: {
+					title: 'title',
+					magnet: undefined,
+					url: undefined
+				}
+			},
+			TTL: 10,
+			categories: ['f11d24b3-be2f-4bdd-d0e0-2ebf9ba0f5c7'],
+			status: {
+				lastUpdate: null,
+				code: 200,
+				details: undefined
+			}
 		}]
 	},
 
@@ -142,7 +209,7 @@ var app = {
 			};
 			// RESPONSE FAIL
 			request.onerror = function () {
-				pg.log('pg.getFeed(): Error on request.', request.statusText);
+				pg.log('pg.getFeed(): Error on request... ' + request.statusText);
 				request = null;
 				return _resolve(false);
 			};

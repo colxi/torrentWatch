@@ -1,0 +1,32 @@
+/* NOTIFICATION BOXES */
+
+.pg-notification-error {
+    text-align: center;
+    position: relative;
+    font-size: $f-small;
+    font-weight: $f-regular;
+    background: $c-error;
+    color: $c-error-bright;
+    padding: $s-small ;
+    margin-bottom: $s-big;
+    margin-top: $s-big;
+}
+
+.pg-notification-error:before {
+    right: 10px;
+    top: -10px;
+    border-width: 7px 15px;
+    border-style: solid;
+    width: 0px;
+    content: "!";
+    position: absolute;
+    height: 20px;
+    color: $c-error;
+    box-shadow: 0 -2px 0px $c-error;
+    border-color: $c-error-bright;
+    border-bottom-color: transparent;
+    text-align: center;
+    font-weight: $f-bolder;
+    font-size: 14px;
+}
+

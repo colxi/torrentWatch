@@ -1,30 +1,40 @@
-<section class="tab">
+<section>
 	<!-- feeds listing -->
-	<div class="pg-row pg-vertical-center pg-margin-bottom-biggest">
+	<header class="pg-row pg-section-header">
 		<h2 class="pg-col">Feeds :</h2>
 		<div class="pg-col pg-text-right">
-			<div class="pg-col pg-btn" rv-on-click="feeds.location | = 'feeds/form'"><span class="fa fa-plus-circle"></span> Add</div>
+			<div class="pg-col pg-btn" rv-on-click="feeds.form.initialize | ()  'insert'"><span class="fa fa-plus-circle"></span> Add</div>
 		</div>
-	</div>
+	</header>
 
 	<div class="pg-row">
 		<div class="pg-table pg-expand">
 			<div class="pg-row" rv-each-feed="app.Data.feeds">
-				<div class="pg-col-30">
+				<div class="pg-col-40">
 					<div>{feed.name}</div>
 					<div class="pg-text-smaller">Last update: {feed.lastUpdate}</div>
 				</div>
-				<div class="pg-col pg-text-center">
-					<span class="pg-text-small" rv-each-category="app.Data.categories" >
+				<div class="pg-col-40 pg-text-center pg-text-smallest">
+					<span rv-each-category="app.Data.categories">
 						{ app.Data.categories | findBy 'id' category.id | getProperty 'name' } <span rv-hide="category | isLastIn app.Data.categories"> | </span>
 					</span>
 				</div>
-				<div class="pg-col-fixed">
+				<div class="pg-col-20 pg-text-right">
 					<span class="fa fa-refresh pg-hover pg-margin-right-smallest"></span>
 					<span class="fa fa-pencil pg-hover pg-margin-right-smallest pg-margin-left-smallest"></span>
 					<span class="fa fa-trash pg-hover pg-margin-left-smallest"></span>
 				</div>
 			</div>
+		</div>
+	</div>
+	<div class="pg-row">
+		<div class="pg-pagination">
+			<div class="pg-pagination-item">Previous</div>
+			<div class="pg-pagination-item">1</div>
+			<div class="pg-pagination-item pg-pagination-current">2</div>
+			<div class="pg-pagination-item">3</div>
+			<div class="pg-pagination-item">4</div>
+			<div class="pg-pagination-item">Next</div>
 		</div>
 	</div>
 </section>

@@ -5,7 +5,6 @@
 // Declare importedModels container
 rivets.importedModels          = {};
 // Set default configuration directives
-Object.defineProperty( rivets.importedModels , '__count__', {  value: 0,  enumerable: false,  writable:true,  configurable: false });
 Object.defineProperty( rivets.importedModels , '__basePath__', {  value: '',  enumerable: false,  writable:true,  configurable: false });
 Object.defineProperty( rivets.importedModels , '__constructor__', {  value: false,  enumerable: false,  writable:true,  configurable: false });
 Object.defineProperty( rivets.importedModels , '__debug__', {  value: false,  enumerable: false,  writable:true,  configurable: false });
@@ -33,18 +32,17 @@ rivets.configure_importer   = function(configObj, w, d){
         _window.rivets.importedModels['__' + directive + '__'] = configObj[directive];
         // special behaviour for debug...
         if(directive === 'debug'){
-            // disable debuging...
-            if( configObj[directive] === false ) _document.getElementsById('__rivets_import_debug_styles__').remove();
-            // enable debuging...
+            if( configObj.debug === false ) _document.getElementsById('__rivets_import_debug_styles__').remove();
             else{
+                // enable debuging...
                 var stylesEl        = _document.createElement('STYLE');
                 stylesEl.id         = '__rivets_import_debug_styles__';
                 stylesEl.innerHTML = '                                                      \
-                    [rv\\:model\\:\\:name]{                                                 \
+                    [rv\\:model]{                                                 \
                         border:2px dotted grey;                                             \
                         position:relative;                                                  \
                     }                                                                       \
-                    [rv\\:model\\:\\:name]::after{                                          \
+                    [rv\\:model]::after{                                          \
                         display:block;                                                      \
                         position:absolute;                                                  \
                         top:0;right:0;                                                      \
@@ -55,14 +53,14 @@ rivets.configure_importer   = function(configObj, w, d){
                         font-size:10px;                                                     \
                         color:#fff;                                                         \
                     }                                                                       \
-                    body[rv\\:debug\\:\\:interactive] [rv\\:model\\:\\:name]:hover{         \
+                    body[rv\\:debug\\:\\:interactive] [rv\\:model]:hover{         \
                         border:1px dotted grey;                                             \
                         padding:10px;                                                       \
                         margin:5px;                                                         \
                         transition:all .2s ease-out;                                        \
                         position:relative;                                                  \
                     }                                                                       \
-                    body[rv\\:debug\\:\\:interactive] [rv\\:model\\:\\:name]:hover::after{  \
+                    body[rv\\:debug\\:\\:interactive] [rv\\:model]:hover::after{  \
                         display:block;                                                      \
                         position:absolute;                                                  \
                         top:0;right:0;                                                      \
@@ -81,16 +79,88 @@ rivets.configure_importer   = function(configObj, w, d){
     return true;
 };
 
+rivets._.Util.resolveKeyPath = function(keypath, binding,  returnValue, generatePathIfNotExist){
+    returnValue = ( returnValue === false ) ? false : true;
+    generatePathIfNotExist = ( generatePathIfNotExist === true ) ? true : false;
+    // break string keypath into each object level name
+    var keypathArray = keypath.split(rivets.rootInterface);
+    // must exist at least the model name and a property
+    if(keypathArray.length < 2 ) throw new Error('rivets._.Util.resolveKeyPath(): Invalid keypath :' + keypath + '(Needs at least two levels model.property)');
+    // resolve the reference to modelRoot
+    var modelRoot =  binding.view.models[keypathArray[0]];
+    if( modelRoot === undefined ) throw new Error('rivets._.Util.resolveKeyPath() : Model found in Keypath is not binded to Element View.');
+    // remove model string from keypath array
+    keypathArray.shift();
+    // extract the name of the requewted property
+    var key =  keypathArray.pop();
+    // iterate keypathArray to obtain a Object reference to property parent
+    var model = ( keypathArray.length === 1) ? keypathArray[0] : keypathArray.reduce( function(o,i){
+        if(generatePathIfNotExist && o[i] === undefined) o[i] = {};
+        return  o[i];
+    }, modelRoot );
+    return returnValue ? rivets.adapters[rivets.rootInterface].get(model,key) : {
+        model : model,
+        key : key
+        //value : rivets.adapters[rivets.rootInterface].get(model,key)
+    };
+};
+
+
+
+/* Assignation */
+rivets.formatters.set = function(oldValue,newValue) {
+    return function(event, obj, binding){
+        //window.binding = binding;
+        // var model = obj;
+        var kp = rivets._.Util.resolveKeyPath(binding.keypath, binding, false);
+        //console.log("newValue: "+newValue);
+        // set the value
+        var adapter = rivets.adapters[rivets.rootInterface];
+        adapter.set(kp.model, kp.key, newValue);
+        return true;
+    };
+};
+rivets.formatters['='] = rivets.formatters.set;
+
+
+rivets.binders['element'] = {
+    block:false,
+    priority:5000,
+    publishes: true,
+
+    bind: function(el){
+        console.log( '%c rv-element ' + el.getAttribute('rv-element') + ' : BIND' , 'color: green' );
+        this.publish();
+        return el;
+    },
+    routine: function(el,value){
+        console.log( '%c rv-element ' + el.getAttribute('rv-element') + ' : ROUTINE' , 'color: orange' );
+        return el;
+    },
+    unbind: function(el){
+        console.log( '%c rv-element ' + el.getAttribute('rv-element') + ' : UNBIND' , 'color: red' );
+    },
+    getValue : function(el) {
+        console.log( '%c rv-element ' + el.getAttribute('rv-element') + ' : GET-VALUE' , 'color: yellow' );
+        return el;
+    }
+};
+
+
+
+
 
 rivets.binders['view'] = {
     block: true,
     priority: 5000,
     bind: function(el) {
-        console.log('**************************************************');
-        console.log('rv-view BIND ',el,this);
-
-        if( !(el.firstChild && el.firstChild.hasOwnProperty('getAttribute') && el.firstChild.getAttribute('rv:view::name') !== null) ){
-            // initial inline view backup
+        //if( el.firstChild && el.firstChild.hasOwnProperty('getAttribute') && el.firstChild.getAttribute('rv:view') !== null ){
+        if( this.nested ){
+            console.log( '%c rv-view ' + this.nested.viewName + ' : NESTED UNBIND' , 'color: darkred' );
+            el.innerHTML = this.view.initialHTML;
+            this.unbind();
+        }else{
+            console.log( '%c rv-view ' + el.getAttribute('rv-view') + ' : BIND' , 'color: green' );
             this.view.initialHTML = el.innerHTML;
         }
 
@@ -98,23 +168,24 @@ rivets.binders['view'] = {
         return el;
     },
     routine : function(el,viewName){
-        console.log('rv-view ROUTINE',el,viewName,this);
         var self = this;
         if(!viewName) return false;
         viewName = String( viewName ).trim();
 
-
         // if is detected a previous import binding on element...
-        if( el.firstChild.getAttribute( 'rv:view::name' ) !== null ){
-            var currentView = el.firstChild.getAttribute( 'rv:view::name' );
-            // ignore if VIEW is the same actually binded
-            if(viewName === currentView ) return false;
+        if( self.nested ){
+            if(viewName === self.nested.viewName ) return false; // ignore if VIEW is the same actually binded
             else{
-                // if diferent ...unbind previous import binding and destroy view
+                console.log( '%c rv-view ' + self.nested.viewName + ' : NESTED UNBIND' , 'color: darkred' );
+                self.nested.unbind();
+                self.nested= null;
+                delete self.nested;
             }
         }
-        el.firstChild.setAttribute( 'rv:view::name' , viewName );
+        console.log( '%c rv-view ' + viewName + ' : ROUTINE' , 'color: orange' );
 
+        el.firstChild.setAttribute( 'rv:view' , viewName );
+        el.setAttribute('rv-loading', 'true');
         var path = 'html/views/'+ viewName + '.html';
         var done = false;
         var _html = new XMLHttpRequest();
@@ -123,14 +194,36 @@ rivets.binders['view'] = {
         _html.onload = _html.onreadystatechange = function () {
             if ( !done && (!this.readyState || this.readyState === 4) ) {
                 done = true;
+                el.removeAttribute('rv-loading');
                 // free memory, explicit  listener removal;
                 el.firstChild.innerHTML = _html.responseText;
-                rivets.bind(el.firstChild, self.view.models);
+                console.log( '%c rv-view ' + viewName + ' :  NESTED BIND' , 'color: lightgreen' );
+
+                self.nested = rivets.bind(el.firstChild, self.view.models);
+                self.nested.viewName = viewName;
+
+                // if callback  was setted, execute it!
+                if(el.getAttribute('rv-on-ready')){
+                    rivets._.Util.resolveKeyPath( el.getAttribute('rv-on-ready'), self )(currentView);
+                }
                 _html.onload = _html.onreadystatechange = null;
             }
         };
         _html.send(null);
-    }
+    },
+    unbind: function(el) {
+        console.log( '%c rv-view ' + el.getAttribute('rv-view') + ' : UNBIND' , 'color: red' );
+        this.nested.unbind();
+        this.nested =  null;
+        delete this.nested;
+        //this.unbind();
+        //var modelName = this.el.removeAttribute('rv-controller:bind');
+    },
+    update: function(el) {
+        console.log( '%c rv-view ' + el.getAttribute('rv-view') + ' : UPDATE' , 'color: yellow' );
+        //this.unbind();
+        //var modelName = this.el.removeAttribute('rv-controller:bind');
+    },
 };
 
 /**
@@ -141,60 +234,65 @@ rivets.binders['model'] = {
     block: true,
     priority: 4000,
     bind: function(el) {
-        console.log('**************************************************');
-        console.log('rv-model BIND ',el);
-
-        if( el.firstChild && el.firstChild.hasOwnProperty('getAttribute') && el.firstChild.getAttribute('rv:model::name') !== null ){
-            throw new Error('Element has already been binded to another import. Unbind first.');
-        }else this.view.initialHTML = el.innerHTML;
+        //if( el.firstChild && el.firstChild.hasOwnProperty('getAttribute') && el.firstChild.getAttribute('rv:model') !== null ){
+        if( this.nested ){
+            console.log( '%c rv-model ' + self.nested.modelName + ' : NESTED UNBIND' , 'color: darkred' );
+            el.innerHTML = this.view.initialHTML;
+            this.unbind();
+            //throw new Error('Element has already been binded to another import. Unbind first.');
+        }else{
+            this.view.initialHTML = el.innerHTML;
+            console.log( '%c rv-model ' + el.getAttribute('rv-model') + ' : BIND' , 'color: green' );
+        }
 
         el.innerHTML = '<div>' + this.view.initialHTML + '</div>';
-
         return el;
     },
 
     routine: function(el,modelName){
-        console.log('rv-model ROUTINE',el,modelName,this);
         modelName = String( modelName ).trim();
-
+        var self = this;
         // if is detected a previous import binding on element...
-        if( el.firstChild.getAttribute( 'rv:model::name' ) !== null ){
-            var currentModel = el.firstChild.getAttribute( 'rv:model::name' );
-            var viewId = el.firstChild.getAttribute( 'rv:model::id' );
+        if( el.firstChild.getAttribute( 'rv:model' ) !== null ){
+            var currentModel = el.firstChild.getAttribute( 'rv:model' );
+            //var viewId = el.firstChild.getAttribute( 'rv:model::id' );
             // ignore if MODEL is the same actually binded
             if(modelName === currentModel ) return false;
             else{
                 // if diferent ...unbind previous import binding and destroy view
-                rivets.importedModels[ currentModel ].__views__[ viewId ].unbind();
-                delete rivets.importedModels[ currentModel ].__views__[ viewId ];
-                el.firstChild.innerHTML = this.view.initialHTML;
+                console.log( '%c rv-model ' + self.nested.modelName + ' : NESTED UNBIND' , 'color: darkred' );
+                self.nested.unbind();
+                self.nested = null;
+                delete self.nested;
+                //el.firstChild.innerHTML = this.view.initialHTML;
             }
         }
-        el.firstChild.setAttribute( 'rv:model::name' , modelName );
-        el.firstChild.setAttribute( 'rv:model::id' , rivets.importedModels.__count__++ );
+        console.log( '%c rv-model ' + modelName + ' : ROUTINE' , 'color: orange' );
+
+        el.firstChild.setAttribute( 'rv:model' , modelName );
         el.firstChild.setAttribute( 'rv:model::scopes' , modelName);
 
         // import CONTROLLER module if setted &  controller NOT already loaded
         if(modelName.length && !rivets.importedModels.hasOwnProperty(modelName) ){
+            el.setAttribute('rv-loading', 'true');
             System.import( rivets.importedModels.__basePath__ + modelName + '.js' ).then(function(controller){
                 // create CONTROLLER module instance
                 controller = rivets.importedModels[modelName] = controller.default;
                 // assign non enumerable meta property NAME
                 Object.defineProperty(controller, '__name__', {  value: modelName, enumerable: false, writable:false,  configurable: false });
-                Object.defineProperty(controller, '__views__', {  value: {}, enumerable: false, writable:true,  configurable: false });
 
                 var initialize = false;
                 if( rivets.importedModels.__constructor__ !== undefined &&
                     typeof rivets.importedModels[modelName][rivets.importedModels.__constructor__] === 'function' &&
                     rivets.importedModels[modelName].__initialized__ !== true ) initialize = true;
 
+                el.removeAttribute('rv-loading');
                 _bind(el, modelName, initialize);
             });
         }else _bind( el, modelName , false);
 
         // INTERNAL WRAPPER BINDER
         function _bind(el, modelName, initializeModel){
-            console.log( 'rv-controller _BIND ('+modelName+')' );
 
             function parents(element, _array) {
                 if(element.parentNode===null) window.a = element;
@@ -212,7 +310,7 @@ rivets.binders['model'] = {
             var _p = parents(el);
             var scopesList = modelName;
             for(var i =0; i<_p.length;i++){
-                var parentModel_name = _p[i].getAttribute('rv:model::name');
+                var parentModel_name = _p[i].getAttribute('rv:model');
                 if(parentModel_name !== null){
                     bindedObj[parentModel_name] = rivets.importedModels[parentModel_name];
                     scopesList += ' ' + parentModel_name;
@@ -220,13 +318,21 @@ rivets.binders['model'] = {
             }
             el.firstChild.setAttribute( 'rv:model::scopes' , scopesList );
 
+            console.log( '%c rv-model ' + modelName + ' : NESTED BIND' , 'color: lightgreen' );
+
             // do the bindings!
-            rivets.importedModels[modelName].__views__[ el.firstChild.getAttribute('rv:model::id') ] =  rivets.bind( el.firstChild, bindedObj );
+            self.nested =  rivets.bind( el.firstChild, bindedObj );
+            self.nested.modelName = modelName;
+            console.log(self.nested);
 
             // if has custom constructor/igniter should be executed...
             if(initializeModel){
                 rivets.importedModels[modelName][rivets.importedModels.__constructor__]();
                 Object.defineProperty(rivets.importedModels[modelName], '__initialized__', {  value: true, enumerable: false, writable:false,  configurable: false });
+            }
+
+            if(el.getAttribute('rv-on-ready')){
+                rivets._.Util.resolveKeyPath( el.getAttribute('rv-on-ready'), {view:self.nested} )(currentModel);
             }
             return true;
         }
@@ -234,8 +340,11 @@ rivets.binders['model'] = {
         return void 0;
     },
 
-    unbind: function() {
-        console.log('***** rv-controller UNBIND **** ');
+    unbind: function(el) {
+        console.log( '%c rv-model ' + el.getAttribute('rv-model') + ' : UNBIND' , 'color: red' );
+        this.nested.unbind();
+        this.nested = null;
+        delete this.nested;
         //this.unbind();
         //var modelName = this.el.removeAttribute('rv-controller:bind');
     },

@@ -1,0 +1,1 @@
+{"version":3,"sources":["list.es6"],"names":[],"mappings":";;;;;AAAA,IAAI,gBAAgB,EAApB;;kBAGe,a","file":"list.js","sourcesContent":["let feeds_listing = {\r\n};\r\n\r\nexport default feeds_listing;\r\n"]}

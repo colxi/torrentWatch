@@ -10,6 +10,37 @@ var pg = void 0;
 	'use strict';
 
 	pg = {
+
+		load: {
+			model: function model(modelName) {
+				return new Promise(function (_resolve) {
+					_resolve(rivets.importedModels[modelName]);
+				});
+			},
+			view: {},
+			html: {}
+		},
+		loader: function loader() {
+			var el = arguments.length <= 0 || arguments[0] === undefined ? document.body : arguments[0];
+
+			return {
+				show: function show() {
+					var text = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
+					el.setAttribute('pg-loading', text);
+				},
+				hide: function hide() {
+					el.removeAttribute('pg-loading');
+				},
+				text: function text() {
+					var _text = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
+
+					el.setAttribute('pg-loading', _text);
+				},
+				has: function has() {
+					return el.hasAttribute('pg-loading');
+				}
+			};
+		},
 		/**
    * [configure description]
    * @param  {[type]} obj [description]

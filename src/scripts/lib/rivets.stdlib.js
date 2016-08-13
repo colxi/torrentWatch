@@ -35,46 +35,20 @@
     };
 
 
-    rivets._.Util.resolveKeyPath = function(binding){
-        // break string keypath into each object level name
-        var keypathArray = binding.keypath.split(rivets.rootInterface);
-        // must exist at least the model name and a property
-        if(keypathArray.length < 2 ) throw new Error('Invalid keypath :' + binding.keypath);
-        // resolve the reference to modelRoot
-        var modelRoot =  binding.view.models[keypathArray[0]];
-        console.log(binding)
-        // remove model string from keypath array
-        keypathArray.shift();
-        // extract the name of the requewted property
-        var key =  keypathArray.pop();
-        // iterate keypathArray to obtain a Object reference to property parent
-        var model = ( keypathArray.length === 1) ? keypathArray[0] : keypathArray.reduce( (o,i)=>o[i], modelRoot );
-        console.log("model: ", model);
-        console.log("key: " + key);
-        return {
-            model : model,
-            key : key,
-            value : rivets.adapters[rivets.rootInterface].get(model,key)
-        };
-    };
 
 
-    /* Assignation */
 
+    /* STRICT equality unequality */
+    rivets.formatters['==='] = function(target, val) { return target === val; };
+    rivets.formatters['is']  = rivets.formatters['==='] ;
 
-    rivets.formatters.set = function(oldValue,newValue) {
-        return function(event, obj, binding){
-            //window.binding = binding;
-            // var model = obj;
-            var kp = rivets._.Util.resolveKeyPath(binding);
-            //console.log("newValue: "+newValue);
-            // set the value
-            var adapter = rivets.adapters[rivets.rootInterface];
-            adapter.set(kp.model, kp.key, newValue);
-            return true;
-        };
-    };
-    rivets.formatters['='] = rivets.formatters.set;
+    rivets.formatters['!=='] = function(target, val) { return target !== val; };
+    rivets.formatters['not']  = rivets.formatters['==='] ;
+
+    /* SOFT equality unequality */
+    rivets.formatters['=='] = function(target, val) { return target == val; };
+    rivets.formatters['!='] = function(target, val) { return target != val; };
+
 
 
 
@@ -105,12 +79,6 @@
     };
 
 
-    /* logical opetators */
-    rivets.formatters['==='] = function(target, val) { return target === val; };
-    rivets.formatters['=='] = function(target, val) { return target == val; };
-
-    rivets.formatters['!=='] = function(target, val) { return target !== val; };
-    rivets.formatters['!='] = function(target, val) { return target != val; };
 
     /* Function */
 

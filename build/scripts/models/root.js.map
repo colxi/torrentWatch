@@ -1,1 +1,0 @@
-{"version":3,"sources":["root.es6"],"names":[],"mappings":";;;;;AAAA,IAAI,OAAO,EAAX;kBACe,I","file":"root.js","sourcesContent":["let root = {}\r\nexport default root;\r\n"]}

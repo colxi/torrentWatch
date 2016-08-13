@@ -1,39 +1,44 @@
-<section class="tab">
-	<div class="pg-row pg-vertical-center pg-margin-bottom-biggest">
-		<h2 class="pg-col">Feeds :</h2>
+<section>
+	<header class="pg-row pg-section-header">
+		<h2 class="pg-col" rv-text="feeds.form.title | getProperty feeds.form.mode"></h2>
 		<div class="pg-col pg-text-right">
-			<div class="pg-col pg-btn" rv-on-click="feeds.location | = 'feeds/list'"><span class="fa fa-plus-circle"></span> Cancel</div>
+			<div class="pg-col pg-btn" rv-on-click="feeds.initialize"><span class="fa fa-plus-circle"></span> Cancel</div>
 		</div>
-	</div>
+	</header>
+
 	<!-- feeds form -->
-	<form rv-on-submit="feeds.showFormConfig" rv-show="feeds.form.step | === '1'">
+	<form rv-element="feeds.form.UI.feedDeclarationForm" rv-show="feeds.form.show | === 'feedDeclarationForm'">
+		<div class="pg-notification-error" rv-show="feeds.form.Data.formError" rv-text="feeds.form.Data.formError"></div>
 		<label class="pg-form-control">
-			<input type="text" rv-value="feeds.form.name" required pattern=".*\S+.*">
-			<span class="pg-label">Name:</span>
+			<input type="text" rv-value="feeds.form.Data.name" required pattern=".*\S+.*" placeholder="eg. HurryTorrents - Software">
+			<span>Name :</span>
 		</label>
 		<label class="pg-form-control">
-			<input type="url" rv-value="feeds.form.url" required pattern="https?://.+">
-			<span class="pg-label">Url:</span>
+			<input type="url" rv-value="feeds.form.Data.url" rv-element="feeds.form.UI.feedUrl" required pattern="https?://.+" placeholder="eg. http://www.whatatorrent.net/rss?cat=music">
+			<span>Url :</span>
 		</label>
-		<div class="pg-form-control ph-text-center">
+		<div class="pg-form-control pg-text-center">
 			<label rv-each-category="app.Data.categories">
-				<input type="checkbox" rv-on-click="app.toogleArrayItem | () category.name feeds.form.categories" >
+				<input type="checkbox" rv-on-click="app.toogleArrayItem | () category.name feeds.form.Data.categories" >
 				<span>{category.name}</span>
 			</label>
-			<input hidden type="text" rv-value="feeds.form.categories | string" required pattern=".*\S+.*">
-			<span class="pg-label">Category:</span>
+			<input hidden type="text" rv-value="feeds.form.Data.categories | string" required pattern=".*\S+.*">
+			<span>Category :</span>
 		</div>
-		<button type="submit" >Validate Feed<div class="fa fa-plus"></div></button>
+		<div class="pg-form-footer">
+			<div class="pg-btn" rv-on-click="feeds.form.validate_feedSource" >Validate Feed<div class="fa fa-plus"></div></div>
+		</div>
 	</form>
 
-	<form class="pg-row" rv-on-submit="view.feed.saveForm" rv-show="view.feed.location | === 'form:config'">
+	<form class="pg-row" rv-element="feeds.form.UI.feedConfigurationForm" rv-show="feeds.form.show | === 'feedConfigurationForm'">
+		<!--
 		<label class="pg-form-control">
 			<input type="range" min="0" max="120" rv-value="view.feed.form.TTL" step="5">
 			<span class="pg-label">Check Interval (ttl : <span>{view.feed.form.TTL}</span> minutes):</span>
 		</label>
 		<div class="pg-form-control pg-text-center">
 			<label rv-each-property="view.feed.helpers.feedProperties">
-				<input type="checkbox" rv-on-click="view.toogleArrayItem | args property view.feed.form.properties" >
+				<input type="checkbox" rv-on-click="app.toogleArrayItem | args property view.feed.form.properties" >
 				<span>{property}</span>
 			</label>
 			<input hidden type="text" rv-value="view.feed.form.properties | string" required pattern=".*\S+.*">
@@ -48,5 +53,6 @@
 			 	<button  type="submit" >Save Feed<div class="fa fa-plus"></div></button>
 			</div>
 		</div>
+		-->
 	</form>
 </section>

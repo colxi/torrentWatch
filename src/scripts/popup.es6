@@ -5,6 +5,6 @@
 'use strict';
 window.onload = function() {
 	var _d = document;
-	chrome.runtime.getBackgroundPage( _w => _w.rivets.configure_importer({debug:true} , _w , _d) );
+	chrome.runtime.getBackgroundPage( _w => _w.rivets.configure_importer({debug:false} , _w , _d) );
 	chrome.runtime.connect({name:'popup'});
 };

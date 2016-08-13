@@ -7,6 +7,24 @@ let pg;
 (function(){
 	'use strict';
 	pg = {
+
+		load :{
+			model: function(modelName){
+				return new Promise(function(_resolve){
+					_resolve(rivets.importedModels[modelName]);
+				});
+			},
+			view : {},
+			html : {}
+		},
+		loader :function(el = document.body){
+			return {
+				show : function(text = ''){ el.setAttribute('pg-loading',text) },
+				hide : function(){ el.removeAttribute('pg-loading') },
+				text : function(text = ''){ el.setAttribute('pg-loading',text) },
+				has : function(){ return el.hasAttribute('pg-loading') },
+			};
+		},
 		/**
 		 * [configure description]
 		 * @param  {[type]} obj [description]
@@ -122,9 +140,7 @@ let pg;
 		 * [controller description]
 		 * @type {Object}
 		 */
-		controllers : {
-
-		},
+		controllers : {},
 		/**
 		 * [description]
 		 * @param  {[type]} )

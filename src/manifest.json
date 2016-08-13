@@ -1,5 +1,5 @@
 {
-	"version": "0.0.2034",
+	"version": "0.0.2450",
 	"manifest_version": 2,
 	"name": "Torrent Watch : Alerts on torrent releases",
 	"description": "This extension alerts user when torrent file is released",
@@ -14,7 +14,7 @@
 			"19": "img/icon_19.png",
 			"38": "img/icon_38.png"
 		},
-		"default_popup": "html/extension_popup.html"
+		"default_popup": "html/views/main.html"
 	},
 	"permissions": [
 		"storage",
