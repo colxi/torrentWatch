@@ -5,9 +5,10 @@
 'use strict';
 
 window.onload = function () {
+	var debug = true;
 	var _d = document;
 	chrome.runtime.getBackgroundPage(function (_w) {
-		return _w.rivets.configure_importer({ debug: false }, _w, _d);
+		return _w.rivets.configure_importer({ debug: debug }, _w, _d);
 	});
 	chrome.runtime.connect({ name: 'popup' });
 };

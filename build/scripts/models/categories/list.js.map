@@ -1,0 +1,1 @@
+{"version":3,"sources":["list.es6"],"names":[],"mappings":";;;;;AAAA,IAAI,qBAAqB,EAAzB;;kBAGe,kB","file":"list.js","sourcesContent":["let categories_listing = {\r\n};\r\n\r\nexport default categories_listing;\r\n"]}

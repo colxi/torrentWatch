@@ -5,6 +5,7 @@
 @import 'pg-partials/columnization';
 @import 'pg-partials/button';
 @import 'pg-partials/pagination';
+@import 'pg-partials/position';
 @import 'pg-partials/spacing';
 @import 'pg-partials/text';
 @import 'pg-partials/form';
@@ -43,6 +44,7 @@ h5{ font-size: $f-small;}
 h6{ font-size: $f-smaller;}
 
 
+[hidden], .pg-hidden, .pg-hide{ display:none !important; }
 /* MOUSE INTERACTIONS */
 
 .pg-hover{ cursor:pointer; }
@@ -72,14 +74,8 @@ h6{ font-size: $f-smaller;}
 	display:inline-block;
 }
 
-.pg-float-left{ float:left; }
-.pg-float-right{ float:right; }
-.pg-float-none{ float:none; }
 
-.pg-vertical-center{
-    vertical-align:middle;
-    align-items: center;
-}
+
 
 
 

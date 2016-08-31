@@ -88,12 +88,12 @@ table {
   margin-left: 0px !important;
   margin-right: 0px !important;
   width: 100%;
-  display: -webkit-box;
-  display: -moz-box;
-  display: -ms-flexbox;
-  display: -moz-flex;
-  display: -webkit-flex;
-  display: flex;
+  display: -webkit-box !important;
+  display: -moz-box !important;
+  display: -ms-flexbox !important;
+  display: -moz-flex !important;
+  display: -webkit-flex !important;
+  display: flex !important;
   -webkit-flex-wrap: nowrap;
   -moz-flex-wrap: nowrap;
   -ms-flex-wrap: none;
@@ -127,184 +127,222 @@ table {
 }
 
 /* line 49, ../../src/styles/pg-partials/_columnization.scss */
-[class^=pg-col-] {
+.pg-row > [class^=pg-col]:first-child {
+  margin-left: 0px;
+}
+
+/* line 50, ../../src/styles/pg-partials/_columnization.scss */
+.pg-row > [class^=pg-col] {
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+/* line 51, ../../src/styles/pg-partials/_columnization.scss */
+.pg-row > [class^=pg-col]:last-child {
+  margin-right: 0px;
+}
+
+/* line 53, ../../src/styles/pg-partials/_columnization.scss */
+.pg-row.pg-big-gap > [class^=pg-col]:first-child {
+  margin-left: 0px;
+}
+
+/* line 54, ../../src/styles/pg-partials/_columnization.scss */
+.pg-row.pw-big-gap > [class^=pg-col] {
+  margin-left: 15px;
+  margin-right: 15px;
+}
+
+/* line 55, ../../src/styles/pg-partials/_columnization.scss */
+.pg-row.pg-big-gap > [class^=pg-col]:last-child {
+  margin-right: 0px;
+}
+
+/* line 57, ../../src/styles/pg-partials/_columnization.scss */
+.pg-row.pg-small-gap > [class^=pg-col]:first-child {
+  margin-left: 0px;
+}
+
+/* line 58, ../../src/styles/pg-partials/_columnization.scss */
+.pg-row.pg-small-gap > [class^=pg-col] {
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+/* line 59, ../../src/styles/pg-partials/_columnization.scss */
+.pg-row.pg-small-gap > [class^=pg-col]:last-child {
+  margin-right: 0px;
+}
+
+/* line 61, ../../src/styles/pg-partials/_columnization.scss */
+.pg-row.pg-no-gap > [class^=pg-col]:first-child {
+  margin-left: 0px;
+}
+
+/* line 62, ../../src/styles/pg-partials/_columnization.scss */
+.pg-row.pg-no-gap > [class^=pg-col] {
+  margin-left: 0px;
+  margin-right: 0px;
+}
+
+/* line 63, ../../src/styles/pg-partials/_columnization.scss */
+.pg-row.pg-no-gap > [class^=pg-col]:last-child {
+  margin-right: 0px;
+}
+
+/* line 65, ../../src/styles/pg-partials/_columnization.scss */
+.pg-row > [class^=pg-col].pg-no-gap {
+  margin-left: 0px;
+  margin-right: 0px;
+}
+
+/* line 67, ../../src/styles/pg-partials/_columnization.scss */
+.pg-row > [class^=pg-col] {
   position: relative;
   display: block;
-  overflow: hidden;
   transition: width .5s ease-in-out;
 }
 
-/* line 56, ../../src/styles/pg-partials/_columnization.scss */
-[class^=pg-col-]::after {
+/* line 74, ../../src/styles/pg-partials/_columnization.scss */
+.pg-row > [class^=pg-col]::after {
   clear: both;
   content: "";
   display: block;
 }
 
-/* line 62, ../../src/styles/pg-partials/_columnization.scss */
-[class^=pg-col-]:empty::before {
+/* line 80, ../../src/styles/pg-partials/_columnization.scss */
+.pg-row > [class^=pg-col]:empty::before {
   content: "\200B";
   display: block;
 }
 
-/* line 67, ../../src/styles/pg-partials/_columnization.scss */
-.pg-col-collapsed {
+/* line 86, ../../src/styles/pg-partials/_columnization.scss */
+.pg-row .pg-col-collapsed {
   width: 0px !important;
   opacity: 0;
 }
-
-/* line 68, ../../src/styles/pg-partials/_columnization.scss */
-.pg-col-5 {
+/* line 87, ../../src/styles/pg-partials/_columnization.scss */
+.pg-row .pg-col-5 {
   width: 5%;
 }
-
-/* line 69, ../../src/styles/pg-partials/_columnization.scss */
-.pg-col-10 {
+/* line 88, ../../src/styles/pg-partials/_columnization.scss */
+.pg-row .pg-col-10 {
   width: 10%;
 }
-
-/* line 70, ../../src/styles/pg-partials/_columnization.scss */
-.pg-col-15 {
+/* line 89, ../../src/styles/pg-partials/_columnization.scss */
+.pg-row .pg-col-15 {
   width: 15%;
 }
-
-/* line 71, ../../src/styles/pg-partials/_columnization.scss */
-.pg-col-20 {
+/* line 90, ../../src/styles/pg-partials/_columnization.scss */
+.pg-row .pg-col-20 {
   width: 20%;
 }
-
-/* line 72, ../../src/styles/pg-partials/_columnization.scss */
-.pg-col-25 {
+/* line 91, ../../src/styles/pg-partials/_columnization.scss */
+.pg-row .pg-col-25 {
   width: 25%;
 }
-
-/* line 73, ../../src/styles/pg-partials/_columnization.scss */
-.pg-col-30 {
+/* line 92, ../../src/styles/pg-partials/_columnization.scss */
+.pg-row .pg-col-30 {
   width: 30%;
 }
-
-/* line 74, ../../src/styles/pg-partials/_columnization.scss */
-.pg-col-33 {
+/* line 93, ../../src/styles/pg-partials/_columnization.scss */
+.pg-row .pg-col-33 {
   width: 33%;
 }
-
-/* line 75, ../../src/styles/pg-partials/_columnization.scss */
-.pg-col-35 {
+/* line 94, ../../src/styles/pg-partials/_columnization.scss */
+.pg-row .pg-col-35 {
   width: 35%;
 }
-
-/* line 76, ../../src/styles/pg-partials/_columnization.scss */
-.pg-col-40 {
+/* line 95, ../../src/styles/pg-partials/_columnization.scss */
+.pg-row .pg-col-40 {
   width: 40%;
 }
-
-/* line 77, ../../src/styles/pg-partials/_columnization.scss */
-.pg-col-45 {
+/* line 96, ../../src/styles/pg-partials/_columnization.scss */
+.pg-row .pg-col-45 {
   width: 45%;
 }
-
-/* line 78, ../../src/styles/pg-partials/_columnization.scss */
-.pg-col-50 {
+/* line 97, ../../src/styles/pg-partials/_columnization.scss */
+.pg-row .pg-col-50 {
   width: 50%;
 }
-
-/* line 79, ../../src/styles/pg-partials/_columnization.scss */
-.pg-col-55 {
+/* line 98, ../../src/styles/pg-partials/_columnization.scss */
+.pg-row .pg-col-55 {
   width: 55%;
 }
-
-/* line 80, ../../src/styles/pg-partials/_columnization.scss */
-.pg-col-60 {
+/* line 99, ../../src/styles/pg-partials/_columnization.scss */
+.pg-row .pg-col-60 {
   width: 60%;
 }
-
-/* line 81, ../../src/styles/pg-partials/_columnization.scss */
-.pg-col-65 {
+/* line 100, ../../src/styles/pg-partials/_columnization.scss */
+.pg-row .pg-col-65 {
   width: 65%;
 }
-
-/* line 82, ../../src/styles/pg-partials/_columnization.scss */
-.pg-col-70 {
+/* line 101, ../../src/styles/pg-partials/_columnization.scss */
+.pg-row .pg-col-70 {
   width: 70%;
 }
-
-/* line 83, ../../src/styles/pg-partials/_columnization.scss */
-.pg-col-75 {
+/* line 102, ../../src/styles/pg-partials/_columnization.scss */
+.pg-row .pg-col-75 {
   width: 75%;
 }
-
-/* line 84, ../../src/styles/pg-partials/_columnization.scss */
-.pg-col-80 {
+/* line 103, ../../src/styles/pg-partials/_columnization.scss */
+.pg-row .pg-col-80 {
   width: 80%;
 }
-
-/* line 85, ../../src/styles/pg-partials/_columnization.scss */
-.pg-col-85 {
+/* line 104, ../../src/styles/pg-partials/_columnization.scss */
+.pg-row .pg-col-85 {
   width: 85%;
 }
-
-/* line 86, ../../src/styles/pg-partials/_columnization.scss */
-.pg-col-90 {
+/* line 105, ../../src/styles/pg-partials/_columnization.scss */
+.pg-row .pg-col-90 {
   width: 90%;
 }
-
-/* line 87, ../../src/styles/pg-partials/_columnization.scss */
-.pg-col-95 {
+/* line 106, ../../src/styles/pg-partials/_columnization.scss */
+.pg-row .pg-col-95 {
   width: 95%;
 }
-
-/* line 88, ../../src/styles/pg-partials/_columnization.scss */
-.pg-col-100 {
+/* line 107, ../../src/styles/pg-partials/_columnization.scss */
+.pg-row .pg-col-100 {
   width: 100%;
 }
-
-/* line 90, ../../src/styles/pg-partials/_columnization.scss */
-.pg-col {
+/* line 109, ../../src/styles/pg-partials/_columnization.scss */
+.pg-row .pg-col {
   flex-grow: 1;
 }
-
-/* line 91, ../../src/styles/pg-partials/_columnization.scss */
-.pg-col-x1 {
+/* line 110, ../../src/styles/pg-partials/_columnization.scss */
+.pg-row .pg-col-x1 {
   flex-grow: 1;
 }
-
-/* line 92, ../../src/styles/pg-partials/_columnization.scss */
-.pg-col-x2 {
+/* line 111, ../../src/styles/pg-partials/_columnization.scss */
+.pg-row .pg-col-x2 {
   flex-grow: 2;
 }
-
-/* line 93, ../../src/styles/pg-partials/_columnization.scss */
-.pg-col-x3 {
+/* line 112, ../../src/styles/pg-partials/_columnization.scss */
+.pg-row .pg-col-x3 {
   flex-grow: 3;
 }
-
-/* line 94, ../../src/styles/pg-partials/_columnization.scss */
-.pg-col-x4 {
+/* line 113, ../../src/styles/pg-partials/_columnization.scss */
+.pg-row .pg-col-x4 {
   flex-grow: 4;
 }
-
-/* line 95, ../../src/styles/pg-partials/_columnization.scss */
-.pg-col-x5 {
+/* line 114, ../../src/styles/pg-partials/_columnization.scss */
+.pg-row .pg-col-x5 {
   flex-grow: 5;
 }
-
-/* line 96, ../../src/styles/pg-partials/_columnization.scss */
-.pg-col-x6 {
+/* line 115, ../../src/styles/pg-partials/_columnization.scss */
+.pg-row .pg-col-x6 {
   flex-grow: 6;
 }
-
-/* line 97, ../../src/styles/pg-partials/_columnization.scss */
-.pg-col-x7 {
+/* line 116, ../../src/styles/pg-partials/_columnization.scss */
+.pg-row .pg-col-x7 {
   flex-grow: 7;
 }
-
-/* line 98, ../../src/styles/pg-partials/_columnization.scss */
-.pg-col-x8 {
+/* line 117, ../../src/styles/pg-partials/_columnization.scss */
+.pg-row .pg-col-x8 {
   flex-grow: 8;
 }
-
-/* line 99, ../../src/styles/pg-partials/_columnization.scss */
-.pg-col-fixed {
+/* line 118, ../../src/styles/pg-partials/_columnization.scss */
+.pg-row .pg-col-fixed {
   flex-grow: 0;
 }
 
@@ -367,6 +405,42 @@ table {
   color: white;
   cursor: default;
   pointer-events: none;
+}
+
+/* POSITION */
+/* line 2, ../../src/styles/pg-partials/_position.scss */
+.pg-vertical-center {
+  vertical-align: middle;
+  align-items: center;
+  display: flex !important;
+}
+
+/* line 8, ../../src/styles/pg-partials/_position.scss */
+.pg-float-left {
+  float: left;
+}
+
+/* line 9, ../../src/styles/pg-partials/_position.scss */
+.pg-float-right {
+  float: right;
+}
+
+/* line 10, ../../src/styles/pg-partials/_position.scss */
+.pg-float-right, .pg-float-left {
+  content: "";
+  display: block;
+  clear: both;
+  position: relative;
+}
+
+/* line 16, ../../src/styles/pg-partials/_position.scss */
+.pg-float-none {
+  float: none;
+}
+
+/* line 17, ../../src/styles/pg-partials/_position.scss */
+.pg-float-clear {
+  clear: both;
 }
 
 /* MARGINS */
@@ -772,58 +846,85 @@ table {
   font-size: 9px;
 }
 
+/* line 14, ../../src/styles/pg-partials/_text.scss */
+.pg-text-bolder {
+  font-weight: 900;
+}
+
+/* line 15, ../../src/styles/pg-partials/_text.scss */
+.pg-text-bold {
+  font-weight: 600;
+}
+
+/* line 16, ../../src/styles/pg-partials/_text.scss */
+.pg-text-regular {
+  font-weight: 400;
+}
+
+/* line 17, ../../src/styles/pg-partials/_text.scss */
+.pg-text-light {
+  font-weight: 200;
+}
+
+/* line 18, ../../src/styles/pg-partials/_text.scss */
+.pg-text-lighter {
+  font-weight: 100;
+}
+
 /* FORM AND FORM CONTROLS */
-/* line 2, ../../src/styles/pg-partials/_form.scss */
-::-webkit-input-placeholder {
-  /* Chrome/Opera/Safari */
-  color: #d1d1e6;
-}
-
 /* line 5, ../../src/styles/pg-partials/_form.scss */
+::-webkit-input-placeholder {
+  color: #d1d1e6;
+}
+
+/* Chrome/Opera/Safari */
+/* line 6, ../../src/styles/pg-partials/_form.scss */
 ::-moz-placeholder {
-  /* Firefox 19+ */
   color: #d1d1e6;
 }
 
-/* line 8, ../../src/styles/pg-partials/_form.scss */
+/* Firefox 19+ */
+/* line 7, ../../src/styles/pg-partials/_form.scss */
 :-ms-input-placeholder {
-  /* IE 10+ */
   color: #d1d1e6;
 }
 
-/* line 11, ../../src/styles/pg-partials/_form.scss */
+/* IE 10+ */
+/* line 8, ../../src/styles/pg-partials/_form.scss */
 :-moz-placeholder {
-  /* Firefox 18- */
   color: #d1d1e6;
 }
 
-/* line 16, ../../src/styles/pg-partials/_form.scss */
+/* Firefox 18- */
+/* line 13, ../../src/styles/pg-partials/_form.scss */
 .pg-form-footer {
   border-top: 1px solid #c1c1c6;
   padding-top: 10px;
-  margin-top: 40px;
+  margin-top: 20px;
   text-align: right;
   position: relative;
   clear: both;
   display: block;
 }
 
-/* line 26, ../../src/styles/pg-partials/_form.scss */
+/* line 23, ../../src/styles/pg-partials/_form.scss */
 .pg-form-control {
   position: relative;
   margin-bottom: 20px;
   clear: both;
   display: block;
   padding-top: 20px;
+  width: 100%;
 }
 
-/* line 34, ../../src/styles/pg-partials/_form.scss */
+/* line 32, ../../src/styles/pg-partials/_form.scss */
 .pg-form-control *:focus {
   outline: none;
 }
 
-/* line 38, ../../src/styles/pg-partials/_form.scss */
-.pg-form-control > input {
+/* line 36, ../../src/styles/pg-partials/_form.scss */
+.pg-form-control > input,
+.pg-form-control > select {
   position: relative;
   width: 100%;
   border-radius: 15px;
@@ -834,12 +935,13 @@ table {
   border-right: 1px solid #c3c2c2;
   background-color: #f4f4ff;
   color: #76767d;
+  height: 32px;
 }
 
 /* line 51, ../../src/styles/pg-partials/_form.scss */
 .pg-form-control > span {
   display: block;
-  top: 0px;
+  top: 2px;
   position: absolute;
   transition: all 0.5s ease;
   font-size: 12px;
@@ -864,13 +966,8 @@ table {
   font-family: "lucida console";
 }
 
-/* line 77, ../../src/styles/pg-partials/_form.scss */
-.pg-form-control label > input[type="checkbox"] {
-  display: none;
-}
-
 /* line 78, ../../src/styles/pg-partials/_form.scss */
-.pg-form-control label > input[type="checkbox"] + span {
+.pg-form-control label > .pg-tag {
   display: inline-block;
   background-color: #6d6d7f;
   padding: 10px 15px;
@@ -884,12 +981,12 @@ table {
   font-size: 12px;
 }
 /* line 90, ../../src/styles/pg-partials/_form.scss */
-.pg-form-control label > input[type="checkbox"] + span:hover {
+.pg-form-control label > .pg-tag:hover {
   background-color: #ff4500;
 }
 
 /* line 94, ../../src/styles/pg-partials/_form.scss */
-.pg-form-control label > input[type="checkbox"]:checked + span {
+.pg-form-control label > .pg-tag.pg-checked {
   background-color: #3c3c44;
   box-shadow: 1px 1px 2px 2px rgba(0, 0, 0, 0.3) inset;
   border-left: 1px solid #fff;
@@ -903,17 +1000,17 @@ table {
 }
 
 /* line 105, ../../src/styles/pg-partials/_form.scss */
-.pg-form-control input:invalid {
+.pg-form-control *:invalid {
   color: #cd3347;
 }
 
 /* line 109, ../../src/styles/pg-partials/_form.scss */
-.pg-form-control input:invalid + span {
+.pg-form-control *:invalid + span {
   color: #cd3347 !important;
   margin-left: 15px;
 }
 /* line 112, ../../src/styles/pg-partials/_form.scss */
-.pg-form-control input:invalid + span:after {
+.pg-form-control *:invalid + span:after {
   content: "!";
   position: absolute;
   background: #cd3347;
@@ -929,6 +1026,143 @@ table {
   font-weight: 800;
   line-height: 12px;
   font-family: arial;
+}
+
+/* line 139, ../../src/styles/pg-partials/_form.scss */
+input[type=range] {
+  -webkit-appearance: none;
+  /* Hides the slider so that custom slider can be made */
+  width: 100%;
+  /* Specific width is required for Firefox. */
+  background: transparent !important;
+  /* Otherwise white in Chrome */
+  border: none !important;
+  padding: 0 !important;
+  margin: 0px !important;
+}
+
+/* line 147, ../../src/styles/pg-partials/_form.scss */
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+}
+
+/* line 148, ../../src/styles/pg-partials/_form.scss */
+input[type=range]::-ms-track {
+  width: 100%;
+  cursor: pointer;
+  /* Hides the slider so custom styles can be added */
+  background: transparent;
+  border-color: transparent;
+  color: transparent;
+}
+
+/* Special styling for WebKit/Blink */
+/* line 171, ../../src/styles/pg-partials/_form.scss */
+.pg-form-control input[type=range]::-webkit-slider-thumb {
+  border: none;
+  border-bottom: 1px solid #c3c2c2;
+  border-right: 1px solid #c3c2c2;
+  background-color: #f4f4ff;
+  height: 30px;
+  width: 12px;
+  border-radius: 3px;
+  cursor: pointer;
+  box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+  -webkit-appearance: none;
+  margin-top: -14px;
+  /* You need to specify a margin in Chrome, but in Firefox and IE it is automatic */
+}
+
+/* All the same stuff for Firefox */
+/* line 178, ../../src/styles/pg-partials/_form.scss */
+.pg-form-control input[type=range]::-moz-range-thumb {
+  border: none;
+  border-bottom: 1px solid #c3c2c2;
+  border-right: 1px solid #c3c2c2;
+  background-color: #f4f4ff;
+  height: 30px;
+  width: 12px;
+  border-radius: 3px;
+  cursor: pointer;
+  box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+}
+
+/* All the same stuff for IE */
+/* line 181, ../../src/styles/pg-partials/_form.scss */
+.pg-form-control input[type=range]::-ms-thumb {
+  border: none;
+  border-bottom: 1px solid #c3c2c2;
+  border-right: 1px solid #c3c2c2;
+  background-color: #f4f4ff;
+  height: 30px;
+  width: 12px;
+  border-radius: 3px;
+  cursor: pointer;
+  box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+}
+
+/* line 186, ../../src/styles/pg-partials/_form.scss */
+input[type=range]::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 4px;
+  box-shadow: none;
+  cursor: pointer;
+  background: #6d6d7f;
+  border-radius: 1.3px;
+  border: 0.2px solid #010101;
+}
+
+/* line 196, ../../src/styles/pg-partials/_form.scss */
+input[type=range]:focus::-webkit-slider-runnable-track {
+  background: #6d6d7f;
+}
+
+/* line 197, ../../src/styles/pg-partials/_form.scss */
+input[type=range]::-moz-range-track {
+  width: 100%;
+  height: 4px;
+  box-shadow: none;
+  cursor: pointer;
+  background: #6d6d7f;
+  border-radius: 1.3px;
+  border: 0.2px solid #010101;
+}
+
+/* line 206, ../../src/styles/pg-partials/_form.scss */
+input[type=range]::-ms-track {
+  width: 100%;
+  height: 4px;
+  cursor: pointer;
+  background: transparent;
+  border-color: transparent;
+  border-width: 16px 0;
+  color: transparent;
+}
+
+/* line 215, ../../src/styles/pg-partials/_form.scss */
+input[type=range]::-ms-fill-lower {
+  box-shadow: none;
+  background: #6d6d7f;
+  border: 0.2px solid #010101;
+  border-radius: 2.6px;
+}
+
+/* line 221, ../../src/styles/pg-partials/_form.scss */
+input[type=range]:focus::-ms-fill-lower {
+  background: #6d6d7f;
+}
+
+/* line 222, ../../src/styles/pg-partials/_form.scss */
+input[type=range]::-ms-fill-upper {
+  box-shadow: none;
+  background: #6d6d7f;
+  border: 0.2px solid #010101;
+  border-radius: 2.6px;
+}
+
+/* line 228, ../../src/styles/pg-partials/_form.scss */
+input[type=range]:focus::-ms-fill-upper {
+  background: #6d6d7f;
 }
 
 /* RIVETS LOADER */
@@ -1030,6 +1264,49 @@ table {
   font-size: 14px;
 }
 
+/* line 33, ../../src/styles/pg-partials/_notification.scss */
+.pg-notification-bubble {
+  position: fixed;
+  margin-top: none;
+  margin-bottom: none;
+  padding-left: 10px;
+  padding-right: 10px;
+  top: 0;
+  right: 40px;
+  opacity: 0;
+  width: 130px;
+  z-index: 9999;
+  padding-bottom: 25px;
+  padding-top: 35px;
+  border-radius: 5px;
+  box-shadow: 0 0 50px rgba(0, 0, 0, 0.34);
+  border-bottom: 1px solid #222;
+  animation: pg-bubble 3s normal ease-in-out;
+}
+
+/* line 52, ../../src/styles/pg-partials/_notification.scss */
+.pg-notification-bubble:before {
+  right: 52px;
+}
+
+@keyframes pg-bubble {
+  0% {
+    top: 80px;
+    opacity: 0;
+  }
+  30% {
+    top: 40px;
+    opacity: 1;
+  }
+  60% {
+    top: 40px;
+    opacity: 1;
+  }
+  100% {
+    top: 0px;
+    opacity: 0;
+  }
+}
 /* line 1, ../../src/styles/pg-partials/_tooltip.scss */
 [pg-tooltip] {
   display: inline-block;
@@ -1095,12 +1372,12 @@ table {
   border-right: 14px solid transparent;
 }
 
-/* line 16, ../../src/styles/pg-styles.scss */
+/* line 17, ../../src/styles/pg-styles.scss */
 * {
   box-sizing: border-box;
 }
 
-/* line 19, ../../src/styles/pg-styles.scss */
+/* line 20, ../../src/styles/pg-styles.scss */
 body {
   font-family: "Roboto", Arial;
   font-size: 14px;
@@ -1112,59 +1389,64 @@ body {
   font-weight: 500;
 }
 
-/* line 30, ../../src/styles/pg-styles.scss */
+/* line 31, ../../src/styles/pg-styles.scss */
 body *[hidden], body *.pg-hidden {
   display: none;
 }
 
-/* line 33, ../../src/styles/pg-styles.scss */
+/* line 34, ../../src/styles/pg-styles.scss */
 h1, h2, h3, h4, h5 {
   font-family: "Roboto Slab", Arial;
   font-weight: 700;
 }
 
-/* line 38, ../../src/styles/pg-styles.scss */
+/* line 39, ../../src/styles/pg-styles.scss */
 h1 {
   font-size: 20px;
 }
 
-/* line 39, ../../src/styles/pg-styles.scss */
+/* line 40, ../../src/styles/pg-styles.scss */
 h2 {
   font-size: 18px;
 }
 
-/* line 40, ../../src/styles/pg-styles.scss */
+/* line 41, ../../src/styles/pg-styles.scss */
 h3 {
   font-size: 16px;
 }
 
-/* line 41, ../../src/styles/pg-styles.scss */
+/* line 42, ../../src/styles/pg-styles.scss */
 h4 {
   font-size: 14px;
 }
 
-/* line 42, ../../src/styles/pg-styles.scss */
+/* line 43, ../../src/styles/pg-styles.scss */
 h5 {
   font-size: 12px;
 }
 
-/* line 43, ../../src/styles/pg-styles.scss */
+/* line 44, ../../src/styles/pg-styles.scss */
 h6 {
   font-size: 10px;
 }
 
+/* line 47, ../../src/styles/pg-styles.scss */
+[hidden], .pg-hidden, .pg-hide {
+  display: none !important;
+}
+
 /* MOUSE INTERACTIONS */
-/* line 48, ../../src/styles/pg-styles.scss */
+/* line 50, ../../src/styles/pg-styles.scss */
 .pg-hover {
   cursor: pointer;
 }
 
-/* line 49, ../../src/styles/pg-styles.scss */
+/* line 51, ../../src/styles/pg-styles.scss */
 .pg-hover:hover {
   color: #ff4500;
 }
 
-/* line 51, ../../src/styles/pg-styles.scss */
+/* line 53, ../../src/styles/pg-styles.scss */
 .pg-unselectable {
   -moz-user-select: none;
   -webkit-user-select: none;
@@ -1173,7 +1455,7 @@ h6 {
   cursor: default;
 }
 
-/* line 58, ../../src/styles/pg-styles.scss */
+/* line 60, ../../src/styles/pg-styles.scss */
 .pg-selectable {
   -moz-user-select: text;
   -webkit-user-select: text;
@@ -1182,63 +1464,42 @@ h6 {
 }
 
 /* SIZE & POSITION */
-/* line 68, ../../src/styles/pg-styles.scss */
+/* line 70, ../../src/styles/pg-styles.scss */
 .pg-expand {
   width: 100%;
 }
 
-/* line 69, ../../src/styles/pg-styles.scss */
+/* line 71, ../../src/styles/pg-styles.scss */
 .pg-collapse {
   width: 0px;
   overflow: hidden;
   display: inline-block;
 }
 
-/* line 75, ../../src/styles/pg-styles.scss */
-.pg-float-left {
-  float: left;
-}
-
-/* line 76, ../../src/styles/pg-styles.scss */
-.pg-float-right {
-  float: right;
-}
-
-/* line 77, ../../src/styles/pg-styles.scss */
-.pg-float-none {
-  float: none;
-}
-
-/* line 79, ../../src/styles/pg-styles.scss */
-.pg-vertical-center {
-  vertical-align: middle;
-  align-items: center;
-}
-
 /* TABLE */
-/* line 89, ../../src/styles/pg-styles.scss */
+/* line 85, ../../src/styles/pg-styles.scss */
 .pg-table > .pg-row {
   align-items: center;
   padding: 10px 10px;
   transition: background-color 0.5s ease;
 }
 
-/* line 94, ../../src/styles/pg-styles.scss */
+/* line 90, ../../src/styles/pg-styles.scss */
 .pg-table > .pg-row:nth-child(odd) {
   background-color: rgba(191, 191, 195, 0.03);
 }
 
-/* line 98, ../../src/styles/pg-styles.scss */
+/* line 94, ../../src/styles/pg-styles.scss */
 .pg-table > .pg-row:not(:last-child) {
   border-bottom: 1px solid #cacadc;
 }
 
-/* line 102, ../../src/styles/pg-styles.scss */
+/* line 98, ../../src/styles/pg-styles.scss */
 .pg-table > .pg-row:hover {
   background-color: rgba(104, 104, 109, 0.04);
 }
 
-/* line 107, ../../src/styles/pg-styles.scss */
+/* line 103, ../../src/styles/pg-styles.scss */
 .pg-tag {
   background-color: #555555;
   padding: 5px 10px;
@@ -1251,12 +1512,12 @@ h6 {
   cursor: pointer;
 }
 
-/* line 120, ../../src/styles/pg-styles.scss */
+/* line 116, ../../src/styles/pg-styles.scss */
 .pg-tab {
   padding: 20px;
 }
 
-/* line 125, ../../src/styles/pg-styles.scss */
+/* line 121, ../../src/styles/pg-styles.scss */
 .pg-row > .pg-row {
   flex-wrap: wrap;
   width: 100%;
@@ -1264,25 +1525,25 @@ h6 {
 }
 
 /* PROJECT */
-/* line 134, ../../src/styles/pg-styles.scss */
+/* line 130, ../../src/styles/pg-styles.scss */
 .log-output > div {
   font-size: 10px;
   margin-bottom: 3px;
   color: #555561;
 }
 
-/* line 139, ../../src/styles/pg-styles.scss */
+/* line 135, ../../src/styles/pg-styles.scss */
 .log-output > div:nth-child(even) {
   color: darkgray;
 }
 
-/* line 143, ../../src/styles/pg-styles.scss */
+/* line 139, ../../src/styles/pg-styles.scss */
 #new_feed_form {
   background: #c2c2d4;
   padding: 30px;
 }
 
-/* line 148, ../../src/styles/pg-styles.scss */
+/* line 144, ../../src/styles/pg-styles.scss */
 #new_feed_form > div {
   margin-bottom: 10px;
 }

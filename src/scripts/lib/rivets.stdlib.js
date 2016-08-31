@@ -68,6 +68,7 @@
     /* Objectts */
 
     rivets.formatters.getProperty = function(_object, _property){
+        console.log('rivets.formatters.getProperty', _object)
         return (_object === undefined) ? false :_object[_property];
     };
 

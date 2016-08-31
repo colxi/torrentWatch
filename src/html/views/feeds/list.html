@@ -3,30 +3,31 @@
 	<header class="pg-row pg-section-header">
 		<h2 class="pg-col">Feeds :</h2>
 		<div class="pg-col pg-text-right">
-			<div class="pg-col pg-btn" rv-on-click="feeds.form.initialize | ()  'insert'"><span class="fa fa-plus-circle"></span> Add</div>
+			<div class="pg-col pg-btn" rv-on-click="feeds.form.initialize"><span class="fa fa-plus-circle"></span> Add</div>
 		</div>
 	</header>
 
 	<div class="pg-row">
 		<div class="pg-table pg-expand">
-			<div class="pg-row" rv-each-feed="app.Data.feeds">
+			<div class="pg-row pg-no-gap" rv-each-feed="app.Data.feeds" rv-class-row-failure="feed.status.code | === 400">
 				<div class="pg-col-40">
 					<div>{feed.name}</div>
-					<div class="pg-text-smaller">Last update: {feed.lastUpdate}</div>
+					<div class="pg-text-smaller">Status: {feed.status.details}</div>
 				</div>
-				<div class="pg-col-40 pg-text-center pg-text-smallest">
-					<span rv-each-category="app.Data.categories">
-						{ app.Data.categories | findBy 'id' category.id | getProperty 'name' } <span rv-hide="category | isLastIn app.Data.categories"> | </span>
+				<div class="pg-col-45 pg-text-center pg-text-smallest">
+					<span rv-each-category="feed.categories">
+						{ app.Data.categories | findBy 'id' category | getProperty 'name' } <span rv-unless="category | isLastIn feed.categories"> | </span>
 					</span>
 				</div>
-				<div class="pg-col-20 pg-text-right">
-					<span class="fa fa-refresh pg-hover pg-margin-right-smallest"></span>
-					<span class="fa fa-pencil pg-hover pg-margin-right-smallest pg-margin-left-smallest"></span>
-					<span class="fa fa-trash pg-hover pg-margin-left-smallest"></span>
+				<div class="pg-col pg-text-center">
+					<i class="fa fa-refresh pg-hover pg-margin-right-smallest" rv-on-click="app.updateFeed | () feed.id"  rv-class-fa-spin="feed.status.code | === 100"></i>
+					<i class="fa fa-pencil pg-hover pg-margin-right-smallest pg-margin-left-smallest" rv-on-click="feeds.form.initialize | () feed.id" rv-hide="feed.status.code | === 100"></i>
+					<i class="fa fa-trash pg-hover pg-margin-left-smallest" rv-hide="feed.status.code | === 100" rv-on-click="feeds.list.show_deleteFeedDialog | () feed.id"></i>
 				</div>
 			</div>
 		</div>
 	</div>
+
 	<div class="pg-row">
 		<div class="pg-pagination">
 			<div class="pg-pagination-item">Previous</div>

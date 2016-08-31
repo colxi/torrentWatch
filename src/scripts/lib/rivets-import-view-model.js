@@ -71,6 +71,24 @@ rivets.configure_importer   = function(configObj, w, d){
                         font-family:arial;                                                  \
                         color:#fff;                                                         \
                     }                                                                       \
+                    body [rv-view][rv\\:import\\:error]{                                             \
+                        position:relative !important;                                       \
+                    }                                                                       \
+                    body [rv-view][rv\\:import\\:error]:after{                                       \
+                        position:absolute;                                                            \
+                        top:0px;                                                            \
+                        bottom:0px;                                                         \
+                        width:100%;                                                         \
+                        content:"Import Error ( " attr(rv-view) attr(rv-model) " )";                \
+                        display:block;                                                      \
+                        background-color: red !important;                                   \
+                        color:white;                                                        \
+                        height:100%;                                                        \
+                        padding:10px 0px;                                                        \
+                        min-height:10px;                                                    \
+                        font-size:10px;                                                    \
+                        text-align:center;                                                  \
+                    }                                                                       \
                 ';
                 _document.getElementsByTagName('HEAD')[0].appendChild(stylesEl);
             }
@@ -113,6 +131,8 @@ rivets.formatters.set = function(oldValue,newValue) {
         //window.binding = binding;
         // var model = obj;
         var kp = rivets._.Util.resolveKeyPath(binding.keypath, binding, false);
+        console.log('keypathhhhhhhhhhhhhhhhhhhhhhhh')
+        console.log(binding.keypath ,kp.model, kp.key)
         //console.log("newValue: "+newValue);
         // set the value
         var adapter = rivets.adapters[rivets.rootInterface];
@@ -186,13 +206,14 @@ rivets.binders['view'] = {
 
         el.firstChild.setAttribute( 'rv:view' , viewName );
         el.setAttribute('rv-loading', 'true');
+        el.removeAttribute('rv:import:error');
         var path = 'html/views/'+ viewName + '.html';
         var done = false;
         var _html = new XMLHttpRequest();
         _html.overrideMimeType('text/html');
         _html.open('GET', path , true);
         _html.onload = _html.onreadystatechange = function () {
-            if ( !done && (!this.readyState || this.readyState === 4) ) {
+            if ( !done && _html.readyState === 4 && _html.status ) {
                 done = true;
                 el.removeAttribute('rv-loading');
                 // free memory, explicit  listener removal;
@@ -204,10 +225,15 @@ rivets.binders['view'] = {
 
                 // if callback  was setted, execute it!
                 if(el.getAttribute('rv-on-ready')){
-                    rivets._.Util.resolveKeyPath( el.getAttribute('rv-on-ready'), self )(currentView);
+                    rivets._.Util.resolveKeyPath( el.getAttribute('rv-on-ready'), self )(viewName);
                 }
                 _html.onload = _html.onreadystatechange = null;
             }
+        };
+        _html.onerror = function(err){
+            el.removeAttribute('rv-loading');
+            el.setAttribute('rv:import:error', err.target.status);
+            console.log( '%c rv-view ' + viewName + ' :  ERROR LOADING VIEW' , 'color: orangered' );
         };
         _html.send(null);
     },
