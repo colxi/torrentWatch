@@ -8,7 +8,7 @@ let app;
 let categories = {
 	__constructor(){
 		return new Promise(function(resolve){
-			pg.load.model('app').then( m =>{
+			pg.load.controller('app').then( m =>{
 				app = m;
 				resolve();
 			});

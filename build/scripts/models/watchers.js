@@ -7,140 +7,57 @@ Object.defineProperty(exports, "__esModule", {
 /* jshint undef: true, unused: false */
 /* global chrome , System , pg , rivets , sightglass */
 
-var app = void 0;
-
 var watchers = {
-	__constructor: function __constructor() {
-		return new Promise(function (resolve) {
-			pg.load.model('app').then(function (m) {
-				app = m;
-				resolve();
+	__constructor: function __constructor() {},
+
+
+	Data: undefined,
+
+	page: function page() {
+		var _page = arguments.length <= 0 || arguments[0] === undefined ? 0 : arguments[0];
+
+		var count = arguments.length <= 1 || arguments[1] === undefined ? 10 : arguments[1];
+		var sortBy = arguments.length <= 2 || arguments[2] === undefined ? '' : arguments[2];
+		var order = arguments.length <= 3 || arguments[3] === undefined ? 'DESC' : arguments[3];
+
+		return new Promise(function (_resolve) {
+			chrome.storage.sync.get('watchers', function (r) {
+				return _resolve(r);
 			});
 		});
 	},
-
-
-	location: 'watchers/list',
-
-	initialize: function initialize() {
-		watchers.list.initialize();
+	get: function get() {
+		var id = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
 	},
-
-	list: {
-		target: null,
-
-		initialize: function initialize() {
-			var mode = arguments.length <= 0 || arguments[0] === undefined ? 'insert' : arguments[0];
-
-			watchers.location = 'watchers/list';
-		},
-
-		show_deleteWatchersDialog: function show_deleteWatchersDialog(id) {
-			watchers.list.target = app.getWatcherById(id);
-			watchers.location = 'watchers/list_delete';
-		},
-
-		delete_watchers: function delete_watchers(id) {
-			app.deleteWatcher(id);
-			watchers.list.initialize();
-		}
+	delete: function _delete() {
+		var id = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
 	},
-
-	form: {
-		active: 'watcherDeclarationForm',
-		mode: 'insert', // | update
-		error: false,
-		title: {
-			insert: 'New Watcher :',
-			update: 'Edit Watcher :'
-		},
-
-		UI: {
-			watcherDeclarationForm: null
-		},
-
-		Data: {},
-
-		initialize: function initialize() {
-			var id = arguments.length <= 0 || arguments[0] === undefined ? null : arguments[0];
-
-			if (id !== null) {
-				// EDIT MODE DETECTED! ... get Feed Data
-				var watcher = app.getFeedById(id);
-				if (watcher === -1) throw new Error('watchers.form.initialize(): Can\'t find Watcher with ID : ' + id);
-				watchers.form.mode = 'update';
-				watchers.form.Data = watcher;
-			} else {
-				// INSERT MODE DETECTED ... generate new Feed
-				watchers.form.mode = 'insert';
-				watchers.form.Data = app.emptyWatcher();
-				watchers.form.Data.id = pg.guid();
-			}
-
-			watchers.form.error = false;
-			watchers.location = 'watchers/form';
-			watchers.form.show_watcherDeclarationForm();
-			return true;
-		},
-
-		show_watcherDeclarationForm: function show_watcherDeclarationForm() {
-			watchers.form.active = 'watcherDeclarationForm';
-		},
-
-		validate_watchersDeclarationForm: function validate_watchersDeclarationForm() {
-			pg.log('watchers.form.validate_watchersDeclarationForm(): Validating Watcher Declaration...');
-			// save feed Data
-			app.saveWatcher({
-				id: watchers.form.Data.id,
-				name: watchers.form.Data.name,
-				categories: watchers.form.Data.categories,
-				directives: [{
-					in: 'title',
-					has: watchers.form.Data.directives
-				}]
-			});
-			// DONE! display ending message!
-			watchers.location = 'watchers/list';
-			return true;
-		},
-
-		validate_feedAssignationsForm: function validate_feedAssignationsForm() {
-			/*
-   pg.log( 'feeds.form.validate_feedAssignationsForm(): Validating Feed Assignations...' );
-   // reset previous form validations
-   feeds.form.error = false;
-   // validate form
-   if( !feeds.form.UI.feedAssignationsForm.checkValidity() ){
-   	pg.log( 'feeds.form.validate_feedAssignationsForm(): Form validation failed...' );
-   	feeds.form.error = 'Some fields require your attention.';
-   	return false;
-   }
-   // save feed Data
-   app.saveFeed({
-   	id: feeds.form.Data.id,
-   	name: feeds.form.Data.name,
-   	url : feeds.form.Data.url,
-   	fields: {
-   		available: feeds.form.Data.fields.available,
-   		assignations: {
-   			title: feeds.form.Data.fields.assignations.title,
-   			magnet: feeds.form.Data.fields.assignations.magnet,
-   			url: feeds.form.Data.fields.assignations.url
-   		}
-   	},
-   	TTL: feeds.form.Data.TTL,
-   	categories: feeds.form.Data.categories,
-   	status: {
-   		lastCheck: new Date(),
-   		code: 200,
-   		details: undefined
-   	}
-   });
-   // DONE! display ending message!
-   feeds.location = 'feeds/form_completed';
-   return true;
-   */
-		}
+	save: function save(w) {
+		console.log('app.saveWatcher(): saving watcher');
+		var i = watchers.getIndexById(w.id);
+		if (i === -1) i = watchers.Data.length;
+		watchers.Data.watchers[i] = w;
+		chrome.storage.sync.set({ 'watchers': watchers.Data }, function (r) {
+			// Notify that we saved.
+			console.log('Settings saved', r);
+		});
+		return true;
+	},
+	new: function _new() {
+		return {
+			id: undefined,
+			name: undefined,
+			categories: [],
+			directives: [{
+				in: 'title',
+				has: undefined
+			}]
+		};
+	},
+	getIndexById: function getIndexById(id) {
+		return watchers.Data.findIndex(function (watcher) {
+			return watcher.id === id ? true : false;
+		});
 	}
 };
 

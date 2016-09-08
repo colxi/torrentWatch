@@ -1,1 +1,0 @@
-{"version":3,"sources":["configure.es6"],"names":[],"mappings":";;;;;AAAA,IAAI,sBAAsB,EAA1B;;kBAGe,mB","file":"configure.js","sourcesContent":["let feeds_forms_declare = {\r\n};\r\n\r\nexport default feeds_forms_declare;\r\n"]}

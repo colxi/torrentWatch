@@ -1,1 +1,0 @@
-{"version":3,"sources":["declare.es6"],"names":[],"mappings":";;;;;AAAA,IAAI,2BAA2B,EAA/B;;kBAGe,wB","file":"declare.js","sourcesContent":["let categories_forms_declare = {\r\n};\r\n\r\nexport default categories_forms_declare;\r\n"]}

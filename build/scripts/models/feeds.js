@@ -7,165 +7,111 @@ Object.defineProperty(exports, "__esModule", {
 /* jshint undef: true, unused: false */
 /* global chrome , System , pg , rivets , sightglass */
 
-var app = void 0;
-
 var feeds = {
 	__constructor: function __constructor() {
-		return new Promise(function (resolve) {
-			pg.load.model('app').then(function (m) {
-				app = m;
-				resolve();
+		return new Promise(function (_resolve) {
+			pg.load.model('storage', 'categories').then(function (r) {
+				return _resolve(r);
 			});
 		});
 	},
+	page: function page() {
+		var _page = arguments.length <= 0 || arguments[0] === undefined ? 0 : arguments[0];
 
+		var limit = arguments.length <= 1 || arguments[1] === undefined ? 10 : arguments[1];
+		var sortBy = arguments.length <= 2 || arguments[2] === undefined ? '' : arguments[2];
+		var order = arguments.length <= 3 || arguments[3] === undefined ? 'DESC' : arguments[3];
 
-	location: 'feeds/list',
+		return new Promise(function (resolve) {
+			// get all items (clone array)
+			var items = JSON.parse(JSON.stringify(pg.models.storage.Data.feeds));
 
-	initialize: function initialize() {
-		feeds.list.initialize();
+			// TO DO : sort by key
+			// TO DO : apply ASC DESC order
+
+			// if a page is requested, slice array , and select only corresponding items
+			if (_page > 0) {
+				var firstIndex = _page * limit - limit;
+				var lastIndex = firstIndex + limit - 1 < items ? firstIndex + limit - 1 : items - 1;
+				items = items.slice(firstIndex, lastIndex);
+			}
+			// done ! return items;
+			resolve(items);
+		});
 	},
+	get: function get() {
+		var id = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
+		var original = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
 
-	list: {
-		target: null,
-
-		initialize: function initialize() {
-			var mode = arguments.length <= 0 || arguments[0] === undefined ? 'insert' : arguments[0];
-
-			feeds.location = 'feeds/list';
-		},
-
-		show_deleteFeedDialog: function show_deleteFeedDialog(id) {
-			feeds.list.target = app.getFeedById(id);
-			feeds.location = 'feeds/list_delete';
-		},
-
-		delete_feed: function delete_feed(id) {
-			app.deleteFeed(id);
-			feeds.list.initialize();
-		}
+		var i = feeds.getIndexById(id);
+		return i === -1 ? -1 : original ? pg.models.storage.Data.feeds[i] : JSON.parse(JSON.stringify(pg.models.storage.Data.feeds[i]));
 	},
+	delete: function _delete() {
+		var id = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
 
-	form: {
-		active: 'feedDeclarationForm',
-		mode: 'insert', // | update
-		error: false,
-		title: {
-			insert: 'New Feed :',
-			update: 'Edit Feed :'
-		},
-
-		UI: {
-			feedDeclarationForm: null,
-			feedAssignationsForm: null,
-			feedUrl: null
-		},
-
-		Data: {},
-
-		initialize: function initialize() {
-			var id = arguments.length <= 0 || arguments[0] === undefined ? null : arguments[0];
-
-			if (id !== null) {
-				// EDIT MODE DETECTED! ... get Feed Data
-				var feed = app.getFeedById(id);
-				if (feed === -1) throw new Error('feeds.form.initialize(): Can\'t find Feed with ID : ' + id);
-				feeds.form.mode = 'update';
-				feeds.form.Data = feed;
-			} else {
-				// INSERT MODE DETECTED ... generate new Feed
-				feeds.form.mode = 'insert';
-				feeds.form.Data = app.emptyFeed();
-				feeds.form.Data.id = pg.guid();
-			}
-
-			feeds.form.error = false;
-			feeds.location = 'feeds/form';
-			feeds.form.show_feedDeclarationForm();
-			return true;
-		},
-
-		show_feedDeclarationForm: function show_feedDeclarationForm() {
-			feeds.form.active = 'feedDeclarationForm';
-		},
-		show_feedAssignationsForm: function show_feedAssignationsForm() {
-			feeds.form.active = 'feedAssignationsForm';
-		},
-
-		validate_feedDeclarationForm: function validate_feedDeclarationForm() {
-			pg.log('feeds.form.validate_feedDeclaration(): Validating Feed Declaration...');
-			// reset previous form validations
-			feeds.form.error = false;
-			feeds.form.UI.feedUrl.setCustomValidity('');
-			// validate form
-			if (!feeds.form.UI.feedDeclarationForm.checkValidity()) {
-				pg.log('feeds.form.validate_feedDeclaration(): Form validation failed...');
-				feeds.form.error = 'Some fields require your attention.';
-				return false;
-			}
-			// show loader
-			pg.loader(feeds.form.UI.feedDeclarationForm).show('Validating Feed Source...');
-			//
-			// asyncronic feed url validation
-			//
-			app.getFeed(feeds.form.Data.url).then(function (_feed) {
-				// done! hide loader
-				pg.loader(feeds.form.UI.feedDeclarationForm).hide();
-				// block and return if failed
-				if (!_feed) {
-					pg.log('feeds.form.validate_feedDeclaration(): URL validation failed...');
-					feeds.form.error = 'RSS Feed not found in URL.';
-					feeds.form.UI.feedUrl.setCustomValidity('RSS Feed not found in URL.');
-					return false;
-				}
-				// TO DO:
-				//  - validate structure 'rss.channel.item'
-				//  - validate item length > 0
-
-				// store FEED ITEMS
-				feeds.form.Data.__items = _feed.rss.channel.item;
-				// succeed, get RSS feed item properties structure
-				feeds.form.Data.fields.available = app.getFeedItemsProperties(_feed);
-				// DONE ! show next FORM!
-				feeds.form.show_feedAssignationsForm();
+		return new Promise(function (resolve) {
+			console.log('[Model]:feeds.delete(): deleting feed #' + id);
+			// get index in array
+			var i = feeds.getIndexById(id);
+			// block if  id NOT found
+			if (i === -1) resolve(false);
+			// remove item from Data array
+			pg.models.storage.Data.feeds.splice(i, 1);
+			// request to save new data
+			pg.models.storage.sync.feeds()
+			// update categories dependent Data
+			.then(function (r) {
+				return pg.models.categories.updateFeedCount();
+			})
+			// done!
+			.then(function (r) {
+				return resolve(true);
 			});
-		},
-
-		validate_feedAssignationsForm: function validate_feedAssignationsForm() {
-			pg.log('feeds.form.validate_feedAssignationsForm(): Validating Feed Assignations...');
-			// reset previous form validations
-			feeds.form.error = false;
-			// validate form
-			if (!feeds.form.UI.feedAssignationsForm.checkValidity()) {
-				pg.log('feeds.form.validate_feedAssignationsForm(): Form validation failed...');
-				feeds.form.error = 'Some fields require your attention.';
-				return false;
-			}
-			// save feed Data
-			app.saveFeed({
-				id: feeds.form.Data.id,
-				name: feeds.form.Data.name,
-				url: feeds.form.Data.url,
-				fields: {
-					available: feeds.form.Data.fields.available,
-					assignations: {
-						title: feeds.form.Data.fields.assignations.title,
-						magnet: feeds.form.Data.fields.assignations.magnet,
-						url: feeds.form.Data.fields.assignations.url
-					}
-				},
-				TTL: feeds.form.Data.TTL,
-				categories: feeds.form.Data.categories,
-				status: {
-					lastCheck: new Date(),
-					code: 200,
-					details: undefined
-				}
+		});
+	},
+	save: function save(feed) {
+		return new Promise(function (resolve) {
+			console.log('[Model]:feeds.save(): saving feed #' + feed.id);
+			var i = feeds.getIndexById(feed.id);
+			if (i === -1) i = pg.models.storage.Data.feeds.length;
+			pg.models.storage.Data.feeds[i] = feed;
+			pg.models.storage.sync.feeds()
+			// update categories dependent Data
+			.then(function (r) {
+				return pg.models.categories.updateFeedCount();
+			})
+			// done!
+			.then(function (r) {
+				return resolve(true);
 			});
-			// DONE! display ending message!
-			feeds.location = 'feeds/form_completed';
-			return true;
-		}
+		});
+	},
+	new: function _new() {
+		return {
+			id: pg.guid(),
+			name: undefined,
+			url: undefined,
+			fields: {
+				available: [],
+				assignations: {
+					title: undefined,
+					magnet: undefined,
+					url: undefined
+				}
+			},
+			categories: [],
+			TTL: 120,
+			status: {
+				lastCheck: undefined,
+				code: undefined,
+				details: undefined
+			}
+		};
+	},
+	getIndexById: function getIndexById(id) {
+		return pg.models.storage.Data.feeds.findIndex(function (feed) {
+			return feed.id === id ? true : false;
+		});
 	}
 };
 

@@ -12,7 +12,7 @@ var app = void 0;
 var categories = {
 	__constructor: function __constructor() {
 		return new Promise(function (resolve) {
-			pg.load.model('app').then(function (m) {
+			pg.load.controller('app').then(function (m) {
 				app = m;
 				resolve();
 			});

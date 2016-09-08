@@ -122,23 +122,6 @@ module.exports = function(grunt) {
 						extDot: 'last'
 		        	}
 		        ]
-		    },
-		    build_scripts_TRANSFORM_modules : {
-		    	files: [
-		    		{
-			    		expand: true,
-			        	cwd: 'src/scripts/controllers/',
-			        	dest: 'build/scripts/controllers/',
-			        	src: ['**/*'],
-						ext: '.js',
-						extDot: 'last'
-					}
-		    	],
-		    	options: {
-			    	'plugins': [
-					    ["transform-es2015-modules-systemjs"]
-  					]
-		    	}
 		    }
 		},
 		compass: {
@@ -158,7 +141,6 @@ module.exports = function(grunt) {
 					'clean:build_scripts',
 					'copy:src_scripts_TO_build',
 					'babel:build_scripts_TRANSPILE_es6',
-					'babel:build_scripts_TRANSFORM_modules',
 					'clean:build_scripts_es6',
 					'versionUp.u',
 					'notify_hooks'
@@ -233,7 +215,6 @@ module.exports = function(grunt) {
 		// TRANSPILE es6 files, convert .js MODULES to UMD
 		// and finally clean  ./build/scripts/ of es6 files,
 		'babel:build_scripts_TRANSPILE_es6',
-		'babel:build_scripts_TRANSFORM_modules',
 		'clean:build_scripts_es6',
 		//
 		'clean:build_styles_scss',

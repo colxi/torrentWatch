@@ -2,12 +2,13 @@
 /* jshint undef: true, unused: false */
 /* global System , rivets , sightglass */
 
-// Declare importedModels container
-rivets.importedModels          = {};
+// Declare imports container
+rivets.imports          = {};
 // Set default configuration directives
-Object.defineProperty( rivets.importedModels , '__basePath__', {  value: '',  enumerable: false,  writable:true,  configurable: false });
-Object.defineProperty( rivets.importedModels , '__constructor__', {  value: false,  enumerable: false,  writable:true,  configurable: false });
-Object.defineProperty( rivets.importedModels , '__debug__', {  value: false,  enumerable: false,  writable:true,  configurable: false });
+Object.defineProperty( rivets.imports , '__baseUrl__', {  value: './',  enumerable: false,  writable:true,  configurable: false });
+Object.defineProperty( rivets.imports , '__constructor__', {  value: false,  enumerable: false,  writable:true,  configurable: false });
+Object.defineProperty( rivets.imports , '__debug__', {  value: false,  enumerable: false,  writable:true,  configurable: false });
+Object.defineProperty( rivets.imports , '__onLoadController__', {  value: undefined,  enumerable: false,  writable:true,  configurable: false });
 
 
 /**
@@ -25,11 +26,11 @@ rivets.configure_importer   = function(configObj, w, d){
     for(var directive in ( configObj || {} ) ){
         if( !configObj.hasOwnProperty(directive) ) continue;
         // if config directive does not exist, create it
-        if( !_window.rivets.importedModels.hasOwnProperty('__' + directive + '__') ){
-            Object.defineProperty( _window.rivets.importedModels , '__' + directive + '__', { value: '', enumerable: false, writable:true, configurable: false });
+        if( !_window.rivets.imports.hasOwnProperty('__' + directive + '__') ){
+            Object.defineProperty( _window.rivets.imports , '__' + directive + '__', { value: '', enumerable: false, writable:true, configurable: false });
         }
         // assign value to config directive
-        _window.rivets.importedModels['__' + directive + '__'] = configObj[directive];
+        _window.rivets.imports['__' + directive + '__'] = configObj[directive];
         // special behaviour for debug...
         if(directive === 'debug'){
             if( configObj.debug === false ) _document.getElementsById('__rivets_import_debug_styles__').remove();
@@ -131,9 +132,6 @@ rivets.formatters.set = function(oldValue,newValue) {
         //window.binding = binding;
         // var model = obj;
         var kp = rivets._.Util.resolveKeyPath(binding.keypath, binding, false);
-        console.log('keypathhhhhhhhhhhhhhhhhhhhhhhh')
-        console.log(binding.keypath ,kp.model, kp.key)
-        //console.log("newValue: "+newValue);
         // set the value
         var adapter = rivets.adapters[rivets.rootInterface];
         adapter.set(kp.model, kp.key, newValue);
@@ -299,24 +297,25 @@ rivets.binders['model'] = {
         el.firstChild.setAttribute( 'rv:model::scopes' , modelName);
 
         // import CONTROLLER module if setted &  controller NOT already loaded
-        if(modelName.length && !rivets.importedModels.hasOwnProperty(modelName) ){
+        if(modelName.length && !rivets.imports.hasOwnProperty(modelName) ){
             el.setAttribute('rv-loading', 'true');
-            System.import( rivets.importedModels.__basePath__ + modelName + '.js' ).then(function(controller){
+            System.import( rivets.imports.__baseUrl__ + modelName + '.js' ).then(function(controller){
                 // create CONTROLLER module instance
-                controller = rivets.importedModels[modelName] = controller.default;
+                controller = rivets.imports[modelName] = controller.default;
                 // assign non enumerable meta property NAME
-                Object.defineProperty(controller, '__name__', {  value: modelName, enumerable: false, writable:false,  configurable: false });
 
+                // flag to run constructor if method exists in imported object
                 var initialize = false;
-                if( rivets.importedModels.__constructor__ !== undefined &&
-                    typeof rivets.importedModels[modelName][rivets.importedModels.__constructor__] === 'function' &&
-                    rivets.importedModels[modelName].__initialized__ !== true ) initialize = true;
+                if( rivets.imports.__constructor__ !== undefined &&
+                    typeof rivets.imports[modelName][rivets.imports.__constructor__] === 'function'  ) initialize = true;
 
                 el.removeAttribute('rv-loading');
                 _bind(el, modelName, initialize);
             });
-        }else _bind( el, modelName , false);
-
+        }else{
+            console.log('rv-model : The model '+modelName+' is already loaded. Using active Instance');
+            _bind( el, modelName , false); // already loaded, bind but not run constructor
+        }
         // INTERNAL WRAPPER BINDER
         function _bind(el, modelName, initializeModel){
 
@@ -328,9 +327,19 @@ rivets.binders['model'] = {
                 return (element.tagName !== 'BODY' ) ? parents(element.parentNode, _array) : _array;
             }
 
+            function _constructed(){
+                delete rivets.imports[modelName][rivets.imports.__constructor__]; // ensure one time execution
+                if(typeof rivets.imports.__onLoadController__ === 'function') rivets.imports.__onLoadController__(modelName);
+
+                if(el.getAttribute('rv-on-ready')){
+                    rivets._.Util.resolveKeyPath( el.getAttribute('rv-on-ready'), {view:self.nested} )(currentModel);
+                }
+                return true;
+            }
+
             // prepare binding model object
             var bindedObj = {};
-            bindedObj[modelName] = rivets.importedModels[modelName];
+            bindedObj[modelName] = rivets.imports[modelName];
 
             // include parent elements, binding models to element
             var _p = parents(el);
@@ -338,7 +347,7 @@ rivets.binders['model'] = {
             for(var i =0; i<_p.length;i++){
                 var parentModel_name = _p[i].getAttribute('rv:model');
                 if(parentModel_name !== null){
-                    bindedObj[parentModel_name] = rivets.importedModels[parentModel_name];
+                    bindedObj[parentModel_name] = rivets.imports[parentModel_name];
                     scopesList += ' ' + parentModel_name;
                 }
             }
@@ -349,18 +358,18 @@ rivets.binders['model'] = {
             // do the bindings!
             self.nested =  rivets.bind( el.firstChild, bindedObj );
             self.nested.modelName = modelName;
-            console.log(self.nested);
 
-            // if has custom constructor/igniter should be executed...
+            // if has custom constructor/igniter should be executed... bunding scope to model object
             if(initializeModel){
-                rivets.importedModels[modelName][rivets.importedModels.__constructor__]();
-                Object.defineProperty(rivets.importedModels[modelName], '__initialized__', {  value: true, enumerable: false, writable:false,  configurable: false });
-            }
-
-            if(el.getAttribute('rv-on-ready')){
-                rivets._.Util.resolveKeyPath( el.getAttribute('rv-on-ready'), {view:self.nested} )(currentModel);
-            }
-            return true;
+                console.info('rv-model : Executing '+modelName+' constructor.');
+                let _c = rivets.imports[modelName][rivets.imports.__constructor__].call( rivets.imports[modelName] );
+                if( typeof _c === 'object' && typeof _c.then === 'function'){
+                    console.info('rv-model : Detected Promise in '+modelName+' Constructor. Waiting resolution...');
+                    return _c.then( function(){ _constructed() });
+                }else{
+                    return _constructed();
+                }
+            }else return _constructed();
         }
 
         return void 0;
