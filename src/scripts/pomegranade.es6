@@ -12,6 +12,7 @@ let pg = {
 		baseUrl_controller 		: 'scripts/controllers/',
 		baseUrl_model 			: 'scripts/models/',
 		baseUrl_module 			: 'scripts/pg-modules/',
+		baseUrl_view 			: 'html/views/',
 		imports_constructor 	: '__constructor'
 	},
 	/**
@@ -32,7 +33,7 @@ let pg = {
 			/* rivets expansion */
   			.then(r=> pg.require('lib/rivets.stdlib.js', 'Rivets Formaters Lib...') )
 			/* rivets model and views importer */
-			.then(r=> pg.require('lib/rivets-import-view-model.js', 'Rivets Model Importer Lib...') )
+			.then(r=> pg.require('lib/rivets-import.js', 'Rivets Model Importer Lib...') )
 			/* modules configurations  */
 			.then(r=>{
 				pg.log('pg.initialize() : Configure Rivets & Rivets Model Importer...');
@@ -49,6 +50,7 @@ let pg = {
 				rivets.configure_importer({
 					onLoadController : pg.load._onRivetsLoadController,
 					baseUrl : pg.config.baseUrl_controller,
+					baseUrl_Views : pg.config.baseUrl_view,
 					constructor : pg.config.imports_constructor
 				});
 				pg.log('pg.initialize() : Integrate Binder in Pomegranade...');

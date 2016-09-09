@@ -16,6 +16,7 @@ var pg = {
 		baseUrl_controller: 'scripts/controllers/',
 		baseUrl_model: 'scripts/models/',
 		baseUrl_module: 'scripts/pg-modules/',
+		baseUrl_view: 'html/views/',
 		imports_constructor: '__constructor'
 	},
 	/**
@@ -65,6 +66,7 @@ var pg = {
 			rivets.configure_importer({
 				onLoadController: pg.load._onRivetsLoadController,
 				baseUrl: pg.config.baseUrl_controller,
+				baseUrl_Views: pg.config.baseUrl_view,
 				constructor: pg.config.imports_constructor
 			});
 			pg.log('pg.initialize() : Integrate Binder in Pomegranade...');

@@ -9,5 +9,6 @@
 #Common
 /node_modules
 /npm-debug.log
+/sass-cache
 /torrentWatch.sublime-project
 /torrentWatch.sublime-workspace

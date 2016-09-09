@@ -1,3 +1,15 @@
+/*
+*
+*  Experimental RIVETS IMPORT Binder
+*  by Colxi - www.colxi.info
+*
+*  Main binders:
+*  --------------
+*  rivets.binders['model']  -> Imports the JS file and binds the imported object to element (and childs)
+*  rivets.binders['view'] -> Imports the HTML file and renders inside the binded element.
+*
+*/
+
 /* jsHint inline configuration : */
 /* jshint undef: true, unused: false */
 /* global System , rivets , sightglass */
@@ -5,7 +17,8 @@
 // Declare imports container
 rivets.imports          = {};
 // Set default configuration directives
-Object.defineProperty( rivets.imports , '__baseUrl__', {  value: './',  enumerable: false,  writable:true,  configurable: false });
+Object.defineProperty( rivets.imports , '__baseUrl__', {  value: './models/',  enumerable: false,  writable:true,  configurable: false });
+Object.defineProperty( rivets.imports , '__baseUrl_Views__', {  value: './views/',  enumerable: false,  writable:true,  configurable: false });
 Object.defineProperty( rivets.imports , '__constructor__', {  value: false,  enumerable: false,  writable:true,  configurable: false });
 Object.defineProperty( rivets.imports , '__debug__', {  value: false,  enumerable: false,  writable:true,  configurable: false });
 Object.defineProperty( rivets.imports , '__onLoadController__', {  value: undefined,  enumerable: false,  writable:true,  configurable: false });
@@ -33,64 +46,64 @@ rivets.configure_importer   = function(configObj, w, d){
         _window.rivets.imports['__' + directive + '__'] = configObj[directive];
         // special behaviour for debug...
         if(directive === 'debug'){
-            if( configObj.debug === false ) _document.getElementsById('__rivets_import_debug_styles__').remove();
+            if( configObj.debug === false ) _document.getElementById('__rivets_import_debug_styles__').remove();
             else{
                 // enable debuging...
                 var stylesEl        = _document.createElement('STYLE');
                 stylesEl.id         = '__rivets_import_debug_styles__';
-                stylesEl.innerHTML = '                                                      \
-                    [rv\\:model]{                                                 \
-                        border:2px dotted grey;                                             \
-                        position:relative;                                                  \
-                    }                                                                       \
-                    [rv\\:model]::after{                                          \
-                        display:block;                                                      \
-                        position:absolute;                                                  \
-                        top:0;right:0;                                                      \
-                        background-color:#000;                                              \
-                        content:"\\21b5" " " attr(rv\\:model\\:\\:scopes);                  \
-                        padding:3px;                                                        \
-                        font-family:arial;                                                  \
-                        font-size:10px;                                                     \
-                        color:#fff;                                                         \
-                    }                                                                       \
-                    body[rv\\:debug\\:\\:interactive] [rv\\:model]:hover{         \
-                        border:1px dotted grey;                                             \
-                        padding:10px;                                                       \
-                        margin:5px;                                                         \
-                        transition:all .2s ease-out;                                        \
-                        position:relative;                                                  \
-                    }                                                                       \
-                    body[rv\\:debug\\:\\:interactive] [rv\\:model]:hover::after{  \
-                        display:block;                                                      \
-                        position:absolute;                                                  \
-                        top:0;right:0;                                                      \
-                        background-color:#000;                                              \
-                        content:"\\21b5" " " attr(rv\\:model\\:\\:scopes);                  \
-                        padding:3px;                                                        \
-                        font-size:10px;                                                     \
-                        font-family:arial;                                                  \
-                        color:#fff;                                                         \
-                    }                                                                       \
-                    body [rv-view][rv\\:import\\:error]{                                             \
-                        position:relative !important;                                       \
-                    }                                                                       \
-                    body [rv-view][rv\\:import\\:error]:after{                                       \
-                        position:absolute;                                                            \
-                        top:0px;                                                            \
-                        bottom:0px;                                                         \
-                        width:100%;                                                         \
-                        content:"Import Error ( " attr(rv-view) attr(rv-model) " )";                \
-                        display:block;                                                      \
-                        background-color: red !important;                                   \
-                        color:white;                                                        \
-                        height:100%;                                                        \
-                        padding:10px 0px;                                                        \
-                        min-height:10px;                                                    \
-                        font-size:10px;                                                    \
-                        text-align:center;                                                  \
-                    }                                                                       \
-                ';
+                stylesEl.innerHTML = `
+                    [rv\\:model]{
+                        border:2px dotted grey;
+                        position:relative;
+                    }
+                    [rv\\:model]::after{
+                        display:block;
+                        position:absolute;
+                        top:0;right:0;
+                        background-color:#000;
+                        content:"\\21b5" " " attr(rv\\:model\\:\\:scopes);
+                        padding:3px;
+                        font-family:arial;
+                        font-size:10px;
+                        color:#fff;
+                    }
+                    body[rv\\:debug\\:\\:interactive] [rv\\:model]:hover{
+                        border:1px dotted grey;
+                        padding:10px;
+                        margin:5px;
+                        transition:all .2s ease-out;
+                        position:relative;
+                    }
+                    body[rv\\:debug\\:\\:interactive] [rv\\:model]:hover::after{
+                        display:block;
+                        position:absolute;
+                        top:0;right:0;
+                        background-color:#000;
+                        content:"\\21b5" " " attr(rv\\:model\\:\\:scopes);
+                        padding:3px;
+                        font-size:10px;
+                        font-family:arial;
+                        color:#fff;
+                    }
+                    body [rv-view][rv\\:import\\:error]{
+                        position:relative !important;
+                    }
+                    body [rv-view][rv\\:import\\:error]:after{
+                        position:absolute;
+                        top:0px;
+                        bottom:0px;
+                        width:100%;
+                        content:"Import Error ( " attr(rv-view) attr(rv-model) " )";
+                        display:block;
+                        background-color: red !important;
+                        color:white;
+                        height:100%;
+                        padding:10px 0px;
+                        min-height:10px;
+                        font-size:10px;
+                        text-align:center;
+                    }
+                `;
                 _document.getElementsByTagName('HEAD')[0].appendChild(stylesEl);
             }
         }
@@ -205,7 +218,7 @@ rivets.binders['view'] = {
         el.firstChild.setAttribute( 'rv:view' , viewName );
         el.setAttribute('rv-loading', 'true');
         el.removeAttribute('rv:import:error');
-        var path = 'html/views/'+ viewName + '.html';
+        var path = rivets.imports.__baseUrl_Views__+ viewName + '.html';
         var done = false;
         var _html = new XMLHttpRequest();
         _html.overrideMimeType('text/html');
@@ -292,7 +305,6 @@ rivets.binders['model'] = {
             }
         }
         console.log( '%c rv-model ' + modelName + ' : ROUTINE' , 'color: orange' );
-
         el.firstChild.setAttribute( 'rv:model' , modelName );
         el.firstChild.setAttribute( 'rv:model::scopes' , modelName);
 
@@ -313,7 +325,7 @@ rivets.binders['model'] = {
                 _bind(el, modelName, initialize);
             });
         }else{
-            console.log('rv-model : The model '+modelName+' is already loaded. Using active Instance');
+            console.log('rv-model : The model "'+modelName+'" is cached. Using cache');
             _bind( el, modelName , false); // already loaded, bind but not run constructor
         }
         // INTERNAL WRAPPER BINDER
@@ -328,6 +340,7 @@ rivets.binders['model'] = {
             }
 
             function _constructed(){
+                if(!modelName) return false; // patch, to prevent error caused when no model name is attached
                 delete rivets.imports[modelName][rivets.imports.__constructor__]; // ensure one time execution
                 if(typeof rivets.imports.__onLoadController__ === 'function') rivets.imports.__onLoadController__(modelName);
 
