@@ -1,0 +1,55 @@
+/* line 1, ../../src/styles/styles.scss */
+.pg-header {
+  background: #6d6d7f;
+  padding-top: 60px;
+  padding-bottom: 10px;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+/* line 9, ../../src/styles/styles.scss */
+.row-failure {
+  color: #cd3347;
+}
+
+/* line 11, ../../src/styles/styles.scss */
+.row-failure:before {
+  content: "\f071";
+  position: absolute;
+  left: -20px;
+  font: normal normal normal 14px/1 FontAwesome;
+  color: #cd3347;
+  font-size: inherit;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* line 23, ../../src/styles/styles.scss */
+.feedPreviewBox {
+  width: 100%;
+}
+
+/* line 27, ../../src/styles/styles.scss */
+.feedPreviewTag {
+  color: #ff4500;
+  font-weight: 600;
+}
+
+/* line 32, ../../src/styles/styles.scss */
+.feedPreviewContent {
+  max-height: 28px;
+  display: inline-block;
+  overflow: hidden;
+  max-width: 100%;
+  word-wrap: break-word;
+  word-break: break-all;
+  padding-left: 20px;
+}
+
+/* line 43, ../../src/styles/styles.scss */
+.feedAssignationInstructions {
+  padding: 0 10px;
+  margin-top: -10px;
+  margin-bottom: 25px;
+}

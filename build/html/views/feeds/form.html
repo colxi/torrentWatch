@@ -1,0 +1,107 @@
+<section>
+	<header class="pg-row pg-section-header">
+		<h2 class="pg-col" rv-text="feeds.form.title | getProperty feeds.form.mode"></h2>
+		<div class="pg-col pg-text-right">
+			<div class="pg-col pg-btn" rv-on-click="feeds.initialize"><span class="fa fa-close"></span> Cancel</div>
+		</div>
+	</header>
+	<div class="pg-notification-error pg-notification-bubble" rv-if="feeds.form.error" rv-text="feeds.form.error"></div>
+	<!-- feeds DECLARATION form -->
+	<form rv-element="feeds.form.UI.feedDeclarationForm" rv-show="feeds.form.active | === 'feedDeclarationForm'">
+		<!-- id -->
+		<input type="text"  hidden rv-value="feeds.form.Data.id">
+		<div class="pg-row">
+			<!-- name -->
+			<label class="pg-col-60 pg-form-control">
+				<input type="text" rv-value="feeds.form.Data.name" required pattern=".*\S+.*" placeholder="eg. HurryTorrents - Software">
+				<span>Name :</span>
+			</label>
+			<!-- ttl -->
+			<label class="pg-col-40 pg-form-control">
+				<input type="range" min="1" max="120" rv-value="feeds.form.Data.TTL" step="1">
+				<span class="pg-label">Check every <span class="pg-text-bold">{feeds.form.Data.TTL}</span> minutes</span>
+			</label>
+		</div>
+		<!-- url -->
+		<div class="pg-row">
+			<label class="pg-form-control">
+				<input type="url" rv-value="feeds.form.Data.url" rv-element="feeds.form.UI.feedUrl" required pattern="https?://.+" placeholder="eg. http://www.whatatorrent.net/rss?cat=music">
+				<span>Url :</span>
+			</label>
+		</div>
+		<!-- category -->
+		<div class="pg-row">
+			<div class="pg-form-control pg-text-center">
+				<label rv-each-category="app.Data.categories">
+					<div class="pg-tag" rv-class-pg-checked="feeds.form.Data.categories | contains category.id" rv-on-click="app.toogleArrayItem | () category.id feeds.form.Data.categories">{category.name}</div>
+				</label>
+				<!-- category field validation -->
+				<input  hidden type="text" rv-value="feeds.form.Data.categories | string" required pattern=".*\S+.*">
+				<span>Category :</span>
+			</div>
+		</div>
+		<div class="pg-row pg-form-footer">
+			<div class="pg-col">
+				<div class="pg-btn" rv-on-click="feeds.form.validate_feedDeclarationForm">Validate Feed<div class="fa fa-arrow-right"></div></div>
+			</div>
+		</div>
+	</form>
+
+	<!-- FIELD ASSIGNATION FORM -->
+	<form rv-element="feeds.form.UI.feedAssignationsForm" rv-show="feeds.form.active | === 'feedAssignationsForm'">
+
+		<div class="pg-row feedAssignationInstructions">
+			<div class="pg-col pg-vertical-center pg-no-gap">
+				<i class="fa fa-code fa-2x"></i>
+			</div>
+			<div class="pg-col">
+				<div class="pg-text-bolder">Observe the Feed preview, and match fields.</div>
+				<div class="pg-text-small">Is recomended to match as many fields as possible, in order to perform advanced searches.</div>
+			</div>
+		</div>
+
+		<div class="pg-row">
+			<div class="pg-col-40">
+				<label class="pg-col pg-form-control">
+					<select rv-value="feeds.form.Data.fields.assignations.title" required>
+						<option value="" selected="selected">---</option>
+						<option rv-each-field="feeds.form.Data.fields.available" rv-value="field">{field}</option>
+					</select>
+					<span class="pg-text-center">Title :</span>
+				</label>
+				<label class="pg-col pg-form-control">
+					<select rv-value="feeds.form.Data.fields.assignations.url">
+						<option value="" selected="selected">---</option>
+						<option rv-each-field="feeds.form.Data.fields.available" rv-value="field">{field}</option>
+					</select>
+					<span class="pg-text-center">Info URL :</span>
+				</label>
+				<label class="pg-col pg-form-control">
+					<select rv-value="feeds.form.Data.fields.assignations.magnet">
+						<option value="" selected="selected">---</option>
+						<option rv-each-field="feeds.form.Data.fields.available" rv-value="field">{field}</option>
+					</select>
+					<span class="pg-text-center">Magnet :</span>
+				</label>
+			</div>
+			<div class="pg-col-60 pg-vertical-center">
+				<div class="feedPreviewBox pg-text-smallest">
+					<div class="pg-margin-bottom-smallest" rv-each-field="feeds.form.Data.fields.available">
+						<div class="feedPreviewTag">{field}</div>
+						<div class="feedPreviewContent">{feeds.form.Data.__items.0 | getProperty field | getProperty '#text'}</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="pg-row pg-form-footer">
+			<div class="pg-col pg-text-left">
+				 <div class="pg-btn" rv-on-click="feeds.form.show_feedDeclarationForm">Previous<div class="fa fa-arrow-left"></div></div>
+			</div>
+			<div class="pg-col pg-text-right">
+			 	<div class="pg-btn" rv-on-click="feeds.form.validate_feedAssignationsForm">Save Feed<div class="fa fa-check-circle"></div></div>
+			</div>
+		</div>
+	</form>
+
+</section>

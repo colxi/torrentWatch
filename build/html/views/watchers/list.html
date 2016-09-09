@@ -1,0 +1,41 @@
+<section>
+	<!-- watchers listing -->
+	<header class="pg-row pg-section-header">
+		<h2 class="pg-col">Watchers :</h2>
+		<div class="pg-col pg-text-right">
+			<div class="pg-col pg-btn" rv-on-click="watchers.form.initialize"><span class="fa fa-plus-circle"></span> Add</div>
+		</div>
+	</header>
+
+	<div class="pg-row">
+		<div class="pg-table pg-expand">
+			<div class="pg-row pg-no-gap" rv-each-watcher="app.Data.watchers" rv-class-row-failure="watcher.status.code | === 400">
+				<div class="pg-col-40">
+					<div>{watcher.name}</div>
+					<div class="pg-text-smaller">Status: {watcher.status.details}</div>
+				</div>
+				<div class="pg-col-45 pg-text-center pg-text-smallest">
+					<span rv-each-category="watcher.categories">
+						{ app.Data.categories | findBy 'id' category | getProperty 'name' } <span rv-unless="category | isLastIn watcher.categories"> | </span>
+					</span>
+				</div>
+				<div class="pg-col pg-text-center">
+					<i class="fa fa-refresh pg-hover pg-margin-right-smallest" rv-on-click="app.updateWatcher | () watcher.id"  rv-class-fa-spin="watcher.status.code | === 100"></i>
+					<i class="fa fa-pencil pg-hover pg-margin-right-smallest pg-margin-left-smallest" rv-on-click="watchers.form.initialize | () watcher.id" rv-hide="watcher.status.code | === 100"></i>
+					<i class="fa fa-trash pg-hover pg-margin-left-smallest" rv-hide="watcher.status.code | === 100" rv-on-click="watchers.list.show_deleteWatcherDialog | () watcher.id"></i>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="pg-row">
+		<div class="pg-pagination">
+			<div class="pg-pagination-item">Previous</div>
+			<div class="pg-pagination-item">1</div>
+			<div class="pg-pagination-item pg-pagination-current">2</div>
+			<div class="pg-pagination-item">3</div>
+			<div class="pg-pagination-item">4</div>
+			<div class="pg-pagination-item">Next</div>
+		</div>
+	</div>
+</section>

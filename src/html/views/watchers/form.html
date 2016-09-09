@@ -1,0 +1,49 @@
+<section>
+	<header class="pg-row pg-section-header">
+		<h2 class="pg-col" rv-text="watchers.form.title | getProperty watchers.form.mode"></h2>
+		<div class="pg-col pg-text-right">
+			<div class="pg-col pg-btn" rv-on-click="watchers.initialize"><span class="fa fa-close"></span> Cancel</div>
+		</div>
+	</header>
+	<div class="pg-notification-error pg-notification-bubble" rv-if="watchers.form.error" rv-text="watchers.form.error"></div>
+	<!-- watchers DECLARATION form -->
+	<form rv-element="watchers.form.UI.watcherDeclarationForm" rv-show="watchers.form.active | === 'watcherDeclarationForm'">
+		<!-- id -->
+		<input type="text"  hidden rv-value="watchers.form.Data.id">
+		<div class="pg-row">
+			<label class="pg-col-60 pg-form-control">
+				<!-- name -->
+				<input type="text" rv-value="watchers.form.Data.name" required rv-pattern="{app.regExp.notEmpty}" placeholder="eg. HurryTorrents - Software">
+				<span>Name :</span>
+			</label>
+		</div>
+		<div class="pg-row">
+			<div class="pg-col">
+				<!-- search in category -->
+				<div class="pg-form-control pg-text-center">
+					<label rv-each-category="app.Data.categories">
+						<div class="pg-tag" rv-class-pg-checked="watchers.form.Data.categories | contains category.id" rv-on-click="app.toogleArrayItem | () category.id watchers.form.Data.categories">{category.name}</div>
+					</label>
+					<!-- category field validation -->
+					<input  hidden type="text" rv-value="watchers.form.Data.categories | string" required rv-pattern="app.regExp.notEmpty">
+					<span>Search in selected Categories :</span>
+				</div>
+			</div>
+		</div>
+		<div rv-each-directive="watchers.form.Data.directives">
+			<label class="pg-col-60 pg-form-control">
+				<input type="text" rv-value="" required rv-pattern="{app.regExp.notEmpty}" placeholder="eg. HurryTorrents - Software" rv-value="directive">
+				<span>Title contains :</span>
+			</label>
+
+		</div>
+
+		<div class="pg-row pg-form-footer">
+			<div class="pg-col">
+				<div class="pg-btn" rv-on-click="watchers.form.validate_watchersDeclarationForm">Validate Watcher<div class="fa fa-arrow-right"></div></div>
+			</div>
+		</div>
+	</form>
+
+
+</section>
