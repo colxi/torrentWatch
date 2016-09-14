@@ -22,22 +22,20 @@ var feeds = {
 		var sortBy = arguments.length <= 2 || arguments[2] === undefined ? '' : arguments[2];
 		var order = arguments.length <= 3 || arguments[3] === undefined ? 'DESC' : arguments[3];
 
-		return new Promise(function (resolve) {
-			// get all items (clone array)
-			var items = JSON.parse(JSON.stringify(pg.models.storage.Data.feeds));
+		// get all items (clone array)
+		var items = JSON.parse(JSON.stringify(pg.models.storage.Data.feeds));
 
-			// TO DO : sort by key
-			// TO DO : apply ASC DESC order
+		// TO DO : sort by key
+		// TO DO : apply ASC DESC order
 
-			// if a page is requested, slice array , and select only corresponding items
-			if (_page > 0) {
-				var firstIndex = _page * limit - limit;
-				var lastIndex = firstIndex + limit - 1 < items ? firstIndex + limit - 1 : items - 1;
-				items = items.slice(firstIndex, lastIndex);
-			}
-			// done ! return items;
-			resolve(items);
-		});
+		// if a page is requested, slice array , and select only corresponding items
+		if (_page > 0) {
+			var firstIndex = _page * limit - limit;
+			var lastIndex = firstIndex + limit - 1 < items.length ? firstIndex + limit : items.length;
+			items = items.slice(firstIndex, lastIndex);
+		}
+		// done ! return items;
+		return items;
 	},
 	get: function get() {
 		var id = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
@@ -58,13 +56,8 @@ var feeds = {
 			// remove item from Data array
 			pg.models.storage.Data.feeds.splice(i, 1);
 			// request to save new data
-			pg.models.storage.sync.feeds()
-			// update categories dependent Data
-			.then(function (r) {
-				return pg.models.categories.updateFeedCount();
-			})
-			// done!
-			.then(function (r) {
+			pg.models.categories.updateFeedCount();
+			pg.models.storage.sync.feeds().then(function (r) {
 				return resolve(true);
 			});
 		});
@@ -75,13 +68,8 @@ var feeds = {
 			var i = feeds.getIndexById(feed.id);
 			if (i === -1) i = pg.models.storage.Data.feeds.length;
 			pg.models.storage.Data.feeds[i] = feed;
-			pg.models.storage.sync.feeds()
-			// update categories dependent Data
-			.then(function (r) {
-				return pg.models.categories.updateFeedCount();
-			})
-			// done!
-			.then(function (r) {
+			pg.models.categories.updateFeedCount();
+			pg.models.storage.sync.feeds().then(function (r) {
 				return resolve(true);
 			});
 		});
@@ -107,6 +95,13 @@ var feeds = {
 				details: undefined
 			}
 		};
+	},
+	getItemsProperties: function getItemsProperties(feed) {
+		var prop = [];
+		for (var i in feed.rss.channel.item[0]) {
+			if (feed.rss.channel.item[0].hasOwnProperty(i) && i.charAt(0).match(/[A-Z|a-z]/i)) prop.push(i);
+		}
+		return prop;
 	},
 	getIndexById: function getIndexById(id) {
 		return pg.models.storage.Data.feeds.findIndex(function (feed) {

@@ -8,7 +8,15 @@ Object.defineProperty(exports, "__esModule", {
 /* global chrome , System , pg , rivets , sightglass */
 
 var feedContents = {
-	__constructor: function __constructor() {},
+	__constructor: function __constructor() {
+		return new Promise(function (_resolve) {
+			pg.load.module('JSON/parseXML').then(function (r) {
+				return pg.load.model('feeds');
+			}).then(function (r) {
+				return _resolve(r);
+			});
+		});
+	},
 
 
 	tasks: [],
@@ -48,51 +56,48 @@ var feedContents = {
 	},
 	get: function get(id) {
 		return new Promise(function (_resolve) {
-			_resolve();
-		});
-		return new Promise(function (_resolve, _reject) {
-			if (id === undefined || id === null || id === '') return _reject(-1);
+			if (id === undefined || id === null || id === '') return _resolve(-1);
 
 			// get feed (allow feed Id index or string url feed)
-			var feed = void 0;
+			var f = void 0;
 
-			feed = app.getFeedById(id, true);
-			if (feed === -1) feed = { url: id, name: '***', status: {} };
+			f = pg.models.feeds.get(id);
+			if (f === -1) f = { url: id, name: '***', status: {} };
 
-			feed.status.code = 100;
-			feed.status.details = 'Updating...';
-			feed.status.lastCheck = new Date();
+			f.status.code = 100;
+			f.status.details = 'Updating...';
+			f.status.lastCheck = new Date();
 
-			pg.log('pg.updateFeed() : Updating Feed from :' + feed.url + ' ( ' + feed.name + ' )');
+			pg.log('pg.updateFeed() : Updating Feed from :' + f.url + ' ( ' + f.name + ' )');
 
 			//
 			// Prepare Ajax request
 			//
-			var request = new XMLHttpRequest();
-			request.open('get', feed.url, true);
+			var http = new XMLHttpRequest();
+			http.open('get', f.url, true);
 
 			// RESPONSE OK
-			request.onload = function () {
+			http.onload = function (r) {
 				var parser = new DOMParser();
-				var xmlDoc = parser.parseFromString(request.responseText, 'text/xml');
+				var xmlDoc = parser.parseFromString(http.responseText, 'text/xml');
 				var JSONxml = pg.JSON.parseXML(xmlDoc, true);
 
-				feed.status.code = 200;
-				feed.status.details = 'Ok';
+				f.status.code = 200;
+				f.status.details = 'Ok';
 
-				request = null;
+				http = null;
 				return _resolve(JSONxml);
 			};
 			// RESPONSE FAIL
-			request.onerror = function () {
-				pg.log('pg.getFeed(): Error on request... ' + request.statusText);
-				feed.status.code = 400;
-				feed.status.details = 'Fail';
-				request = null;
+			http.onerror = function (r) {
+				pg.log('pg.getFeed(): Error on request... ' + http.statusText);
+				f.status.code = 400;
+				f.status.details = 'Fail';
+				http = null;
 				return _resolve(false);
 			};
 			// Send Request
-			request.send(null);
+			http.send(null);
 		});
 	}
 };

@@ -46,7 +46,7 @@ var pg = {
 		})
 		/* rivets model and views importer */
 		.then(function (r) {
-			return pg.require('lib/rivets-import-view-model.js', 'Rivets Model Importer Lib...');
+			return pg.require('lib/rivets-import.js', 'Rivets Model Importer Lib...');
 		})
 		/* modules configurations  */
 		.then(function (r) {

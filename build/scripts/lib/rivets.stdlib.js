@@ -81,6 +81,7 @@
 
 
 
+
     /* Function */
 
     rivets.formatters['args'] = function(target) {
@@ -220,6 +221,11 @@
         }
 
         return [target];
+    };
+
+    // new: generates of x indexes
+    rivets.formatters.Array = function(count) {
+        return new Array(Number(count));
     };
 
     rivets.formatters.toString = function(target) {

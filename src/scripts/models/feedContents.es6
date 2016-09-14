@@ -4,7 +4,13 @@
 
 
 let feedContents = {
-	__constructor(){},
+	__constructor(){
+		 return new Promise(function(_resolve){
+			pg.load.module('JSON/parseXML')
+				.then( r => pg.load.model('feeds') )
+				.then( r=> _resolve(r) );
+        });
+	},
 
  	tasks : [],
 
@@ -46,52 +52,49 @@ let feedContents = {
 	},
 
 	get(id){
-		return new Promise( _resolve => {
-	    	_resolve();
-	    });
-		return new Promise( (_resolve, _reject)=>{
-			if(id === undefined || id === null || id === '') return _reject(-1);
+		return new Promise( _resolve=>{
+			if(id === undefined || id === null || id === '') return _resolve(-1);
 
 			// get feed (allow feed Id index or string url feed)
-			let feed;
+			let f;
 
-			feed = app.getFeedById(id, true);
-			if( feed === -1 ) feed = { url : id , name : '***', status : {}};
+			f = pg.models.feeds.get(id);
+			if( f === -1 ) f = { url : id , name : '***', status : {}};
 
-			feed.status.code = 100;
-			feed.status.details = 'Updating...';
-			feed.status.lastCheck = new Date();
+			f.status.code = 100;
+			f.status.details = 'Updating...';
+			f.status.lastCheck = new Date();
 
-			pg.log('pg.updateFeed() : Updating Feed from :'+ feed.url +' ( ' + feed.name + ' )' );
+			pg.log('pg.updateFeed() : Updating Feed from :'+ f.url +' ( ' + f.name + ' )' );
 
 			//
 			// Prepare Ajax request
 			//
-			let request = new XMLHttpRequest();
-			request.open('get', feed.url, true);
+			let http = new XMLHttpRequest();
+			http.open('get', f.url, true);
 
 			// RESPONSE OK
-			request.onload  = ()=>{
+			http.onload  = r=>{
 				let parser = new DOMParser();
-			   	let xmlDoc = parser.parseFromString(request.responseText,'text/xml');
+			   	let xmlDoc = parser.parseFromString(http.responseText,'text/xml');
 				let JSONxml = pg.JSON.parseXML(xmlDoc, true);
 
-				feed.status.code = 200;
-				feed.status.details = 'Ok';
+				f.status.code = 200;
+				f.status.details = 'Ok';
 
-				request = null;
+				http = null;
 				return _resolve(JSONxml);
 			};
 			// RESPONSE FAIL
-			request.onerror  = ()=>{
-				pg.log('pg.getFeed(): Error on request... ' + request.statusText);
-				feed.status.code =  400;
-				feed.status.details = 'Fail';
-				request = null;
+			http.onerror  = r=>{
+				pg.log('pg.getFeed(): Error on request... ' + http.statusText);
+				f.status.code =  400;
+				f.status.details = 'Fail';
+				http = null;
 				return _resolve(false);
 			};
 			// Send Request
-			request.send(null);
+			http.send(null);
 		});
 	},
 };

@@ -1,7 +1,7 @@
 <section>
 	<!-- feeds listing -->
 	<header class="pg-row pg-section-header">
-		<h2 class="pg-col">Feeds :</h2>
+		<h2 class="pg-col"><i class="fa fa-bars pg-margin-right-small"></i>Feeds :</h2>
 		<div class="pg-col pg-text-right">
 			<div class="pg-col pg-btn" rv-on-click="feeds.form.initialize"><span class="fa fa-plus-circle"></span> Add</div>
 		</div>
@@ -9,14 +9,14 @@
 
 	<div class="pg-row">
 		<div class="pg-table pg-expand">
-			<div class="pg-row pg-no-gap" rv-each-feed="app.Data.feeds" rv-class-row-failure="feed.status.code | === 400">
+			<div class="pg-row pg-no-gap" rv-each-feed="feeds.list.page.items" rv-class-row-failure="feed.status.code | === 400">
 				<div class="pg-col-40">
 					<div>{feed.name}</div>
 					<div class="pg-text-smaller">Status: {feed.status.details}</div>
 				</div>
 				<div class="pg-col-45 pg-text-center pg-text-smallest">
 					<span rv-each-category="feed.categories">
-						{ app.Data.categories | findBy 'id' category | getProperty 'name' } <span rv-unless="category | isLastIn feed.categories"> | </span>
+						{ feeds.categories | findBy 'id' category | getProperty 'name' } <span rv-unless="category | isLastIn feed.categories"> | </span>
 					</span>
 				</div>
 				<div class="pg-col pg-text-center">
@@ -29,13 +29,10 @@
 	</div>
 
 	<div class="pg-row">
-		<div class="pg-pagination">
-			<div class="pg-pagination-item">Previous</div>
-			<div class="pg-pagination-item">1</div>
-			<div class="pg-pagination-item pg-pagination-current">2</div>
-			<div class="pg-pagination-item">3</div>
-			<div class="pg-pagination-item">4</div>
-			<div class="pg-pagination-item">Next</div>
+		<div class="pg-col pg-pagination">
+			<div class="pg-pagination-item" rv-on-click="feeds.list.page.set | () feeds.list.page.current -1">Previous</div>
+			<div class="pg-pagination-item" rv-on-click="feeds.list.page.set | () %page% +1" rv-each-page="feeds.list.page.total | Array" rv-class-pg-pagination-current="%page% | add 1 | === feeds.list.page.current">{%page% | add 1}</div>
+			<div class="pg-pagination-item" rv-on-click="feeds.list.page.set | () feeds.list.page.current +1" >Next</div>
 		</div>
 	</div>
 </section>
