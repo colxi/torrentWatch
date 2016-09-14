@@ -13,7 +13,7 @@
 		<div class="pg-row">
 			<!-- name -->
 			<label class="pg-col-60 pg-form-control">
-				<input type="text" rv-value="feeds.form.Data.name" required pattern=".*\S+.*" placeholder="eg. HurryTorrents - Software">
+				<input type="text" rv-value="feeds.form.Data.name" required rv-pattern="{app.regExp.notEmpty}" placeholder="eg. HurryTorrents - Software" autofocus>
 				<span>Name :</span>
 			</label>
 			<!-- ttl -->
@@ -25,18 +25,18 @@
 		<!-- url -->
 		<div class="pg-row">
 			<label class="pg-form-control">
-				<input type="url" rv-value="feeds.form.Data.url" rv-element="feeds.form.UI.feedUrl" required pattern="https?://.+" placeholder="eg. http://www.whatatorrent.net/rss?cat=music">
+				<input type="url" rv-value="feeds.form.Data.url" rv-element="feeds.form.UI.feedUrl" required rv-pattern="{app.regExp.url}" placeholder="eg. http://www.whatatorrent.net/rss?cat=music">
 				<span>Url :</span>
 			</label>
 		</div>
 		<!-- category -->
 		<div class="pg-row">
 			<div class="pg-form-control pg-text-center">
-				<label rv-each-category="app.Data.categories">
+				<label rv-each-category="feeds.categories">
 					<div class="pg-tag" rv-class-pg-checked="feeds.form.Data.categories | contains category.id" rv-on-click="app.toogleArrayItem | () category.id feeds.form.Data.categories">{category.name}</div>
 				</label>
 				<!-- category field validation -->
-				<input  hidden type="text" rv-value="feeds.form.Data.categories | string" required pattern=".*\S+.*">
+				<input  hidden type="text" rv-value="feeds.form.Data.categories | string" required rv-pattern="{app.regExp.notEmpty}">
 				<span>Category :</span>
 			</div>
 		</div>

@@ -1,16 +1,16 @@
 <section>
 	<!-- categories listing -->
 	<header class="pg-row pg-section-header">
-		<h2 class="pg-col">Categories :</h2>
+		<h2 class="pg-col"><i class="fa fa-bars pg-margin-right-small"></i>Categories :</h2>
 		<div class="pg-col pg-text-right">
-			<div class="pg-col pg-btn" rv-on-click="categories.form.initialize"><i class="fa fa-plus-circle"></i> Add</div>
+			<div class="pg-col pg-btn" rv-on-click="categories.form.initialize"><i class="fa fa-plus-circle"></i>Add</div>
 		</div>
 	</header>
 
 
 	<div class="pg-row">
 		<div class="pg-table pg-expand">
-			<div class="pg-row pg-no-gap" rv-each-category="app.Data.categories">
+			<div class="pg-row pg-no-gap" rv-each-category="categories.list.page.items">
 				<div class="pg-col-40">
 					{category.name}
 				</div>
@@ -26,13 +26,10 @@
 	</div>
 
 	<div class="pg-row">
-		<div class="pg-pagination">
-			<div class="pg-pagination-item">Previous</div>
-			<div class="pg-pagination-item">1</div>
-			<div class="pg-pagination-item pg-pagination-current">2</div>
-			<div class="pg-pagination-item">3</div>
-			<div class="pg-pagination-item">4</div>
-			<div class="pg-pagination-item">Next</div>
+		<div class="pg-col pg-pagination">
+			<div class="pg-pagination-item" rv-on-click="categories.list.page.set | () categories.list.page.current -1">Previous</div>
+			<div class="pg-pagination-item" rv-on-click="categories.list.page.set | () %page% +1" rv-each-page="categories.list.page.total | Array" rv-class-pg-pagination-current="%page% | add 1 | === categories.list.page.current">{%page% | add 1}</div>
+			<div class="pg-pagination-item" rv-on-click="categories.list.page.set | () categories.list.page.current +1" >Next</div>
 		</div>
 	</div>
 </section>

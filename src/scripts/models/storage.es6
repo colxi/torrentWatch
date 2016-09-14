@@ -48,15 +48,9 @@ let storage = {
 		    });
 		},
 		categories: function(){
-		    pg.log('pg.models.storage.get.categories(): Getting Categories (useCached='+useCached+')');
-		    return new Promise(function(_resolve){
-		    	if( !useCached || !storage.Data.categories ){
-		    		chrome.storage.sync.get( 'categories', r=>{
-			    		storage.Data.categories =  r.categories || [];
-			    		_resolve( storage.Data.categories );
-			    	});
-		        }else _resolve(storage.Data.categories);
-		    });
+		   return new Promise(function(resolve){
+				chrome.storage.sync.set({'categories': storage.Data.categories} , r=> resolve(true) );
+		   });
 		},
 		watchers: function(){
 		    pg.log('pg.models.storage.get.watchers(): Getting Watchers (useCached='+useCached+')');

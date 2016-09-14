@@ -7,18 +7,12 @@ Object.defineProperty(exports, "__esModule", {
 /* jshint undef: true, unused: false */
 /* global chrome , System , pg , rivets , sightglass */
 
-var app = void 0;
-var model = void 0;
-
 var feeds = {
 	__constructor: function __constructor() {
 		pg.log('[Controller]:feeds.__constructor() : Initializating Feeds Controller');
 		return new Promise(function (resolve) {
-			app = pg.controllers.app;
-			pg.load.model('feeds').then(function (r) {
-				pg.log(r);
-				model = r;
-				resolve();
+			pg.load.model('feeds', 'feedContents', 'categories').then(function (r) {
+				return resolve();
 			});
 		});
 	},
@@ -27,41 +21,56 @@ var feeds = {
 	location: 'feeds/list',
 
 	initialize: function initialize() {
+		// update available categories
+		feeds.categories = pg.models.categories.page(0);
 		feeds.list.initialize();
 	},
+
+	categories: [],
 
 	list: {
 		target: null,
 
+		page: {
+			current: 1, // current page
+			total: 1, // total pages
+			limit: 5, // limit of items
+			order: 'DESC',
+			sortBy: 'id',
+			items: [],
+			count: function count() {
+				return feeds.list.page.total = Math.ceil(pg.models.feeds.page(0).length / feeds.list.page.limit);
+			},
+			update: function update() {
+				feeds.list.page.count();
+				feeds.list.page.set(feeds.list.page.current || 1);
+				return true;
+			},
+			set: function set(num) {
+				var modifier = arguments.length <= 1 || arguments[1] === undefined ? 0 : arguments[1];
+
+				num = num + modifier;
+				// validate pageNum
+				if (typeof num !== 'number' || num < 1) num = 1;else if (num > feeds.list.page.total) num = feeds.list.page.count();
+				feeds.list.page.current = Math.floor(num);
+
+				feeds.list.page.items = pg.models.feeds.page(feeds.list.page.current, feeds.list.page.limit);
+				return true;
+			}
+		},
+
 		initialize: function initialize() {
 			var mode = arguments.length <= 0 || arguments[0] === undefined ? 'insert' : arguments[0];
 
-			feeds.location = 'feeds/list';
-			return feeds.list.page.current(1);
+			feeds.list.page.set(1);
+			feeds.list.show();
+			return true;
 		},
 
-		page: {
-			count: undefined,
-			current: function current(num) {
-				var _this = this;
-
-				return new Promise(function (resolve) {
-					if (typeof num === 'undefined') return resolve(_this.current || 1);
-					if (num > feeds.list.page.count) num = feeds.list.page.count;
-					_this.current = num;
-					model.page(num, feeds.list.page.limit).then(function (r) {
-						feeds.list.page.items = r;
-						return model.page(0);
-					}).then(function (r) {
-						feeds.list.page.count = Math.ceil(r.length / feeds.list.page.limit);
-						resolve(feeds.list.page.items);
-					});
-				});
-			},
-			limit: 2,
-			order: 'DESC',
-			sortBy: 'id',
-			items: []
+		show: function show() {
+			feeds.list.page.update();
+			feeds.location = 'feeds/list';
+			return true;
 		},
 
 		show_deleteFeedDialog: function show_deleteFeedDialog(id) {
@@ -72,7 +81,9 @@ var feeds = {
 		delete_feed: function delete_feed(id) {
 			pg.models.feeds.delete(id);
 			feeds.list.initialize();
-		}
+		},
+
+		getCategoryName: function getCategoryName(id) {}
 	},
 
 	form: {
@@ -97,15 +108,14 @@ var feeds = {
 
 			if (id !== null) {
 				// EDIT MODE DETECTED! ... get Feed Data
-				var feed = app.getFeedById(id);
+				var feed = pg.models.feeds.get(id);
 				if (feed === -1) throw new Error('feeds.form.initialize(): Can\'t find Feed with ID : ' + id);
 				feeds.form.mode = 'update';
 				feeds.form.Data = feed;
 			} else {
 				// INSERT MODE DETECTED ... generate new Feed
 				feeds.form.mode = 'insert';
-				feeds.form.Data = app.emptyFeed();
-				feeds.form.Data.id = pg.guid();
+				feeds.form.Data = pg.models.feeds.new();
 			}
 
 			feeds.form.error = false;
@@ -137,7 +147,7 @@ var feeds = {
 			//
 			// asyncronic feed url validation
 			//
-			app.getFeed(feeds.form.Data.url).then(function (_feed) {
+			pg.models.feedContents.get(feeds.form.Data.url).then(function (_feed) {
 				// done! hide loader
 				pg.loader(feeds.form.UI.feedDeclarationForm).hide();
 				// block and return if failed
@@ -154,7 +164,7 @@ var feeds = {
 				// store FEED ITEMS
 				feeds.form.Data.__items = _feed.rss.channel.item;
 				// succeed, get RSS feed item properties structure
-				feeds.form.Data.fields.available = app.getFeedItemsProperties(_feed);
+				feeds.form.Data.fields.available = pg.models.feeds.getItemsProperties(_feed);
 				// DONE ! show next FORM!
 				feeds.form.show_feedAssignationsForm();
 			});
@@ -170,8 +180,9 @@ var feeds = {
 				feeds.form.error = 'Some fields require your attention.';
 				return false;
 			}
+			pg.loader(feeds.form.UI.feedAssignationsForm).show('Validating Feed Assignations...');
 			// save feed Data
-			app.saveFeed({
+			pg.models.feeds.save({
 				id: feeds.form.Data.id,
 				name: feeds.form.Data.name,
 				url: feeds.form.Data.url,
@@ -190,9 +201,12 @@ var feeds = {
 					code: 200,
 					details: undefined
 				}
+			}).then(function (r) {
+				//  hide loader
+				pg.loader(feeds.form.UI.feedAssignationsForm).hide();
+				// DONE! display ending message!
+				feeds.location = 'feeds/form_completed';
 			});
-			// DONE! display ending message!
-			feeds.location = 'feeds/form_completed';
 			return true;
 		}
 	}

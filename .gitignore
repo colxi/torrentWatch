@@ -4,11 +4,9 @@
 
 #Sublime
 *.sublime-workspace
-*.sublime-project
 
 #Common
+/.sass-cache
 /node_modules
 /npm-debug.log
-/sass-cache
-/torrentWatch.sublime-project
-/torrentWatch.sublime-workspace
+

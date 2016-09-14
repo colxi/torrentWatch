@@ -23,7 +23,7 @@
 		<div class="pg-row">
 			<!-- name -->
 			<label class="pg-col pg-form-control">
-				<input type="text" rv-value="categories.form.Data.name" rv-element="categories.form.UI.categoryName" required pattern=".*\S+.*" placeholder="eg. CreativeCommons Music">
+				<input type="text" rv-value="categories.form.Data.name" rv-element="categories.form.UI.categoryName" autofocus required rv-pattern="{app.regExp.notEmpty}" placeholder="eg. CreativeCommons Music">
 				<span>Name :</span>
 			</label>
 		</div>

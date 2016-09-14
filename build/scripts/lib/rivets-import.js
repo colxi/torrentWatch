@@ -1,71 +1,12 @@
 /*
-*  Experimental RIVETS IMPORT Binder alpha v.0.0.12
-*  by Colxi - www.colxi.info
 *
-*  Rivets-import is a set of custom Binders available of importing ES6 modules
-*  as View Data Models, performing automatic binding to DOM elements, applying
-*  convenient inheritage, when nesting is detected, allowing to develope rivetJS
-*  based applications with a clean an structured model files, independent one from
-*  each other.
-*  rivets-import iscapable of importing HTML code from files and inject in in the DOM,
-*  again , performing appropiate Model binding.
+*  Experimental RIVETS IMPORT Binder
+*  by Colxi - www.colxi.info
 *
 *  Main binders:
 *  --------------
 *  rivets.binders['model']  -> Imports the JS file and binds the imported object to element (and childs)
 *  rivets.binders['view'] -> Imports the HTML file and renders inside the binded element.
-*
-*  Some extra binders and formaters are included in this library  :
-*  -----------------------------------------------------------------
-*  rivets.formatters.set -> allows assign a value to a variable
-*  rivets.binders['element'] -> for DOM element binding to a variable
-*
-*  Utilities:
-*  -----------
-*  rivets._.Util.resolveKeyPath => returns the Reference of the object represented in a string KeyPath
-*  rivets.configure_importer => Expects an object with one or all the following properties:
-*  {
-*      baseUrl : (string) base url for models directory
-*      baseUrl_Views : (string) base url for views directory
-*      constructor : (string) name of the custom Module constructor
-*      debug : (boolean) : enabled and disabled the on-screen bindings visualization
-*      onLoadController : (function) function to be notified each time a Model is loaded
-*   }
-*
-*  Some notes:
-*  ------------
-*  - SystemJS needs to be included manually (https://github.com/systemjs/systemjs)
-*  - Views must use .html extewnsion
-*  - Imported Models are stored in rivets.imports.
-*  - Custom Model Constructor can be set via config, it will be executed only in first import.
-*  - Debug mode (enable it via config) allows bindings and nested bindings visualization on elements
-*  - By default models should be placed in ./models/ and vies in ./views/ (configurable)
-*  - Models Structure needs to be implemented using an Object Pattern , and exports must be using the export default mode.
-*
-*    Examples:
-*    ----------
-*    - simple model module (./models/myModel.js):
-*
-*        let myModel = {
-*            about : 'This is an example model',
-*            consideration : 'rivets-import is EXPERIMENTAL. Do not forget it.',
-*            warn : function(){ alert('WARN: This library is Not ready for  production enviroments. You are warned!!'); },
-*            author : {
-*                name : 'colxi',
-*                web : 'http://www.colxi.info',
-*                email : 'contact@colxi.info'
-*            }
-*        };
-*        export default myModel;
-*
-*    - simple view (./views/myView.js):
-*
-*        <div rv-model="myModel">
-*            <div>About this model : <span rv-text="myModel.about"></span>
-*            <div>Library by {myModel.author.name} - {myModel.author.web} - {myModel.author.email}
-*            <div rv-on-click="myModel.warn">Click for a Warn...</div>
-*            <div rv-on-click="myModel.about | set myModel.consideration ">Click for a final consideration...</div>
-*        </div>
 *
 */
 
@@ -76,7 +17,7 @@
 // Declare imports container
 rivets.imports          = {};
 // Set default configuration directives
-Object.defineProperty( rivets.imports , '__baseUrl__', {  value: './models',  enumerable: false,  writable:true,  configurable: false });
+Object.defineProperty( rivets.imports , '__baseUrl__', {  value: './models/',  enumerable: false,  writable:true,  configurable: false });
 Object.defineProperty( rivets.imports , '__baseUrl_Views__', {  value: './views/',  enumerable: false,  writable:true,  configurable: false });
 Object.defineProperty( rivets.imports , '__constructor__', {  value: false,  enumerable: false,  writable:true,  configurable: false });
 Object.defineProperty( rivets.imports , '__debug__', {  value: false,  enumerable: false,  writable:true,  configurable: false });
@@ -105,64 +46,64 @@ rivets.configure_importer   = function(configObj, w, d){
         _window.rivets.imports['__' + directive + '__'] = configObj[directive];
         // special behaviour for debug...
         if(directive === 'debug'){
-            if( configObj.debug === false ) _document.getElementsById('__rivets_import_debug_styles__').remove();
+            if( configObj.debug === false ) _document.getElementById('__rivets_import_debug_styles__').remove();
             else{
                 // enable debuging...
                 var stylesEl        = _document.createElement('STYLE');
                 stylesEl.id         = '__rivets_import_debug_styles__';
-                stylesEl.innerHTML = '                                                      \
-                    [rv\\:model]{                                                 \
-                        border:2px dotted grey;                                             \
-                        position:relative;                                                  \
-                    }                                                                       \
-                    [rv\\:model]::after{                                          \
-                        display:block;                                                      \
-                        position:absolute;                                                  \
-                        top:0;right:0;                                                      \
-                        background-color:#000;                                              \
-                        content:"\\21b5" " " attr(rv\\:model\\:\\:scopes);                  \
-                        padding:3px;                                                        \
-                        font-family:arial;                                                  \
-                        font-size:10px;                                                     \
-                        color:#fff;                                                         \
-                    }                                                                       \
-                    body[rv\\:debug\\:\\:interactive] [rv\\:model]:hover{         \
-                        border:1px dotted grey;                                             \
-                        padding:10px;                                                       \
-                        margin:5px;                                                         \
-                        transition:all .2s ease-out;                                        \
-                        position:relative;                                                  \
-                    }                                                                       \
-                    body[rv\\:debug\\:\\:interactive] [rv\\:model]:hover::after{  \
-                        display:block;                                                      \
-                        position:absolute;                                                  \
-                        top:0;right:0;                                                      \
-                        background-color:#000;                                              \
-                        content:"\\21b5" " " attr(rv\\:model\\:\\:scopes);                  \
-                        padding:3px;                                                        \
-                        font-size:10px;                                                     \
-                        font-family:arial;                                                  \
-                        color:#fff;                                                         \
-                    }                                                                       \
-                    body [rv-view][rv\\:import\\:error]{                                             \
-                        position:relative !important;                                       \
-                    }                                                                       \
-                    body [rv-view][rv\\:import\\:error]:after{                                       \
-                        position:absolute;                                                            \
-                        top:0px;                                                            \
-                        bottom:0px;                                                         \
-                        width:100%;                                                         \
-                        content:"Import Error ( " attr(rv-view) attr(rv-model) " )";                \
-                        display:block;                                                      \
-                        background-color: red !important;                                   \
-                        color:white;                                                        \
-                        height:100%;                                                        \
-                        padding:10px 0px;                                                        \
-                        min-height:10px;                                                    \
-                        font-size:10px;                                                    \
-                        text-align:center;                                                  \
-                    }                                                                       \
-                ';
+                stylesEl.innerHTML = `
+                    [rv\\:model]{
+                        border:2px dotted grey;
+                        position:relative;
+                    }
+                    [rv\\:model]::after{
+                        display:block;
+                        position:absolute;
+                        top:0;right:0;
+                        background-color:#000;
+                        content:"\\21b5" " " attr(rv\\:model\\:\\:scopes);
+                        padding:3px;
+                        font-family:arial;
+                        font-size:10px;
+                        color:#fff;
+                    }
+                    body[rv\\:debug\\:\\:interactive] [rv\\:model]:hover{
+                        border:1px dotted grey;
+                        padding:10px;
+                        margin:5px;
+                        transition:all .2s ease-out;
+                        position:relative;
+                    }
+                    body[rv\\:debug\\:\\:interactive] [rv\\:model]:hover::after{
+                        display:block;
+                        position:absolute;
+                        top:0;right:0;
+                        background-color:#000;
+                        content:"\\21b5" " " attr(rv\\:model\\:\\:scopes);
+                        padding:3px;
+                        font-size:10px;
+                        font-family:arial;
+                        color:#fff;
+                    }
+                    body [rv-view][rv\\:import\\:error]{
+                        position:relative !important;
+                    }
+                    body [rv-view][rv\\:import\\:error]:after{
+                        position:absolute;
+                        top:0px;
+                        bottom:0px;
+                        width:100%;
+                        content:"Import Error ( " attr(rv-view) attr(rv-model) " )";
+                        display:block;
+                        background-color: red !important;
+                        color:white;
+                        height:100%;
+                        padding:10px 0px;
+                        min-height:10px;
+                        font-size:10px;
+                        text-align:center;
+                    }
+                `;
                 _document.getElementsByTagName('HEAD')[0].appendChild(stylesEl);
             }
         }
@@ -364,7 +305,6 @@ rivets.binders['model'] = {
             }
         }
         console.log( '%c rv-model ' + modelName + ' : ROUTINE' , 'color: orange' );
-
         el.firstChild.setAttribute( 'rv:model' , modelName );
         el.firstChild.setAttribute( 'rv:model::scopes' , modelName);
 
@@ -385,7 +325,7 @@ rivets.binders['model'] = {
                 _bind(el, modelName, initialize);
             });
         }else{
-            console.log('rv-model : The model '+modelName+' is already loaded. Using active Instance');
+            console.log('rv-model : The model "'+modelName+'" is cached. Using cache');
             _bind( el, modelName , false); // already loaded, bind but not run constructor
         }
         // INTERNAL WRAPPER BINDER
@@ -400,6 +340,7 @@ rivets.binders['model'] = {
             }
 
             function _constructed(){
+                if(!modelName) return false; // patch, to prevent error caused when no model name is attached
                 delete rivets.imports[modelName][rivets.imports.__constructor__]; // ensure one time execution
                 if(typeof rivets.imports.__onLoadController__ === 'function') rivets.imports.__onLoadController__(modelName);
 
