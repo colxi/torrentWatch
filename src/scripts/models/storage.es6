@@ -6,7 +6,7 @@
 let storage = {
 	__constructor(){
 		return new Promise(resolve=>{
-			pg.log('[Model]:storage.__constructor() : Preparing for Initial Data Syncronization...')
+			pg.log('[Model]:storage.__constructor() : Preparing for Initial Data Syncronization...');
 			chrome.storage.sync.get( 'feeds', f=>{
 				chrome.storage.sync.get( 'categories', c=>{
 					chrome.storage.sync.get( 'watchers', w=>{
@@ -53,16 +53,10 @@ let storage = {
 		   });
 		},
 		watchers: function(){
-		    pg.log('pg.models.storage.get.watchers(): Getting Watchers (useCached='+useCached+')');
-		    return new Promise(function(_resolve){
-		    	if( !useCached || !storage.Data.watchers ){
-		    		chrome.storage.sync.get( 'watchers', r=>{
-			    		storage.Data.watchers =  r.watchers || [];
-			    		_resolve( storage.Data.watchers );
-			    	});
-		        }else _resolve(storage.Data.watchers);
-		    });
-		}
+		   return new Promise(function(resolve){
+				chrome.storage.sync.set({'watchers': storage.Data.watchers} , r=> resolve(true) );
+		   });
+		},
 	},
 	set: {}
 };

@@ -59,14 +59,10 @@ var storage = {
 			});
 		},
 		watchers: function watchers() {
-			pg.log('pg.models.storage.get.watchers(): Getting Watchers (useCached=' + useCached + ')');
-			return new Promise(function (_resolve) {
-				if (!useCached || !storage.Data.watchers) {
-					chrome.storage.sync.get('watchers', function (r) {
-						storage.Data.watchers = r.watchers || [];
-						_resolve(storage.Data.watchers);
-					});
-				} else _resolve(storage.Data.watchers);
+			return new Promise(function (resolve) {
+				chrome.storage.sync.set({ 'watchers': storage.Data.watchers }, function (r) {
+					return resolve(true);
+				});
 			});
 		}
 	},

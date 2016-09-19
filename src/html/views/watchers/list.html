@@ -3,20 +3,20 @@
 	<header class="pg-row pg-section-header">
 		<h2 class="pg-col"><i class="fa fa-bars pg-margin-right-small"></i>Watchers :</h2>
 		<div class="pg-col pg-text-right">
-			<div class="pg-col pg-btn" rv-on-click="watchers.form.initialize"><span class="fa fa-plus-circle"></span> Add</div>
+			<div class="pg-col pg-btn" rv-on-click="watchers.form.initialize"><span class="fa fa-plus-circle"></span>Add</div>
 		</div>
 	</header>
 
 	<div class="pg-row">
 		<div class="pg-table pg-expand">
-			<div class="pg-row pg-no-gap" rv-each-watcher="app.Data.watchers" rv-class-row-failure="watcher.status.code | === 400">
+			<div class="pg-row pg-no-gap" rv-each-watcher="watchers.list.page.items" rv-class-row-failure="watcher.status.code | === 400">
 				<div class="pg-col-40">
 					<div>{watcher.name}</div>
 					<div class="pg-text-smaller">Status: {watcher.status.details}</div>
 				</div>
 				<div class="pg-col-45 pg-text-center pg-text-smallest">
 					<span rv-each-category="watcher.categories">
-						{ app.Data.categories | findBy 'id' category | getProperty 'name' } <span rv-unless="category | isLastIn watcher.categories"> | </span>
+						{ watchers.categories | findBy 'id' category | getProperty 'name' } <span rv-unless="category | isLastIn watcher.categories"> | </span>
 					</span>
 				</div>
 				<div class="pg-col pg-text-center">
@@ -29,13 +29,10 @@
 	</div>
 
 	<div class="pg-row">
-		<div class="pg-pagination">
-			<div class="pg-pagination-item">Previous</div>
-			<div class="pg-pagination-item">1</div>
-			<div class="pg-pagination-item pg-pagination-current">2</div>
-			<div class="pg-pagination-item">3</div>
-			<div class="pg-pagination-item">4</div>
-			<div class="pg-pagination-item">Next</div>
+		<div class="pg-col pg-pagination">
+			<div class="pg-pagination-item" rv-on-click="watchers.list.page.set | () watchers.list.page.current -1">Previous</div>
+			<div class="pg-pagination-item" rv-on-click="watchers.list.page.set | () %page% +1" rv-each-page="watchers.list.page.total | Array" rv-class-pg-pagination-current="%page% | add 1 | === watchers.list.page.current">{%page% | add 1}</div>
+			<div class="pg-pagination-item" rv-on-click="watchers.list.page.set | () watchers.list.page.current +1" >Next</div>
 		</div>
 	</div>
 </section>

@@ -11,9 +11,9 @@
 		<!-- id -->
 		<input type="text"  hidden rv-value="watchers.form.Data.id">
 		<div class="pg-row">
-			<label class="pg-col-60 pg-form-control">
+			<label class="pg-col pg-form-control">
 				<!-- name -->
-				<input type="text" rv-value="watchers.form.Data.name" required rv-pattern="{app.regExp.notEmpty}" placeholder="eg. HurryTorrents - Software">
+				<input type="text" rv-value="watchers.form.Data.name" required rv-pattern="app.regExp.notEmpty" placeholder="eg. LibreOffice" autofocus>
 				<span>Name :</span>
 			</label>
 		</div>
@@ -21,7 +21,7 @@
 			<div class="pg-col">
 				<!-- search in category -->
 				<div class="pg-form-control pg-text-center">
-					<label rv-each-category="app.Data.categories">
+					<label rv-each-category="watchers.categories">
 						<div class="pg-tag" rv-class-pg-checked="watchers.form.Data.categories | contains category.id" rv-on-click="app.toogleArrayItem | () category.id watchers.form.Data.categories">{category.name}</div>
 					</label>
 					<!-- category field validation -->
@@ -32,7 +32,7 @@
 		</div>
 		<div rv-each-directive="watchers.form.Data.directives">
 			<label class="pg-col-60 pg-form-control">
-				<input type="text" rv-value="" required rv-pattern="{app.regExp.notEmpty}" placeholder="eg. HurryTorrents - Software" rv-value="directive">
+				<input type="text" rv-value="" required rv-pattern="app.regExp.notEmpty" placeholder="eg. HurryTorrents - Software" rv-value="directive">
 				<span>Title contains :</span>
 			</label>
 
