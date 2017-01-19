@@ -45,7 +45,7 @@ var watchers = {
 				return true;
 			},
 			set: function set(num) {
-				var modifier = arguments.length <= 1 || arguments[1] === undefined ? 0 : arguments[1];
+				var modifier = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
 
 				num = num + modifier;
 				// validate pageNum
@@ -58,7 +58,7 @@ var watchers = {
 		},
 
 		initialize: function initialize() {
-			var mode = arguments.length <= 0 || arguments[0] === undefined ? 'insert' : arguments[0];
+			var mode = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'insert';
 
 			watchers.list.page.set(1);
 			watchers.list.show();
@@ -100,7 +100,7 @@ var watchers = {
 		Data: {},
 
 		initialize: function initialize() {
-			var id = arguments.length <= 0 || arguments[0] === undefined ? null : arguments[0];
+			var id = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
 
 			if (id !== null) {
 				// EDIT MODE DETECTED! ... get watchers Data
@@ -166,7 +166,7 @@ var watchers = {
    	return false;
    }
    loader
-   		// save feed Data
+   	// save feed Data
    app.saveFeed({
    	id: feeds.form.Data.id,
    	name: feeds.form.Data.name,

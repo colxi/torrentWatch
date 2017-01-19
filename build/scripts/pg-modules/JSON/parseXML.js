@@ -6,8 +6,8 @@ Object.defineProperty(exports, "__esModule", {
 // Changes XML to JSON
 var _JSON = {
 	parseXML: function parseXML() {
-		var xml = arguments.length <= 0 || arguments[0] === undefined ? document.createElement('xml') : arguments[0];
-		var convertCDATAtoTEXT = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
+		var xml = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : document.createElement('xml');
+		var convertCDATAtoTEXT = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 
 		// Create the return object
 		var obj = {};

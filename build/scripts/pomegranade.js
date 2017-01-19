@@ -1,6 +1,6 @@
 'use strict';
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 /* jsHint inline configuration : */
 /* jshint undef: true, unused: false */
@@ -99,7 +99,7 @@ var pg = {
   */
 	load: {
 		path_toArray: function path_toArray() {
-			var p = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
+			var p = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
 
 			// generate array from path and remove empty keys (caused by double // or ending /)
 			return p.split('/').filter(function (n) {
@@ -107,9 +107,9 @@ var pg = {
 			});
 		},
 		path_toObject: function path_toObject() {
-			var p = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
-			var obj = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-			var canWrite = arguments.length <= 2 || arguments[2] === undefined ? true : arguments[2];
+			var p = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
+			var obj = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+			var canWrite = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
 
 			var arrayPath = pg.load.path_toArray(p);
 			// extract las item (module name reference)
@@ -141,10 +141,10 @@ var pg = {
 			if (!pg.load._loaded['controller'].hasOwnProperty(controllerName)) pg.load._loaded['controller'][controllerName] = 1;else pg.load._loaded['controller'][controllerName]++;
 		},
 		_load: function _load() {
-			var itemType = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
-			var itemsList = arguments.length <= 1 || arguments[1] === undefined ? [] : arguments[1];
-			var containerObj = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
-			var returnArray = arguments.length <= 3 || arguments[3] === undefined ? false : arguments[3];
+			var itemType = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
+			var itemsList = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+			var containerObj = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+			var returnArray = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
 
 			pg.log('pg.load.' + itemType + '() : *** PREPARING TO LOAD ' + itemsList.length + ' ' + itemType + '(s)...');
 			// return promise
@@ -157,7 +157,7 @@ var pg = {
 				};
 				// loader function
 				var _loader = function _loader() {
-					var itemName = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
+					var itemName = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
 
 					pg.log('pg.load.' + itemType + '() : Loading ' + itemType + ' : ' + itemName);
 					return new Promise(function (_resolve) {
@@ -211,7 +211,7 @@ var pg = {
 			});
 		},
 		model: function model() {
-			var items = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
+			var items = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
 
 			// if more than one module has been requested, or single item has been requested inside array, return array
 			var returnArray = arguments.length > 1 || Array.isArray(items) ? true : false;
@@ -221,7 +221,7 @@ var pg = {
 			return pg.load._load('model', items, pg.models, returnArray);
 		},
 		controller: function controller() {
-			var items = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
+			var items = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
 
 			// if more than one module has been requested, or single item has been requested inside array, return array
 			var returnArray = arguments.length > 1 || Array.isArray(items) ? true : false;
@@ -231,7 +231,7 @@ var pg = {
 			return pg.load._load('controller', items, pg.controllers, returnArray);
 		},
 		module: function module() {
-			var items = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
+			var items = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
 
 			// if more than one module has been requested, or single item has been requested inside array, return array
 			var returnArray = arguments.length > 1 || Array.isArray(items) ? true : false;
@@ -247,18 +247,18 @@ var pg = {
 	},
 
 	loader: function loader() {
-		var el = arguments.length <= 0 || arguments[0] === undefined ? document.body : arguments[0];
+		var el = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : document.body;
 
 		return {
 			show: function show() {
-				var text = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
+				var text = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
 				el.setAttribute('pg-loading', text);
 			},
 			hide: function hide() {
 				el.removeAttribute('pg-loading');
 			},
 			text: function text() {
-				var _text = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
+				var _text = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
 
 				el.setAttribute('pg-loading', _text);
 			},
@@ -362,7 +362,7 @@ var pg = {
 			baseUrl: 'scripts/'
 		};
 		var _require = function _require(src) {
-			var description = arguments.length <= 1 || arguments[1] === undefined ? '' : arguments[1];
+			var description = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
 
 			pg.log('pg.require() :' + description + ' ' + src);
 			return new Promise(function (_resolve, _reject) {
@@ -406,8 +406,8 @@ var pg = {
 
 	logStore: [],
 	log: function log() {
-		var msg = arguments.length <= 0 || arguments[0] === undefined ? '{empty}' : arguments[0];
-		var method = arguments.length <= 1 || arguments[1] === undefined ? 'log' : arguments[1];
+		var msg = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '{empty}';
+		var method = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'log';
 
 		pg.logStore.push(msg);
 		console[method](msg);

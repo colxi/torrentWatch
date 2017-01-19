@@ -16,11 +16,11 @@ var categories = {
 		});
 	},
 	page: function page() {
-		var _page = arguments.length <= 0 || arguments[0] === undefined ? 0 : arguments[0];
+		var _page = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
 
-		var limit = arguments.length <= 1 || arguments[1] === undefined ? 10 : arguments[1];
-		var sortBy = arguments.length <= 2 || arguments[2] === undefined ? '' : arguments[2];
-		var order = arguments.length <= 3 || arguments[3] === undefined ? 'DESC' : arguments[3];
+		var limit = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 10;
+		var sortBy = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
+		var order = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 'DESC';
 
 		// get all items (clone array)
 		var items = JSON.parse(JSON.stringify(pg.models.storage.Data.categories));
@@ -38,8 +38,8 @@ var categories = {
 		return items;
 	},
 	get: function get() {
-		var id = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
-		var original = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
+		var id = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
+		var original = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 
 		var i = categories.getIndexById(id);
 		return i === -1 ? -1 : original ? pg.models.storage.Data.categories[i] : JSON.parse(JSON.stringify(pg.models.storage.Data.categories[i]));
@@ -51,7 +51,7 @@ var categories = {
 		return -1;
 	},
 	delete: function _delete() {
-		var id = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
+		var id = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
 
 		return new Promise(function (resolve) {
 			console.log('[Model]:categories.delete(): deleting feed #' + id);
@@ -87,7 +87,7 @@ var categories = {
 		};
 	},
 	updateFeedCount: function updateFeedCount() {
-		var id = arguments.length <= 0 || arguments[0] === undefined ? undefined : arguments[0];
+		var id = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : undefined;
 
 		var _update = function _update(id) {
 			var category = categories.get(id);
