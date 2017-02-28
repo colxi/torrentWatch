@@ -52,25 +52,17 @@ var storage = {
 			});
 		},
 		categories: function categories() {
-			pg.log('pg.models.storage.get.categories(): Getting Categories (useCached=' + useCached + ')');
-			return new Promise(function (_resolve) {
-				if (!useCached || !storage.Data.categories) {
-					chrome.storage.sync.get('categories', function (r) {
-						storage.Data.categories = r.categories || [];
-						_resolve(storage.Data.categories);
-					});
-				} else _resolve(storage.Data.categories);
+			return new Promise(function (resolve) {
+				chrome.storage.sync.set({ 'categories': storage.Data.categories }, function (r) {
+					return resolve(true);
+				});
 			});
 		},
 		watchers: function watchers() {
-			pg.log('pg.models.storage.get.watchers(): Getting Watchers (useCached=' + useCached + ')');
-			return new Promise(function (_resolve) {
-				if (!useCached || !storage.Data.watchers) {
-					chrome.storage.sync.get('watchers', function (r) {
-						storage.Data.watchers = r.watchers || [];
-						_resolve(storage.Data.watchers);
-					});
-				} else _resolve(storage.Data.watchers);
+			return new Promise(function (resolve) {
+				chrome.storage.sync.set({ 'watchers': storage.Data.watchers }, function (r) {
+					return resolve(true);
+				});
 			});
 		}
 	},

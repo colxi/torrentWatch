@@ -5,7 +5,7 @@
 'use strict';
 
 window.onload = function () {
-	var debug = true;
+	var debug = false;
 	var _d = document;
 	chrome.runtime.getBackgroundPage(function (_w) {
 		return _w.rivets.configure_importer({ debug: debug }, _w, _d);

@@ -166,4 +166,4 @@ var categories = {
 };
 
 exports.default = categories;
-//# sourceMappingURL=categories.js.map
+//# sourceMappingURL=home.js.map

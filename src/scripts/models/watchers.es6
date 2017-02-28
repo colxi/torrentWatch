@@ -8,31 +8,58 @@ let watchers = {
 
 	Data : undefined,
 
-	page( page = 0 , count=10, sortBy = '' , order='DESC'){
-        return new Promise(function(_resolve){
-            chrome.storage.sync.get( 'watchers', r=>_resolve(r) );
-        });
+	page( page = 0 , limit=10, sortBy = '' , order='DESC' ){
+        // get all items (clone array)
+        let items = JSON.parse( JSON.stringify(pg.models.storage.Data.watchers) );
+
+        // TO DO : sort by key
+        // TO DO : apply ASC DESC order
+
+    	// if a page is requested, slice array , and select only corresponding items
+        if(page > 0){
+        	let firstIndex = (page * limit) - limit;
+        	let lastIndex = (firstIndex + limit - 1) < items.length ? (firstIndex + limit ) : items.length ;
+        	items = items.slice(firstIndex, lastIndex);
+        }
+        // done ! return items;
+        return items;
     },
 
-    get(id=''){},
-
-    delete(id=''){},
-
-	save( w ){
-		console.log('app.saveWatcher(): saving watcher');
-		let i = watchers.getIndexById(w.id);
-		if(i === -1) i = watchers.Data.length;
-		watchers.Data.watchers[i] = w;
-		chrome.storage.sync.set({'watchers': watchers.Data}, r=>{
-          // Notify that we saved.
-          console.log('Settings saved',r);
-        });
-		return true;
+    get(id='',original = false){
+		let i = watchers.getIndexById(id);
+		return (i === -1) ? -1 :  ( original ? pg.models.storage.Data.watchers[i] : JSON.parse( JSON.stringify(pg.models.storage.Data.watchers[i]) ) );
 	},
+
+
+    delete(id=''){
+        return new Promise(function(resolve){
+	    	console.log('[Model]:watchers.delete(): deleting watcher #'+id);
+			// get index in array
+			let i = watchers.getIndexById(id);
+			// block if  id NOT found
+			if(i === -1) resolve(false);
+			// remove item from Data array
+			pg.models.storage.Data.watchers.splice(i,1);
+			// request to save new data
+			pg.models.storage.sync.watchers().then( r => resolve(true) );
+		});
+    },
+
+	save( watcher ){
+        return new Promise(function(resolve){
+			console.log('[Model]:watchers.save(): saving watcher #' + watcher.id);
+			console.log(watcher);
+			let i = watchers.getIndexById(watcher.id);
+			if(i === -1) i = pg.models.storage.Data.watchers.length;
+			pg.models.storage.Data.watchers[i] = watcher;
+			pg.models.storage.sync.watchers().then( r => resolve(true) );
+		});
+	},
+
 
 	new(){
 		return {
-			id 			: undefined,
+			id 			: pg.guid(),
 		 	name 		: undefined,
 			categories 	: [],
 			directives 	: [
@@ -45,7 +72,7 @@ let watchers = {
 	},
 
 	getIndexById(id){
-		return watchers.Data.findIndex( watcher=>(watcher.id === id ) ? true : false );
+		return pg.models.storage.Data.watchers.findIndex( watcher=>(watcher.id === id ) ? true : false );
 	},
 };
 

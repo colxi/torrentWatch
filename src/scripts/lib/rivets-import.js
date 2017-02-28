@@ -8,6 +8,17 @@
 *  rivets.binders['model']  -> Imports the JS file and binds the imported object to element (and childs)
 *  rivets.binders['view'] -> Imports the HTML file and renders inside the binded element.
 *
+*  Importer  Configuration
+*  ------------------------
+*  Use :
+*  rivets.configure_importer({
+*       baseUrl : (string) base url for models directory
+*       baseUrl_Views : (string) base url for views directory
+*       constructor : (string) name of the custom Module constructor
+*       debug : (boolean) : enabled and disabled the on-screen bindings visualization and console debugging
+*       onLoadController : (function) function to be notified each time a Model is loaded
+*   }
+*
 */
 
 /* jsHint inline configuration : */
@@ -160,19 +171,19 @@ rivets.binders['element'] = {
     publishes: true,
 
     bind: function(el){
-        console.log( '%c rv-element ' + el.getAttribute('rv-element') + ' : BIND' , 'color: green' );
+        if(rivets.imports.__debug__) console.log( '%c rv-element ' + el.getAttribute('rv-element') + ' : BIND' , 'color: green' );
         this.publish();
         return el;
     },
     routine: function(el,value){
-        console.log( '%c rv-element ' + el.getAttribute('rv-element') + ' : ROUTINE' , 'color: orange' );
+        if(rivets.imports.__debug__) console.log( '%c rv-element ' + el.getAttribute('rv-element') + ' : ROUTINE' , 'color: orange' );
         return el;
     },
     unbind: function(el){
-        console.log( '%c rv-element ' + el.getAttribute('rv-element') + ' : UNBIND' , 'color: red' );
+        if(rivets.imports.__debug__) console.log( '%c rv-element ' + el.getAttribute('rv-element') + ' : UNBIND' , 'color: red' );
     },
     getValue : function(el) {
-        console.log( '%c rv-element ' + el.getAttribute('rv-element') + ' : GET-VALUE' , 'color: yellow' );
+        if(rivets.imports.__debug__) console.log( '%c rv-element ' + el.getAttribute('rv-element') + ' : GET-VALUE' , 'color: yellow' );
         return el;
     }
 };
@@ -187,11 +198,11 @@ rivets.binders['view'] = {
     bind: function(el) {
         //if( el.firstChild && el.firstChild.hasOwnProperty('getAttribute') && el.firstChild.getAttribute('rv:view') !== null ){
         if( this.nested ){
-            console.log( '%c rv-view ' + this.nested.viewName + ' : NESTED UNBIND' , 'color: darkred' );
+            if(rivets.imports.__debug__) console.log( '%c rv-view ' + this.nested.viewName + ' : NESTED UNBIND' , 'color: darkred' );
             el.innerHTML = this.view.initialHTML;
             this.unbind();
         }else{
-            console.log( '%c rv-view ' + el.getAttribute('rv-view') + ' : BIND' , 'color: green' );
+            if(rivets.imports.__debug__) console.log( '%c rv-view ' + el.getAttribute('rv-view') + ' : BIND' , 'color: green' );
             this.view.initialHTML = el.innerHTML;
         }
 
@@ -207,13 +218,13 @@ rivets.binders['view'] = {
         if( self.nested ){
             if(viewName === self.nested.viewName ) return false; // ignore if VIEW is the same actually binded
             else{
-                console.log( '%c rv-view ' + self.nested.viewName + ' : NESTED UNBIND' , 'color: darkred' );
+                if(rivets.imports.__debug__) console.log( '%c rv-view ' + self.nested.viewName + ' : NESTED UNBIND' , 'color: darkred' );
                 self.nested.unbind();
                 self.nested= null;
                 delete self.nested;
             }
         }
-        console.log( '%c rv-view ' + viewName + ' : ROUTINE' , 'color: orange' );
+        if(rivets.imports.__debug__) console.log( '%c rv-view ' + viewName + ' : ROUTINE' , 'color: orange' );
 
         el.firstChild.setAttribute( 'rv:view' , viewName );
         el.setAttribute('rv-loading', 'true');
@@ -229,7 +240,7 @@ rivets.binders['view'] = {
                 el.removeAttribute('rv-loading');
                 // free memory, explicit  listener removal;
                 el.firstChild.innerHTML = _html.responseText;
-                console.log( '%c rv-view ' + viewName + ' :  NESTED BIND' , 'color: lightgreen' );
+                if(rivets.imports.__debug__) console.log( '%c rv-view ' + viewName + ' :  NESTED BIND' , 'color: lightgreen' );
 
                 self.nested = rivets.bind(el.firstChild, self.view.models);
                 self.nested.viewName = viewName;
@@ -244,12 +255,12 @@ rivets.binders['view'] = {
         _html.onerror = function(err){
             el.removeAttribute('rv-loading');
             el.setAttribute('rv:import:error', err.target.status);
-            console.log( '%c rv-view ' + viewName + ' :  ERROR LOADING VIEW' , 'color: orangered' );
+            if(rivets.imports.__debug__) console.log( '%c rv-view ' + viewName + ' :  ERROR LOADING VIEW' , 'color: orangered' );
         };
         _html.send(null);
     },
     unbind: function(el) {
-        console.log( '%c rv-view ' + el.getAttribute('rv-view') + ' : UNBIND' , 'color: red' );
+        if(rivets.imports.__debug__) console.log( '%c rv-view ' + el.getAttribute('rv-view') + ' : UNBIND' , 'color: red' );
         this.nested.unbind();
         this.nested =  null;
         delete this.nested;
@@ -257,7 +268,7 @@ rivets.binders['view'] = {
         //var modelName = this.el.removeAttribute('rv-controller:bind');
     },
     update: function(el) {
-        console.log( '%c rv-view ' + el.getAttribute('rv-view') + ' : UPDATE' , 'color: yellow' );
+        if(rivets.imports.__debug__) console.log( '%c rv-view ' + el.getAttribute('rv-view') + ' : UPDATE' , 'color: yellow' );
         //this.unbind();
         //var modelName = this.el.removeAttribute('rv-controller:bind');
     },
@@ -273,13 +284,13 @@ rivets.binders['model'] = {
     bind: function(el) {
         //if( el.firstChild && el.firstChild.hasOwnProperty('getAttribute') && el.firstChild.getAttribute('rv:model') !== null ){
         if( this.nested ){
-            console.log( '%c rv-model ' + self.nested.modelName + ' : NESTED UNBIND' , 'color: darkred' );
+            if(rivets.imports.__debug__) console.log( '%c rv-model ' + self.nested.modelName + ' : NESTED UNBIND' , 'color: darkred' );
             el.innerHTML = this.view.initialHTML;
             this.unbind();
             //throw new Error('Element has already been binded to another import. Unbind first.');
         }else{
             this.view.initialHTML = el.innerHTML;
-            console.log( '%c rv-model ' + el.getAttribute('rv-model') + ' : BIND' , 'color: green' );
+            if(rivets.imports.__debug__) console.log( '%c rv-model ' + el.getAttribute('rv-model') + ' : BIND' , 'color: green' );
         }
 
         el.innerHTML = '<div>' + this.view.initialHTML + '</div>';
@@ -297,14 +308,14 @@ rivets.binders['model'] = {
             if(modelName === currentModel ) return false;
             else{
                 // if diferent ...unbind previous import binding and destroy view
-                console.log( '%c rv-model ' + self.nested.modelName + ' : NESTED UNBIND' , 'color: darkred' );
+                if(rivets.imports.__debug__) console.log( '%c rv-model ' + self.nested.modelName + ' : NESTED UNBIND' , 'color: darkred' );
                 self.nested.unbind();
                 self.nested = null;
                 delete self.nested;
                 //el.firstChild.innerHTML = this.view.initialHTML;
             }
         }
-        console.log( '%c rv-model ' + modelName + ' : ROUTINE' , 'color: orange' );
+        if(rivets.imports.__debug__) console.log( '%c rv-model ' + modelName + ' : ROUTINE' , 'color: orange' );
         el.firstChild.setAttribute( 'rv:model' , modelName );
         el.firstChild.setAttribute( 'rv:model::scopes' , modelName);
 
@@ -325,7 +336,7 @@ rivets.binders['model'] = {
                 _bind(el, modelName, initialize);
             });
         }else{
-            console.log('rv-model : The model "'+modelName+'" is cached. Using cache');
+            if(rivets.imports.__debug__) console.log('rv-model : The model "'+modelName+'" is cached. Using cache');
             _bind( el, modelName , false); // already loaded, bind but not run constructor
         }
         // INTERNAL WRAPPER BINDER
@@ -366,7 +377,7 @@ rivets.binders['model'] = {
             }
             el.firstChild.setAttribute( 'rv:model::scopes' , scopesList );
 
-            console.log( '%c rv-model ' + modelName + ' : NESTED BIND' , 'color: lightgreen' );
+            if(rivets.imports.__debug__) console.log( '%c rv-model ' + modelName + ' : NESTED BIND' , 'color: lightgreen' );
 
             // do the bindings!
             self.nested =  rivets.bind( el.firstChild, bindedObj );
@@ -374,10 +385,10 @@ rivets.binders['model'] = {
 
             // if has custom constructor/igniter should be executed... bunding scope to model object
             if(initializeModel){
-                console.info('rv-model : Executing '+modelName+' constructor.');
+                if(rivets.imports.__debug__) console.info('rv-model : Executing '+modelName+' constructor.');
                 let _c = rivets.imports[modelName][rivets.imports.__constructor__].call( rivets.imports[modelName] );
                 if( typeof _c === 'object' && typeof _c.then === 'function'){
-                    console.info('rv-model : Detected Promise in '+modelName+' Constructor. Waiting resolution...');
+                    if(rivets.imports.__debug__) console.info('rv-model : Detected Promise in '+modelName+' Constructor. Waiting resolution...');
                     return _c.then( function(){ _constructed() });
                 }else{
                     return _constructed();
@@ -389,7 +400,7 @@ rivets.binders['model'] = {
     },
 
     unbind: function(el) {
-        console.log( '%c rv-model ' + el.getAttribute('rv-model') + ' : UNBIND' , 'color: red' );
+        if(rivets.imports.__debug__) console.log( '%c rv-model ' + el.getAttribute('rv-model') + ' : UNBIND' , 'color: red' );
         this.nested.unbind();
         this.nested = null;
         delete this.nested;
@@ -398,7 +409,7 @@ rivets.binders['model'] = {
     },
 
     update: function(models) {
-        console.log('***** rv-controller UPDATE ***** ');
+        if(rivets.imports.__debug__) console.log('***** rv-controller UPDATE ***** ');
         //var _ref1;
         //return (_ref1 = this.nested) !== null ? _ref1.update(models) : void 0;
     }

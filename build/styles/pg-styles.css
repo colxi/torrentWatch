@@ -386,20 +386,21 @@ table {
 .pg-pagination .pg-pagination-item {
   display: inline-block;
   color: #9595a0;
-  padding: 8px;
+  padding: 10px;
   font-size: 10px;
   cursor: pointer;
   border: 1px solid #afafbd;
-  min-width: 28px;
+  min-width: 25px;
   text-align: center;
+  margin: 2px;
 }
-/* line 18, ../../src/styles/pg-partials/_pagination.scss */
+/* line 19, ../../src/styles/pg-partials/_pagination.scss */
 .pg-pagination .pg-pagination-item:hover {
   border-color: #ff4500;
   background: #ff4500;
   color: white;
 }
-/* line 25, ../../src/styles/pg-partials/_pagination.scss */
+/* line 26, ../../src/styles/pg-partials/_pagination.scss */
 .pg-pagination .pg-pagination-current {
   background-color: #afafbd;
   color: white;
