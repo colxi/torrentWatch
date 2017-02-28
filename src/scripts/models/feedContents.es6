@@ -7,14 +7,16 @@ let feedContents = {
 	__constructor(){
 		 return new Promise(function(_resolve){
 			pg.load.module('JSON/parseXML')
-				.then( r => pg.load.model('feeds') )
+				.then( r => pg.load.model('storage' , 'feeds') )
 				.then( r=> _resolve(r) );
         });
 	},
 
- 	tasks : [],
+	Data : {},
 
-	scheduleUpdates(){
+ 	tasks : {},
+
+	checkInFeed(){
 	    return new Promise( _resolve => {
 	    	_resolve();
 	        /*
@@ -33,27 +35,45 @@ let feedContents = {
 	},
 
 
-	getAll(){
+	save(id=undefined,contents={}){
+		if(id === undefined || id === null || id === ''){
+			pg.log('[Model]:feedContents.save() : No id provided. Returning...', 'warn');
+			return -1;
+		}
+		pg.log('[Model]:feedContents.save() : Saving feed ('+id+') Contents...');
+		feedContents.Data[id] = contents;
+		return true;
+	},
+
+
+	getAll(saveFlag=false){
 		return new Promise( (_resolve, _reject)=>{
-			pg.log('pg.updateAllFeeds(): Updating all Feeds...');
+			pg.log('[Model]:feedContents.getAll(): Updating all Feeds...');
 			var currentFeed = -1;
 			// Loop through the Feeds with array.reduce...
-			app.Data.feeds.reduce( (sequence) => {
+			pg.models.storage.Data.feeds.reduce( (sequence) => {
 				return sequence.then( ()=> {
 					currentFeed++;
-			 		return feedContents.get(app.Data.feeds[currentFeed].id);
+			 		return feedContents.get(pg.models.storage.Data.feeds[currentFeed].id, saveFlag);
 				}).then( (result)=> {
-					if(result) pg.log('pg.updateAllFeeds(): Feed #'+ ( currentFeed + 1) +' ' + app.Data.feeds[currentFeed].name + ' UPDATED' );
-			    	else  pg.log('pg.updateAllFeeds(): Feed #'+ ( currentFeed + 1) +' ' + app.Data.feeds[currentFeed].name + ' FAILED' );
-			  		if( (currentFeed + 1)=== app.Data.feeds.length) _resolve();
+					if(result) pg.log('[Model]:feedContents.getAll(): Feed #'+ ( currentFeed + 1) +' ' + pg.models.storage.Data.feeds[currentFeed].name + ' UPDATED' );
+			    	else  pg.log('[Model]:feedContents.getAll(): Feed #'+ ( currentFeed + 1) +' ' + pg.models.storage.Data.feeds[currentFeed].name + ' FAILED' );
+			  		if( (currentFeed + 1)=== pg.models.storage.Data.feeds.length) _resolve();
 			  	});
 			} , Promise.resolve());
 		});
 	},
 
-	get(id){
+	get(id=undefined, saveFlag=false){
+		//
+		// TODO: check if was previously cached, if not expired yet
+		// return cached data
+		//
 		return new Promise( _resolve=>{
-			if(id === undefined || id === null || id === '') return _resolve(-1);
+			if(id === undefined || id === null || id === ''){
+				pg.log('[Model]:feedContents.get() : No id provided. Returning...', 'warn');
+				return _resolve(-1);
+			}
 
 			// get feed (allow feed Id index or string url feed)
 			let f;
@@ -65,7 +85,7 @@ let feedContents = {
 			f.status.details = 'Updating...';
 			f.status.lastCheck = new Date();
 
-			pg.log('pg.updateFeed() : Updating Feed from :'+ f.url +' ( ' + f.name + ' )' );
+			pg.log('[Model]:feedContents.get() : Updating Feed from :'+ f.url +' ( ' + f.name + ' )' );
 
 			//
 			// Prepare Ajax request
@@ -80,17 +100,27 @@ let feedContents = {
 				let JSONxml = pg.JSON.parseXML(xmlDoc, true);
 
 				f.status.code = 200;
-				f.status.details = 'Ok';
+				f.status.details = 'Update Ok';
 
 				http = null;
-				return _resolve(JSONxml);
+				if( !JSONxml.hasOwnProperty('rss') ||
+					!JSONxml.rss.hasOwnProperty('channel') ||
+					! JSONxml.rss.channel.hasOwnProperty('item') ){
+						pg.log('[Model]:feedContents.get(): Invalid XML RSS structure. Aborting...', 'warn');
+						return _resolve(-1);
+					}else{
+						if(saveFlag === true) feedContents.save(id,JSONxml.rss.channel.item);
+						return _resolve(JSONxml.rss.channel.item);
+					}
 			};
 			// RESPONSE FAIL
 			http.onerror  = r=>{
-				pg.log('pg.getFeed(): Error on request... ' + http.statusText);
+				pg.log('[Model]:feedContents.get(): Error on request. ' + http.statusText, 'warn');
 				f.status.code =  400;
-				f.status.details = 'Fail';
+				f.status.details = 'Update Fail';
+				f.status.lastCheck = new Date();
 				http = null;
+				if(saveFlag === true) feedContents.save(id,[]);
 				return _resolve(false);
 			};
 			// Send Request

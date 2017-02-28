@@ -131,7 +131,7 @@ let watchers = {
 				directives 	: [
 					{
 						in : 'title',
-						has : watchers.form.Data.directives
+						has : watchers.form.Data.directives[0].has
 					}
 				],
 			}).then( r=> {

@@ -61,7 +61,8 @@ var watchers = {
 	},
 	save: function save(watcher) {
 		return new Promise(function (resolve) {
-			console.log('[Model]:watchers.save(): saving watcher #' + watchers.id);
+			console.log('[Model]:watchers.save(): saving watcher #' + watcher.id);
+			console.log(watcher);
 			var i = watchers.getIndexById(watcher.id);
 			if (i === -1) i = pg.models.storage.Data.watchers.length;
 			pg.models.storage.Data.watchers[i] = watcher;

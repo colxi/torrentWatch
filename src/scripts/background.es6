@@ -38,6 +38,9 @@
             });
         });
         // LAUNCH APPLICATION MAIN CONTROLLER, for initialization
-        return new Promise( _resolve => { pg.load.controller('app') });
+        return new Promise( _resolve => {
+            pg.load.controller('app')
+            .then( r=> pg.log('----------------------------------------------------------------------') );
+        });
     }
 })();

@@ -143,7 +143,7 @@ var watchers = {
 				categories: watchers.form.Data.categories,
 				directives: [{
 					in: 'title',
-					has: watchers.form.Data.directives
+					has: watchers.form.Data.directives[0].has
 				}]
 			}).then(function (r) {
 				//  hide loader

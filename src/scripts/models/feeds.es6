@@ -83,8 +83,8 @@ let feeds = {
 
 	getItemsProperties(feed){
 		let prop = [];
-		for(let i in feed.rss.channel.item[0]){
-		 	if( feed.rss.channel.item[0].hasOwnProperty(i) &&  i.charAt(0).match(/[A-Z|a-z]/i) ) prop.push(i);
+		for(let i in feed[0]){
+		 	if( feed[0].hasOwnProperty(i) &&  i.charAt(0).match(/[A-Z|a-z]/i) ) prop.push(i);
 		}
 		return prop;
 	},

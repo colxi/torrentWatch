@@ -7,12 +7,14 @@ Object.defineProperty(exports, "__esModule", {
 /* jshint undef: true, unused: false */
 /* global chrome , System , pg , rivets , sightglass */
 
+var clock = null;
+
 var app = {
 	__constructor: function __constructor() {
 		var _this = this;
 
-		pg.log('[Model]:app.__constructor(): Application Controller Initialization started.');
-		pg.log('[Model]:app.__constructor(): Importing App Modules & dependencies...');
+		pg.log('app.__constructor(): Application Controller Initialization started.');
+		pg.log('app.__constructor(): Importing App Modules & dependencies...');
 		return new Promise(function (resolve) {
 			// load some required pg modules
 			pg.load.module('JSON/parseXML', 'FORM/validation').then(function (r) {
@@ -20,20 +22,32 @@ var app = {
 			})
 			// get all Feeds Contents
 			.then(function (r) {
-				return pg.models.feedContents.get();
-			})
-			// schedule automatic Feed Contents update
-			.then(function (r) {
-				return pg.models.feedContents.scheduleUpdates();
+				return pg.models.feedContents.getAll(true);
 			}).then(function (r) {
 				// make form validation resources bindable
 				_this.regExp = pg.FORM.validation.pattern;
 				_this.regExpInfo = pg.FORM.validation.title;
+				// schedule feedcontents update...
+				for (var i = 0; i < pg.models.storage.Data.feeds.length; i++) {
+					var feed = pg.models.storage.Data.feeds[i];
+					pg.log('app.__constructor(): Scheduling Feed Refresh : ' + feed.id + ' (TTL : ' + feed.TTL + ')');
+					pg.models.feedContents.tasks[feed.id] = setInterval(function (id) {
+						pg.log('[Scheduled Task]: Refreshing FeedContents for feed #' + id);
+						pg.models.feedContents.get(id, true).then(function (r) {
+							return pg.models.feedContents.checkInFeed(id);
+						});
+					}.bind(undefined, feed.id), feed.TTL * 60 * 1000);
+				}
+				_this.readyState = 'complete';
 				resolve(true);
 			});
 		});
 	},
 
+
+	readyState: 'loading',
+
+	config: {},
 
 	location: 'categories',
 

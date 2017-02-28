@@ -98,8 +98,8 @@ var feeds = {
 	},
 	getItemsProperties: function getItemsProperties(feed) {
 		var prop = [];
-		for (var i in feed.rss.channel.item[0]) {
-			if (feed.rss.channel.item[0].hasOwnProperty(i) && i.charAt(0).match(/[A-Z|a-z]/i)) prop.push(i);
+		for (var i in feed[0]) {
+			if (feed[0].hasOwnProperty(i) && i.charAt(0).match(/[A-Z|a-z]/i)) prop.push(i);
 		}
 		return prop;
 	},

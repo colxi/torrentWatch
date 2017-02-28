@@ -62,7 +62,6 @@ let feeds = {
 			return true;
 		},
 
-
 		show_deleteFeedDialog: function(id){
 			feeds.list.target = pg.models.feeds.get(id);
 			feeds.location = 'feeds/list_delete';
@@ -143,7 +142,7 @@ let feeds = {
 				if(!_feed){
 					pg.log( 'feeds.form.validate_feedDeclaration(): URL validation failed...' );
 					feeds.form.error = 'RSS Feed not found in URL.';
-					feeds.form.UI.feedUrl.setCustomValidity('RSS Feed not found in URL.');
+					feeds.form.UI.feedUrl.setCustomValidity(feeds.form.error);
 					return false;
 				}
 				// TO DO:
@@ -151,7 +150,7 @@ let feeds = {
 				//  - validate item length > 0
 
 				// store FEED ITEMS
-				feeds.form.Data.__items = _feed.rss.channel.item;
+				feeds.form.Data.__items = _feed;
 				// succeed, get RSS feed item properties structure
 				feeds.form.Data.fields.available  =  pg.models.feeds.getItemsProperties(_feed);
 				// DONE ! show next FORM!
@@ -186,11 +185,13 @@ let feeds = {
 				TTL: feeds.form.Data.TTL,
 				categories: feeds.form.Data.categories,
 				status: {
-					lastCheck: new Date(),
+					lastCheck: +new Date(), // timestamp (the operator '+'' triggers .valueOf() )
 					code: 200,
 					details: undefined
 				}
 			}).then( r=> {
+				// save feed contents
+				pg.models.feedContents.save(feeds.form.Data.id, feeds.form.Data.__items);
 				//  hide loader
 				pg.loader(feeds.form.UI.feedAssignationsForm).hide();
 				// DONE! display ending message!
